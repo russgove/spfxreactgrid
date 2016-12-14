@@ -9,6 +9,7 @@ import {  Web, WebList, WebListField } from "../model/Site";
 export function getWebsAction(dispatch: any, siteUrl: string): any {
     // need allwebs
 
+   // const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").orderBy("Web/Title, List/Title, Field/Title", false).get()
     const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").get()
         .then((response) => {
 
@@ -17,6 +18,7 @@ export function getWebsAction(dispatch: any, siteUrl: string): any {
                 for (const list of item.Lists) {
                     const webList: WebList = new WebList(list.Id, list.Title, list.Url);
                     for (const field of list.Fields) {
+                        debugger;
                         webList.fields.push(new WebListField(field.Id, field.Title, field.InternalName, field.TypeDisplayName));
                     }
                     web.lists.push(webList);

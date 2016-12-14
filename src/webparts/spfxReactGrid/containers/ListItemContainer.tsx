@@ -5,7 +5,7 @@ import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ListDefinition from "../model/ListDefinition";
 import Container from "../components/container";
-import { Guid, Log } from "@microsoft/sp-client-base";
+import {  Log } from "@microsoft/sp-client-base";
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 interface IListViewPageProps extends React.Props<any> {
   listItems: Array<ListItem>;
@@ -36,14 +36,14 @@ export class GridColumn {
 function mapDispatchToProps(dispatch) {
   return {
     addListItem: (): void => {
-      dispatch(addListItem(new ListItem("1", "test Item", "123-123123123-123123-123123")));
+      dispatch(addListItem(new ListItem("123-123123123-123123-123123")));
     },
     getListItems: (listDefinitions: Array<ListDefinition>): void => {
-        let promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
+        const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
     },
     removeListItem: (): void => {
-      dispatch(removeListItem(new ListItem("1", "test Item", "123-123123123-123123-123123")));
+      dispatch(removeListItem(new ListItem("123-123123123-123123-123123")));
     },
   };
 }
@@ -98,6 +98,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     // }
   }
   public CellContents(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
+    debugger;
     const {entity, column} = props;
     //switch (column.formatter) {
     //  case "SharePointLookupCellFormatter":

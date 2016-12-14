@@ -8,12 +8,15 @@ import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList } from "../actions/listActions";
 import { getWebsAction } from "../actions/SiteActions";
 import { Button } from "office-ui-fabric-react/lib/Button";
+import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
+
+import { ContextualMenu, IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
 import ListDefinition from "../model/ListDefinition";
 import { ColumnReference } from "../model/ListDefinition";
 import { Site, Web, WebList, WebListField } from "../model/Site";
 import ColumnDefinition from "../model/ColumnDefinition";
 import Container from "../components/container";
-import { Guid, Log } from "@microsoft/sp-client-base";
+import { Guid, Log, PageContext } from "@microsoft/sp-client-base";
 export class GridColumn {
   constructor(
     public id: string,
@@ -27,23 +30,26 @@ interface IListViewPageProps extends React.Props<any> {
   lists: Array<ListDefinition>;
   columnRefs: Array<ColumnDefinition>;
   sites: Array<Site>;
-  addList: () => void;
+  addList: (siteUrl: string) => void;
   removeList: (List) => void;
   saveList: (List) => void;
   getWebs: (siteUrl) => Promise<any>;
+  pageContext: PageContext;
 }
 function mapStateToProps(state) {
   return {
     lists: state.lists,
     sites: state.sites,
-    columnRefs: state.columns
+    columnRefs: state.columns,
+    pageContext: state.pageContext
   };
 }
 function mapDispatchToProps(dispatch) {
   return {
-    addList: (): void => {
+    addList: (siteUrl: string): void => {
+      debugger;
       const id = Guid.newGuid();
-      const list: ListDefinition = new ListDefinition(id.toString(), null, null, null, null);
+      const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null);
       dispatch(addList(list));
     },
     removeList: (list: ListDefinition): void => {
@@ -104,6 +110,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     this.getWebsForSite = this.getWebsForSite.bind(this);
     this.getListsForWeb = this.getListsForWeb.bind(this);
     this.getFieldsForlist = this.getFieldsForlist.bind(this);
+    this.getFieldsForlist = this.getFieldsForlist.bind(this);
 
     this.CellContentsEditable = this.CellContentsEditable.bind(this);
     this.CellContents = this.CellContents.bind(this);
@@ -113,6 +120,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     this.toggleEditing = this.toggleEditing.bind(this);
     this.handleRowUpdated = this.handleRowUpdated.bind(this);
     this.deleteList = this.deleteList.bind(this);
+    this.addList = this.addList.bind(this);
+
   }
   public componentWillMount(): void {
     if (this.props.sites.length === 0) {
@@ -162,12 +171,17 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
     this.props.saveList(entity);
   }
+  public addList(event) :any {
+
+    this.props.addList(this.props.pageContext.site.absoluteUrl);
+    return;
+  }
   public deleteList(event) {
     Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
     const target = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = target.attributes;
     const entity = attributes.getNamedItem("data-entityid").value;
-    const list: ListDefinition = this.props.lists.find(temp => utils.ParseSPField(temp.guid).id === entity);
+    const list: ListDefinition = this.props.lists.find(temp => temp.guid === entity);
     this.props.removeList(list);
     return;
   }
@@ -327,11 +341,19 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       </tbody>
     );
   }
+
   public render() {
+    let MenuItems= new Array<IContextualMenuItem>();
+    MenuItems.push(  {
+    key: "Add LIST",
+    name: "ADD A LIST",
+    canCheck: true,
+    onClick: this.addList
+    });
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>
-        <Button onClick={this.props.addList}>Add List</Button>
+        <CommandBar items={MenuItems} />
         <table border="1">
           <thead>
             <tr>

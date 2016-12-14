@@ -10,7 +10,7 @@ import { Log } from "@microsoft/sp-client-base";
 const INITIAL_STATE = new Array<ColumnDefinition>();
 function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
     Log.verbose("listItemReducer", "In listItemReducer of listItemReducer ActionType is " + action.type);
-      switch (action.type) {
+    switch (action.type) {
         case ADD_COLUMN:
             let newarray = _.clone(state);
             newarray.push(action.payload.column);
@@ -22,7 +22,7 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
             item = action.payload.column;
             return newarray2;
         case REMOVE_COLUMN:
-            let newArr = _.filter(state,  (o)=> { return o.guid !== action.payload.column.guid; });
+            let newArr = _.filter(state, (o) => { return o.guid !== action.payload.column.guid; });
             return newArr;
         case ADD_COLUMNS:
             return _.union(state, action.payload.columns);

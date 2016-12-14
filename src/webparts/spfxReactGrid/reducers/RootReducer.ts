@@ -1,7 +1,8 @@
-import {  combineReducers } from "redux";
+import { combineReducers } from "redux";
 import ListReducer from "./ListReducer";
 import listItemReducer from "./listItemReducer";
 import ColumnReducer from "./ColumnReducer";
+import PageContextReducer from "./PageContextReducer";
 import SiteReducer from "./SiteReducer";
 import { Log } from "@microsoft/sp-client-base";
 const { routerReducer } = require("react-router-redux");
@@ -13,9 +14,10 @@ export function RootReducer(state, action) {
             lists: ListReducer,
             columns: ColumnReducer,
             sites: SiteReducer,
+            pageContext: PageContextReducer,
             routing: routerReducer
         }
     );
-    return combinedReducers(state, action);// Need to pass in inital state and action to combinereducers?
+    return combinedReducers(state, action);
 }
 

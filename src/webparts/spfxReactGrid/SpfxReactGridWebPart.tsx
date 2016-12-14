@@ -6,6 +6,7 @@ const { Router, createMemoryHistory } = require("react-router");
 
 import { addLists } from "./actions/listActions";
 import { addColumns } from "./actions/columnActions";
+import { addPageContext } from "./actions/PageContextActions";
 import {
   BaseClientSideWebPart,
   IPropertyPaneSettings, IWebPartData, IHtmlProperties,
@@ -33,8 +34,10 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
     Log.verbose("SpfxReactGridWebPart", "In constructor of SpfxReactGridWebPart");
   }
   public render(): void {
+
    store.dispatch(addLists(this.properties.lists));
    store.dispatch(addColumns(this.properties.columns));
+   store.dispatch(addPageContext(this.context.pageContext));
     Log.verbose("SpfxReactGridWebPart", "In render of SpfxReactGridWebPart");
     ReactDom.render(App(), this.domElement);
   }

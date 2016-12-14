@@ -11,6 +11,7 @@ export const ADD_LISTITEM = "App/ADD_LISTITEM";
 export const ADD_LISTITEMS = "App/ADD_LISTITEMS";
 export const GET_LISTITEMS = "App/GET_LISTITEMS";
 export const GOT_LISTITEMS = "App/GOT_LISTITEMS";
+export const CLEAR_LISTITEMS = "App/CLEAR_LISTITEMS";
 export const GET_LISTITEMSERROR = "App/GET_LISTITEMSERROR";
 export const REMOVE_LISTITEM = "App/REMOVE_LISTITEM";
 
@@ -24,3 +25,6 @@ export const GET_WEBS = "App/GET_WEBS";
 export const GOT_WEBS = "App/GOT_WEBS";
 export const ADD_WEBS = "App/ADD_WEBS";
 export const GET_WEBSERROR = "App/GET_WEBSERROR";
+
+export const ADD_PAGECONTEXT = "App/ADD_PAGECONTEXT";
+export const ADD_WEBPARTPROPERTIES = "App/ADD_WEBPARTPROPERTIES";
