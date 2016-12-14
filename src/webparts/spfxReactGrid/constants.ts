@@ -1,4 +1,7 @@
-export const ADD_LIST = "App/ADD_LIST";
+// see https://spin.atomicobject.com/2016/09/27/typed-redux-reducers-typescript-2-0/
+export type ADD_LIST= 'App/ADD_LIST';
+export const ADD_LIST : ADD_LIST = 'App/ADD_LIST';
+
 
 export const SAVE_LIST = "App/SAVE_LIST";
 export const ADD_LISTS = "App/ADD_LISTS";

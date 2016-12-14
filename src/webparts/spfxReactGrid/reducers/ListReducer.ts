@@ -12,6 +12,7 @@ const INITIAL_STATE = [];
 function listReducer(state: Array<ListDefinition> = INITIAL_STATE, action: any = { type: "" }): Array<ListDefinition> {
     switch (action.type) {
         case ADD_LIST:
+        //https://spin.atomicobject.com/2016/09/27/typed-redux-reducers-typescript-2-0/
             let newarray = _.clone(state);
             newarray.push(action.payload.list);
             return newarray;
