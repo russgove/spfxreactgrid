@@ -1,3 +1,565 @@
+//
+// Office UI Fabric
+// --------------------------------------------------
+// Fabric responsive variables
+
+
+//== Variables for responsive breakpoints
+//
+// Medium screen / tablet (480px - 639px)
+$ms-screen-md-min:       480px;
+$ms-screen-lg-min:       640px;
+$ms-screen-sm-min:       320px;
+$ms-screen-xxl-min:      1366px;
+$ms-screen-xl-min:       1024px;
+$ms-screen-xxxl-min:     1920px;
+$ms-font-size-m: 10px;
+$ms-font-size-l: 14px;
+ $ms-duration1: 100;
+$ms-ease1:100;
+$ms-zIndex-front:1;
+$ms-screen-md-max:       ($ms-screen-lg-min - 1);
+
+// Small screen / phone (320px - 479px)
+
+$ms-screen-sm-max:       ($ms-screen-md-min - 1);
+
+
+// Large screen / tablet (640px - 1023px)
+
+$ms-screen-lg-max:       ($ms-screen-xl-min - 1);
+
+// Extra large screen / tablet (1024px - 1365px)
+
+$ms-screen-xl-max:       ($ms-screen-xxl-min - 1);
+
+// Extra extra large screen / desktop (1366px - 1919px)
+
+$ms-screen-xxl-max:      ($ms-screen-xxxl-min - 1);
+
+// Extra extra extra large screen / desktop (1366px and up)
+
+
+// PLEASE NOTE:
+// ALL VARIABLES BELOW WILL BE DEPRECATED IN A FUTURE FABRIC RELEASE
+
+// LEGACY SCREEN SIZE VARIABLES:
+
+// Small screen / phone (320px - 479px)
+$screen-sm-min:       $ms-screen-sm-min;
+$screen-sm-max:       $ms-screen-sm-max;
+
+// Medium screen / tablet (480px - 639px)
+$screen-md-min:       $ms-screen-md-min;
+$screen-md-max:       $ms-screen-md-max;
+
+// Large screen / tablet (640px - 1023px)
+$screen-lg-min:       $ms-screen-lg-min;
+$screen-lg-max:       $ms-screen-lg-max;
+
+// Extra large screen / tablet (1024px - 1365px)
+$screen-xl-min:       $ms-screen-xl-min;
+$screen-xl-max:       $ms-screen-xl-max;
+
+// Extra extra large screen / desktop (1366px - 1919px)
+$screen-xxl-min:      $ms-screen-xxl-min;
+$screen-xxl-max:      $ms-screen-xxl-max;
+
+// Extra extra extra large screen / desktop (1366px and up)
+$screen-xxxl-min:     $ms-screen-xxxl-min;
+
+
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information.
+
+//
+// Office UI Fabric
+// --------------------------------------------------
+// Fabric Core Color Variables
+
+
+//== Theme Colors
+//
+$ms-color-themeDarker:     #004578 !default;
+$ms-color-themeDark:       #005a9e !default;
+$ms-color-themeDarkAlt:    #106ebe !default;
+$ms-color-themePrimary:    #0078d7 !default;
+$ms-color-themeSecondary:  #2488d8 !default;
+$ms-color-themeTertiary:   #69afe5 !default;
+$ms-color-themeLight:      #b3d6f2 !default;
+$ms-color-themeLighter:    #deecf9 !default;
+$ms-color-themeLighterAlt: #eff6fc !default;
+
+
+//== Grayscale Colors
+//
+$ms-color-black:                 #000000 !default;
+$ms-color-neutralDark:           #212121 !default;
+$ms-color-neutralPrimary:        #333333 !default;
+$ms-color-neutralPrimaryAlt:     #3C3C3C !default;
+$ms-color-neutralSecondary:      #666666 !default;
+$ms-color-neutralSecondaryAlt:   #767676 !default;
+$ms-color-neutralTertiary:       #a6a6a6 !default;
+$ms-color-neutralTertiaryAlt:    #c8c8c8 !default;
+$ms-color-neutralQuaternary:     #d0d0d0 !default;
+$ms-color-neutralQuaternaryAlt:  #dadada !default;
+$ms-color-neutralLight:          #eaeaea !default;
+$ms-color-neutralLighter:        #f4f4f4 !default;
+$ms-color-neutralLighterAlt:     #f8f8f8 !default;
+$ms-color-white:                 #ffffff !default;
+
+//== Translucent Colors
+//
+$ms-color-blackTranslucent40:  rgba(0,0,0,.4) !default;
+$ms-color-whiteTranslucent40:  rgba(255,255,255,.4) !default;
+
+
+//== Core brand and accent colors
+//
+$ms-color-yellow:        #ffb900 !default;
+$ms-color-yellowLight:   #fff100 !default;
+$ms-color-orange:        #d83b01 !default;
+$ms-color-orangeLight:   #ea4300 !default;
+$ms-color-orangeLighter: #ff8c00 !default;
+$ms-color-redDark:       #a80000 !default;
+$ms-color-red:           #e81123 !default;
+$ms-color-magentaDark:   #5c005c !default;
+$ms-color-magenta:       #b4009e !default;
+$ms-color-magentaLight:  #e3008c !default;
+$ms-color-purpleDark:    #32145a !default;
+$ms-color-purple:        #5c2d91 !default;
+$ms-color-purpleLight:   #b4a0ff !default;
+$ms-color-blueDark:      #002050 !default;
+$ms-color-blueMid:       #00188f !default;
+$ms-color-blue:          #0078d7 !default;
+$ms-color-blueLight:     #00bcf2 !default;
+$ms-color-tealDark:      #004b50 !default;
+$ms-color-teal:          #008272 !default;
+$ms-color-tealLight:     #00b294 !default;
+$ms-color-greenDark:     #004b1c !default;
+$ms-color-green:         #107c10 !default;
+$ms-color-greenLight:    #bad80a !default;
+
+
+//== Message colors
+//
+$ms-color-info:              $ms-color-neutralSecondaryAlt !default;
+$ms-color-infoBackground:    $ms-color-neutralLighter !default;
+$ms-color-success:           $ms-color-green !default;
+$ms-color-successBackground: #dff6dd !default;
+$ms-color-severeWarning:     $ms-color-orange !default;
+$ms-color-severeWarningBackground: #fed9cc !default;
+$ms-color-alert:             $ms-color-severeWarning !default;   // Deprecated: Use $ms-color-severeWarning
+$ms-color-alertBackground:   $ms-color-severeWarningBackground !default; // Deprecated: Use $ms-color-severeWarningBackground
+$ms-color-warning:           $ms-color-neutralSecondaryAlt !default;
+$ms-color-warningBackground: #fff4ce !default;
+$ms-color-error:             $ms-color-redDark !default;
+$ms-color-errorBackground:   #fde7e9 !default;
+
+
+//== High contrast colors
+//
+$ms-color-contrastBlackDisabled: #00ff00 !default;
+$ms-color-contrastWhiteDisabled: #600000 !default;
+$ms-color-contrastBlackSelected: #1AEBFF !default;
+$ms-color-contrastWhiteSelected: #37006E !default;
+
+
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information.
+
+//
+// Office UI Fabric
+// --------------------------------------------------
+// Command Bar styles
+
+$CommandBar-height: 40px;
+$CommandBar-mobileHeight: 48px;
+$CommandBar-iconSize: 18px;
+$CommandBar-smallLeft: 44px;
+$CommandBar-largeLeft: 48px;
+$CommandBar-xLargeLeft: 232px;
+$CommandBar-sideAreaWidthsm: 128px;
+$CommandBar-sideAreaWidthlg: 260px;
+$CommandBar-sideAreaWidthxlg: 345px;
+
+$CommandBarItem-height: $CommandBar-height;
+$CommandBarItem-marginTop: 13px;
+$CommandBarItem-textHeight: 16px;
+$CommandBarItem-iconWidth: 16px;
+$CommandBarItem-iconLabelMargin: 8px;
+$CommandBarItem-flippedLineHeight: 32px;
+
+
+$SearchBox-height: 40px;
+$SearchBox-widthLgCollapsed: 50px;
+$SearchBox-widthMdDownCollapsed: 36px;
+$SearchBox-widthXLarge: 208px;
+$SearchBox-iconSize: 17px;
+$SearchBox-sidePadding: 8px; // padding in input on left and right sides without icons
+$SearchBox-smallWidth: 36px;
+$SearchBox-iconWrapperWidth: $SearchBox-widthLgCollapsed - ($SearchBox-sidePadding * 2);
+
+@mixin highContrastBorder($color) {
+    border-left: 1px solid $color;
+    border-right: 1px solid $color;
+}
+
+.ms-CommandBar {
+  background-color: $ms-color-themeLighterAlt;
+  height: $CommandBar-height;
+  white-space: nowrap;
+  padding-left: 0;
+  border: 0;
+  position: relative;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.ms-CommandBar-mainArea {
+  overflow-x: hidden;
+  display: block;
+  padding-left: $SearchBox-widthLgCollapsed + 8;
+  @media only screen and (min-width: $ms-screen-xl-min) {
+    padding-left: 24px;
+  }
+}
+
+.ms-CommandBar-sideCommands {
+  float: right;
+  text-align: right;
+  width: auto;
+  padding-right: 8px;
+
+  .ms-CommandBarItem:last-child {
+    margin-right: 0;
+  }
+
+  @media only screen and (min-width: $ms-screen-lg-min) {
+    min-width: $CommandBar-sideAreaWidthsm;
+  }
+
+  @media only screen and (min-width: $ms-screen-lg-min) {
+    padding-right: 12px;
+  }
+
+  @media only screen and (min-width: $ms-screen-xl-min) {
+    padding-right: 16px;
+  }
+}
+
+// Command Bar Item
+.ms-CommandBarItem {
+  display: inline-block;
+  color: $ms-color-themePrimary;
+  height: $CommandBarItem-height;
+  outline: none;
+  vertical-align: top;
+  margin-right: -4px;
+
+  .ms-CommandBarItem-chevronDown,
+  .ms-CommandBarItem-commandText {
+    display: none;
+  }
+
+  @media screen and (-ms-high-contrast: active) {
+    @include highContrastBorder($ms-color-black);
+    height: 38px;
+    outline: none;
+  }
+
+  @media screen and (-ms-high-contrast: black-on-white) {
+    @include highContrastBorder($ms-color-white);
+    height: 38px;
+    outline: none;
+  }
+
+  &:hover {
+    background-color: $ms-color-themeLight;
+    color: $ms-color-themePrimary;
+
+    @media screen and (-ms-high-contrast: active) {
+      @include highContrastBorder($ms-color-white);
+    }
+
+    @media screen and (-ms-high-contrast: black-on-white) {
+      @include highContrastBorder($ms-color-black);
+    }
+  }
+
+  // Hide labels and Chevrons SM-MD
+  @media only screen and (min-width: $ms-screen-lg-min) {
+    margin-right: 8px;
+    .ms-CommandBarItem-chevronDown,
+    .ms-CommandBarItem-commandText {
+      display: inline;
+    }
+  }
+
+}
+
+.ms-CommandBarItem.is-hidden {
+  width: 0;
+  overflow: hidden;
+}
+
+//== Modifier: For commands with only an icon
+//
+.ms-CommandBarItem.icon-only,
+.ms-CommandBarItem.ms-CommandBarItem--iconOnly {
+  .ms-CommandBarItem-chevronDown,
+  .ms-CommandBarItem-commandText {
+    display: none;
+  }
+}
+
+.ms-CommandBarItem.ms-CommandBarItem--hasTextOnly {
+  .ms-CommandBarItem-commandText,
+  .ms-CommandBarItem-chevronDown {
+    display: inline;
+  }
+}
+
+.ms-CommandBarItem-overflow {
+  display: none;
+
+  &.is-visible {
+    display: inline-block;
+  }
+
+  .ms-Icon {
+    font-size: $ms-font-size-m;
+    color: $ms-color-neutralSecondary;
+  }
+}
+
+.ms-CommandBarItem-link {
+  line-height: $CommandBarItem-height - 1;
+  padding: 0 6px;
+  cursor: pointer;
+  height: $CommandBarItem-height;
+  min-width: 20px;
+  text-align: center;
+  position: relative;
+  padding: 0 8px;
+  display: block;
+  height: 100%;
+}
+
+.ms-CommandBarItem-link:focus {
+  outline: none;
+  &:before {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: 2px;
+    bottom: 2px;
+    border: 1px solid $ms-color-neutralTertiary;
+    content: '';
+  }
+}
+
+.ms-CommandBarItem-icon {
+ font-size: $ms-font-size-l;
+}
+
+.ms-CommandBarItem-chevronDown  {
+  vertical-align: middle;
+  padding-bottom: 3px;
+  margin-top: $CommandBarItem-marginTop;
+  font-size: 1.1em;
+  line-height: 1em;
+  color: $ms-color-neutralSecondary;
+
+  &:before {
+    height: 10px;
+    line-height: $CommandBarItem-textHeight;
+  }
+}
+
+.ms-CommandBarSearch {
+  float: left;
+  width: 208px;
+  max-width: 208px;
+  background-color: $ms-color-themeLighter;
+  color: $ms-color-neutralPrimary;
+  height: $SearchBox-height;
+  position: relative;
+  box-sizing: border-box;
+  border-color: transparent; // give a base state for animation
+
+
+  @media only screen and (max-width: $ms-screen-lg-max) {
+    overflow: hidden;
+    width: $SearchBox-widthLgCollapsed;
+    position: absolute;
+  }
+
+  transition: $ms-duration1 $ms-ease1;
+  transition-property: width, background-color;
+
+  @media screen and (-ms-high-contrast: active) {
+    border-right: 1px solid $ms-color-white;
+    z-index: 10;
+  }
+
+  @media screen and (-ms-high-contrast: black-on-white) {
+    border-right: 1px solid $ms-color-black;
+  }
+
+  &:hover {
+    background-color: $ms-color-themeLight;
+    color: $ms-color-themePrimary;
+
+    @media screen and (-ms-high-contrast: active) {
+      @include highContrastBorder($ms-color-white);
+    }
+
+    @media screen and (-ms-high-contrast: black-on-white) {
+      @include highContrastBorder($ms-color-black);
+    }
+  }
+
+  .ms-Icon--search {
+    margin-left: 2px;
+    margin-top: 12px;
+    vertical-align: top;
+  }
+}
+
+.ms-CommandBarSearch-input {
+  height: $SearchBox-height;
+  // Due to a bug in IE9, we have to use a transparent left border instead of left padding
+  padding: $SearchBox-sidePadding $SearchBox-sidePadding $SearchBox-sidePadding 0;
+  border: none;
+  border-left: $SearchBox-height + 2 solid transparent;
+  background-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+  font-size: $ms-font-size-m;
+
+  @media screen and (-ms-high-contrast: active) {
+    border-left: $SearchBox-height solid $ms-color-black;
+  }
+
+  @media screen and (-ms-high-contrast: black-on-white) {
+    border-left: $SearchBox-height solid $ms-color-white;
+  }
+
+  // remove default iOS styles on input boxes
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+
+  // hide IE's X button for clearing the input (we have our own)
+  &::-ms-clear {
+    display: none;
+  }
+
+  //Placeholder text styles
+  &::placeholder {
+    color: $ms-color-neutralPrimary;
+    opacity: 1;
+    font-size: $ms-font-size-m;
+  }
+
+  //Fixes older firefox issue.
+  &:placeholder {
+    color: $ms-color-neutralPrimary;
+    opacity: 1;
+    font-size: $ms-font-size-m;
+  }
+}
+
+// default styles for icons, show the search icon and hide X (and arrow) until focused
+.ms-CommandBarSearch-iconSearchWrapper {
+  display: block;
+  padding-left: 15px;
+}
+
+.ms-CommandBarSearch-iconArrowWrapper {
+  display: none;
+}
+
+.ms-CommandBarSearch-iconSearchWrapper,
+.ms-CommandBarSearch-iconArrowWrapper {
+  top: 0;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.ms-CommandBarSearch-iconClearWrapper {
+  display: none;
+  top: 1px;
+  right: 0px;
+  z-index: $ms-zIndex-front;
+}
+
+
+//== State: Puts search in an active state
+//
+.ms-CommandBarSearch.is-active {
+  background-color: $ms-color-themeLight;
+  color: $ms-color-black;
+
+  @media only screen and (max-width: $ms-screen-lg-max) {
+    width: 100%;
+    position: absolute;
+    z-index: $ms-zIndex-front;
+    max-width: 100%;
+  }
+
+  &:hover {
+    background-color: $ms-color-themeLight;
+    color: $ms-color-black;
+  }
+
+  .ms-CommandBarSearch-input {
+    cursor: text;
+    padding-right: $SearchBox-height; // leave room for the X
+    border-left-width: $SearchBox-sidePadding;
+  }
+
+  &.ms-CommandBarSearch--hasBack .ms-CommandBarSearch-input {
+    border-left-width: $SearchBox-height; // leave room for arrow
+  }
+
+  // when focused, remove the search icon and possibly show arrow icon
+  & .ms-CommandBarSearch-iconSearchWrapper {
+    display: none;
+  }
+
+  &.ms-CommandBarSearch--hasBack .ms-CommandBarSearch-iconArrowWrapper {
+    display: block;
+  }
+
+  .ms-CommandBarSearch-input {
+    padding-right: $SearchBox-height;
+  }
+
+  .ms-CommandBarSearch-iconClearWrapper {
+    display: block;
+  }
+}
+
+.ms-CommandBarSearch-iconWrapper {
+  height: $SearchBox-height;
+  line-height: $SearchBox-height;
+  cursor: pointer;
+  padding: 0px $SearchBox-sidePadding;
+  position: absolute;
+  width: $SearchBox-iconWrapperWidth;
+  text-align: center;
+}
+
+.ms-CommandBarSearch .ms-Icon:before {
+  font-size: $SearchBox-iconSize;
+  color: $ms-color-themePrimary;
+}
+
+
+
 .spfxReactGrid {
   .container {
     max-width: 700px;

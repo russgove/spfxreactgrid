@@ -1,6 +1,10 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
 import { Provider } from "react-redux";
+// import "office-ui-fabric/dist/sass/Fabric.scss";
+// import "office-ui-fabric/dist/components/Persona/Persona.scss";
+// import "office-ui-fabric/dist/components/OrgChart/OrgChart.scss";
+
 import configureStore from "./store/configure-store";
 const { Router, createMemoryHistory } = require("react-router");
 
@@ -35,9 +39,9 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
   }
   public render(): void {
 
-   store.dispatch(addLists(this.properties.lists));
-   store.dispatch(addColumns(this.properties.columns));
-   store.dispatch(addPageContext(this.context.pageContext));
+    store.dispatch(addLists(this.properties.lists));
+    store.dispatch(addColumns(this.properties.columns));
+    store.dispatch(addPageContext(this.context.pageContext));
     Log.verbose("SpfxReactGridWebPart", "In render of SpfxReactGridWebPart");
     ReactDom.render(App(), this.domElement);
   }
@@ -47,10 +51,10 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
   }
   protected onBeforeSerialize(): IHtmlProperties {
 
-  // this.properties.columns = [];
- //  this.properties.lists =[];
+    // this.properties.columns = [];
+    //  this.properties.lists =[];
     this.properties.columns = store.getState().columns;
-    this.properties.lists =store.getState().lists;
+    this.properties.lists = store.getState().lists;
     return super.onBeforeSerialize();
   }
   protected get propertyPaneSettings(): IPropertyPaneSettings {

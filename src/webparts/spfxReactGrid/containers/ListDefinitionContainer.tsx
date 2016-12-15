@@ -393,31 +393,50 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
 
   public render() {
-    let MenuItems = new Array<IContextualMenuItem>();
-    MenuItems.push({
+    // let MenuItems = new Array<IContextualMenuItem>();
+    // MenuItems.push({
+    //   key: "Add LIST",
+    //   name: "ADD A LIST",
+    //   canCheck: true,
+    //   onClick: this.addList
+    // });
+    // MenuItems.push({
+    //   key: "Clear All Lists",
+    //   name: "Clear All Lists",
+    //   canCheck: true,
+    //   onClick: this.addList
+    // });
+    // MenuItems.push({
+    //   key: "Allow All Types ",
+    //   name: "Allow All Types ",
+    //   canCheck: true,
+    //   isChecked: true,
+    //   onClick: this.addList
+  //  });
+
+    return (
+      <Container testid="columns" size={2} center>
+        <h1>Lists</h1>
+        <CommandBar items={[{
       key: "Add LIST",
       name: "ADD A LIST",
+           className: 'Charm-List',
       canCheck: true,
       onClick: this.addList
-    });
-    MenuItems.push({
+    },
+    {
       key: "Clear All Lists",
       name: "Clear All Lists",
       canCheck: true,
       onClick: this.addList
-    });
-    MenuItems.push({
+    },
+   {
       key: "Allow All Types ",
       name: "Allow All Types ",
       canCheck: true,
       isChecked: true,
       onClick: this.addList
-    });
-
-    return (
-      <Container testid="columns" size={2} center>
-        <h1>Lists</h1>
-        <CommandBar items={MenuItems} />
+    }]} />
         <table border="1">
           <thead>
             <tr>
