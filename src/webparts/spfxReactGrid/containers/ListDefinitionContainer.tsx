@@ -6,7 +6,7 @@ import WebEditor from "../components/WebEditor";
 import ListEditor from "../components/ListEditor";
 import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList } from "../actions/listActions";
-import { getWebsAction } from "../actions/SiteActions";
+import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
 import { Button } from "office-ui-fabric-react/lib/Button";
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 
@@ -34,6 +34,8 @@ interface IListViewPageProps extends React.Props<any> {
   removeList: (List) => void;
   saveList: (List) => void;
   getWebs: (siteUrl) => Promise<any>;
+  getListsForWeb: (webUrl) => Promise<any>;
+  getFieldsForList: (webUrl, listId) => Promise<any>;
   pageContext: PageContext;
 }
 function mapStateToProps(state) {
@@ -56,8 +58,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(removeList(list));
     },
     getWebs: (siteUrl): Promise<any> => {
-
       return dispatch(getWebsAction(dispatch, siteUrl));
+    },
+    getListsForWeb(webUrl): Promise<any> {
+      return dispatch(getListsForWebAction(dispatch, webUrl));
+    },
+    getFieldsForList(webUrl, listId): Promise<any> {
+      return dispatch(getFieldsForListAction(dispatch, webUrl, listId));
     },
     saveList: (list): void => {
       const action = saveList(list);
@@ -125,8 +132,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   public componentWillMount(): void {
     if (this.props.sites.length === 0) {
-
-      this.props.getWebs("https://rgove3.sharepoint.com/sites/dev");
+      // prload current site, assuming user wants lists from current site
+      //  this.props.getWebs(this.props.pageContext.site.absoluteUrl);
     }
     this.extendedColumns = _.clone(this.defaultColumns);
     for (const columnRef of this.props.columnRefs) {
@@ -171,7 +178,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
     this.props.saveList(entity);
   }
-  public addList(event) :any {
+  public addList(event): any {
 
     this.props.addList(this.props.pageContext.site.absoluteUrl);
     return;
@@ -197,29 +204,46 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         return site.webs;
       }
     }
+    // not in our cache/ go get it
+    this.props.getWebs(siteUrl);
     return [];
   }
   public getListsForWeb(webUrl: string): Array<WebList> {
     for (const site of this.props.sites) {
       for (const web of site.webs) {
         if (web.url === webUrl) {
-          return web.lists;
-        }
-      }
-    }
-    return [];
-  }
-  public getFieldsForlist(listId: string): Array<WebListField> {
-    for (const site of this.props.sites) {
-      for (const web of site.webs) {
-        for (const list of web.lists) {
-          if (list.id === listId) {
-            return list.fields;
+          if (web.listsFetched) {
+            return web.lists;
+          }
+          else {
+            this.props.getListsForWeb(webUrl);
+            return [];
           }
         }
       }
     }
-    return [];
+    // not in our cache/ go get it
+
+  }
+  public getFieldsForlist(weburl: string, listId: string): Array<WebListField> {
+    for (const site of this.props.sites) {
+      for (const web of site.webs) {
+        if (web.url === weburl) {
+          for (const list of web.lists) {
+            if (list.id === listId) {
+              if (list.fieldsFetched) {
+                return list.fields;
+              }
+              else {
+                this.props.getFieldsForList(weburl, listId);
+                return [];
+              }
+            }
+          }
+        }
+      }
+    }
+
   }
   public GetColumnReferenence(listDefinition: ListDefinition, columnDefinitionId: string): ColumnReference {
     for (let columnref of listDefinition.columnReferences) {
@@ -251,7 +275,9 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         columnValue = this.GetColumnReferenence(entity, column.id).name;
       }
     }
+    debugger;
     switch (column.editor) {
+
       case "WebEditor":
         let webs = this.getWebsForSite(entity.siteUrl);
         return (<WebEditor webs={webs} selectedValue={columnValue} onChange={valueChanged} />);
@@ -259,7 +285,9 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         let lists = this.getListsForWeb(utils.ParseSPField(entity.webLookup).id);// the Id portion of the WebLookup is the URL
         return (<ListEditor selectedValue={columnValue} onChange={valueChanged} lists={lists} />);
       case "FieldEditor":
-        let fields = this.getFieldsForlist(utils.ParseSPField(entity.listLookup).id);
+        const listid = utils.ParseSPField(entity.listLookup).id;
+        const webUrl = utils.ParseSPField(entity.webLookup).id;
+        const fields = this.getFieldsForlist(webUrl, listid);
         return (<FieldEditor selectedValue={columnValue} onChange={valueChanged} fields={fields} />);
       default:
         return (
@@ -343,12 +371,12 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
 
   public render() {
-    let MenuItems= new Array<IContextualMenuItem>();
-    MenuItems.push(  {
-    key: "Add LIST",
-    name: "ADD A LIST",
-    canCheck: true,
-    onClick: this.addList
+    let MenuItems = new Array<IContextualMenuItem>();
+    MenuItems.push({
+      key: "Add LIST",
+      name: "ADD A LIST",
+      canCheck: true,
+      onClick: this.addList
     });
     return (
       <Container testid="columns" size={2} center>
