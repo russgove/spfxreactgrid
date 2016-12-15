@@ -78,7 +78,7 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
 
         const promise = web.lists.getById(listid).items.select(fieldnames.join(",")).get()
             .then((response) => {
-                debugger;
+
                 const data = _.map(response, (item: any) => {
                     return new ListItem(item.GUID);
                 });

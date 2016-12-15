@@ -3,9 +3,10 @@ import { Guid } from '@microsoft/sp-client-base';
 export class ColumnReference {
     public constructor(
         /** Tghe ID of this ColmnReference */
-        public columnDefinitionId: string, 
+        public columnDefinitionId: string,
         /** The field in the Sharepoint list. Stored as 'internalname#;displayname')*/
-        public name: string
+        public name: string,
+         public fieldDefinition:{},
 
     ) { }
 

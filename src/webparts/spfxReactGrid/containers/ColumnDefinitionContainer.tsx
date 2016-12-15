@@ -9,12 +9,32 @@ import Container from "../components/container";
 import { Guid, Log } from "@microsoft/sp-client-base";
 import * as utils from "../utils/utils";
 const fieldTypes: Array<ISelectChoices> = [
-    { name: "text", value: "SP.FieldTypeText" },
-    { name: "Date", value: "SP.FieldTypeDateTime" },
-    { name: "Choice", value: "Choice" },
-    { name: "Lookup", value: "Lookup" }
-];
+    { name: "Text", value: "Text" },
+    { name: "Integer", value: "Integer" },
+    // { name: "Note", value: "Note" },
+     { name: "DateTime", value: "DateTime" },
+    // { name: "Counter", value: "Counter" },
+    // { name: "Choice", value: "Choice" },
+    // { name: "Lookup", value: "Lookup" },
+    // { name: "Boolean", value: "Boolean" },
+    // { name: "Number", value: "Number" },
+    // { name: "Currency", value: "Currency" },
+    // { name: "URL", value: "URL" },
+    // { name: "Computed", value: "Computed" },
+    // { name: "Guid", value: "Guid" },
+    // { name: "MultiChoice", value: "MultiChoice" },
+    // { name: "Computed", value: "Computed" },
+    // { name: "Calculated", value: "Calculated" },
+    // { name: "Computed", value: "Computed" },
+    // { name: "File", value: "File" },
+    // { name: "Attachments", value: "Attachments" },
+     { name: "User", value: "User" },
+    // { name: "ModStat", value: "ModStat" },
+    // { name: "ContentTypeId", value: "ContentTypeId" },
+    // { name: "WorkflowStatus", value: "WorkflowStatus" },
+    // { name: "WorkflowEventType", value: "WorkflowEventType" },
 
+];
 interface IColumnsPageProps extends React.Props<any> {
     columns: Array<ColumnDefinition>;
     addColumn: () => void;
@@ -25,7 +45,6 @@ interface IContextMenu extends React.Props<any> {
     onRowDelete: AdazzleReactDataGrid.ColumnEventCallback;
 }
 function mapStateToProps(state) {
-
     return {
         columns: state.columns,
     };
@@ -44,7 +63,6 @@ function mapDispatchToProps(dispatch) {
 
             dispatch(removeColumn(column));
         },
-
     };
 }
 interface ICellContentsEditableProps extends React.Props<any> {
@@ -59,11 +77,8 @@ class CellContentsEditable extends React.Component<ICellContentsEditableProps, a
     public getFieldTypesEditorChoices(): Array<ISelectChoices> {
         return fieldTypes;
     }
-
     public render() {
-
         const {entity, gridColumn, valueChanged} = this.props;
-
         switch (gridColumn.editor) {
             case "FieldTypesEditor":
                 return (
@@ -96,20 +111,14 @@ interface IGridProps {
 class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGridProps> {
     public constructor() {
         super();
-
         this.CellContents = this.CellContents.bind(this);
         this.TableDetail = this.TableDetail.bind(this);
         this.TableRow = this.TableRow.bind(this);
         this.TableRows = this.TableRows.bind(this);
-
         this.toggleEditing = this.toggleEditing.bind(this);
-
         this.handleRowUpdated = this.handleRowUpdated.bind(this);
         this.handleRowdeleted = this.handleRowdeleted.bind(this);
-
-
     }
-
     public gridColulumns: Array<GridColumn> = [{
         id: "guid",
         name: "guid",
@@ -143,12 +152,10 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
             return (<span >
                 {entity[gridColumn.name]}
             </span>);
-
         }
         switch (gridColumn.formatter) {
             case "SharePointLookupCellFormatter":
                 return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);
-
             default:
                 return (<a href="#" onFocus={this.toggleEditing}>
                     {entity[gridColumn.name]}
@@ -156,15 +163,11 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 );
         }
     }
-
     public TableDetail(props): JSX.Element {
-
         const {entity, column, rowChanged} = props;
-
         if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id && column.editable) {
             return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "4px solid black", padding: "0px" }}>
                 <CellContentsEditable entity={entity} gridColumn={column} valueChanged={rowChanged} />
-
             </td>
             );
         } else {
@@ -172,13 +175,10 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 <this.CellContents key={entity.id + column.id} entity={entity} gridColumn={column} rowChanged={rowChanged} />
             </td>
             );
-
         }
-
     }
     public TableRow(props): JSX.Element {
         const {entity, columns, rowChanged} = props;
-
         return (
             <tr>
                 {
@@ -195,7 +195,6 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 </td>
             </tr>);
     };
-
     public TableRows(props): JSX.Element {
         const {entities, columns, rowChanged} = props;
         return (
@@ -209,9 +208,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 }
             </tbody>
         );
-
     }
-
     private handleRowUpdated(event) {
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
         const target = event.target;
@@ -243,21 +240,14 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
     }
     public toggleEditing(event) {
         Log.verbose("list-Page", "focus event fired editing  when entering cell");
-
         const target = this.getParent(event.target, "TD"); // walk up the Dom to the TD, thats where the IDs are stored
         const attributes: NamedNodeMap = target.attributes;
         const entityid = attributes.getNamedItem("data-entityid").value;
         const columnid = attributes.getNamedItem("data-columnid").value;
-
-
-
         this.setState({ "editing": { entityid: entityid, columnid: columnid } });
     }
-
     public render() {
-
         const {  addColumn, removeColumn } = this.props;
-
         return (
             <Container testid="columns" size={2} center>
                 <div><h1>Columns</h1>
@@ -270,13 +260,9 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                             })}
                         </tr>
                     </thead>
-
                     {
                         <this.TableRows entities={this.props.columns} columns={this.gridColulumns} rowChanged={this.handleRowUpdated} />
-
                     })}
-
-
         </table>
             </Container>
         );

@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as utils from "../utils/utils";
+import {WebListField} from "../model/Site";
 export interface KeyValue {
   value: any;
   displayName: string;
@@ -7,7 +8,7 @@ export interface KeyValue {
 export interface IListEditorProps extends React.Props<any> {
   selectedValue?: string;
   onChange(event): void;
-  fields: Array<{ internalName: string, name: string }>;
+  fields: Array<WebListField>;
 }
 export default class FieldEditor extends React.Component<IListEditorProps, void> {
   constructor() {
@@ -24,7 +25,7 @@ export default class FieldEditor extends React.Component<IListEditorProps, void>
       <select value={this.props.selectedValue} onChange={this.handleChange} >
         {this.props.fields.map((field) => {
           return (
-            <option key={field.internalName} value={field.name}  >{utils.ParseSPField(field.name).value}</option>
+            <option key={field.name} value={field.name}  >{utils.ParseSPField(field.name).value}</option>
           );
         }, this)
         }

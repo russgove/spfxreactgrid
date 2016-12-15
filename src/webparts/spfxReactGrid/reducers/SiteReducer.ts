@@ -15,7 +15,7 @@ function siteReducer(state: Array<Site> = INITIAL_STATE, action: any = { type: "
             sitea.webs = action.payload.webs;
             return _.union(state, new Array<Site>(sitea));
         case GET_LISTSFORWEB_SUCCESS:
-            debugger;
+
             let newState = _.clone(state);
             //find the site and add the lists to it
             for (const site of newState) {
@@ -29,7 +29,7 @@ function siteReducer(state: Array<Site> = INITIAL_STATE, action: any = { type: "
             return newState;
         case GET_FIELDSFORLIST_SUCCESS:
             {
-                debugger;
+
                 let newState2 = _.clone(state);
                 //find the site and add the lists to it
                 for (const site of newState2) {

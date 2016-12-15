@@ -19,10 +19,12 @@ import Container from "../components/container";
 import { Guid, Log, PageContext } from "@microsoft/sp-client-base";
 export class GridColumn {
   constructor(
+
     public id: string,
     public name: string,
     public editable: boolean,
     public width: number,
+    public type: string,
     public formatter: string = "",
     public editor?: string) { }
 }
@@ -49,7 +51,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     addList: (siteUrl: string): void => {
-      debugger;
+
       const id = Guid.newGuid();
       const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null);
       dispatch(addList(list));
@@ -85,14 +87,16 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       name: "guid",
       editable: false,
       width: 250,
-      formatter: ""
+      formatter: "",
+      type: "Text"
     },
     {
       id: "SiteUrl",
       name: "siteUrl", // the url to the site
       editable: true,
       width: 259,
-      formatter: ""
+      formatter: "",
+      type: "Text"
     },
     {
       id: "WebLookup",
@@ -100,7 +104,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       editable: true,
       width: 200,
       editor: "WebEditor",
-      formatter: "SharePointLookupCellFormatter"
+      formatter: "SharePointLookupCellFormatter",
+      type: "Lookup"
     },
     {
       id: "listlookup",
@@ -108,7 +113,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       name: "listLookup",
       editable: true,
       editor: "ListEditor",
-      formatter: "SharePointLookupCellFormatter"
+      formatter: "SharePointLookupCellFormatter",
+      type: "Lookup"
     }];
   public extendedColumns: Array<GridColumn> = [];
   public constructor() {
@@ -117,7 +123,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     this.getWebsForSite = this.getWebsForSite.bind(this);
     this.getListsForWeb = this.getListsForWeb.bind(this);
     this.getFieldsForlist = this.getFieldsForlist.bind(this);
-    this.getFieldsForlist = this.getFieldsForlist.bind(this);
+    this.getFieldDefinition = this.getFieldDefinition.bind(this);
 
     this.CellContentsEditable = this.CellContentsEditable.bind(this);
     this.CellContents = this.CellContents.bind(this);
@@ -137,7 +143,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
     this.extendedColumns = _.clone(this.defaultColumns);
     for (const columnRef of this.props.columnRefs) {
-      const newCol = new GridColumn(columnRef.guid, columnRef.name, columnRef.editable, columnRef.width, null, "FieldEditor");
+
+      const newCol = new GridColumn(columnRef.guid, columnRef.name, columnRef.editable, columnRef.width, columnRef.type, "FieldFormatter", "FieldEditor");
       this.extendedColumns.push(newCol);
     }
   }
@@ -148,15 +155,21 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     return false;
   }
   private updateExtendedColumn(entity: ListDefinition, columnid: string, value: any) {
+    const internalName = utils.ParseSPField(value).id;
+    let fieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
     for (const col of entity.columnReferences) {
       if (col.columnDefinitionId === columnid) {
         col.name = value;
+        col.fieldDefinition = fieldDefinition;
         return;
       }
     }
-
-    const x = new ColumnReference(columnid, value);
+    const x = new ColumnReference(columnid, value, fieldDefinition);
     entity.columnReferences.push(x);
+  }
+  public getFieldDefinition(listdef: ListDefinition, internalName: string): {} {
+    let field = this.getFieldInList(listdef, internalName);
+    return field.fieldDefinition;
   }
   public handleRowUpdated(event): void {
     Log.verbose("Columns-Page", "Row changed-fired when row changed or leaving cell ");
@@ -169,17 +182,18 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     const columnid = attributes.getNamedItem("data-columnid").value;
     const entity: ListDefinition = this.props.lists.find((temp) => temp.guid === entityid);
     const column = this.extendedColumns.find(temp => temp.id === columnid);
-    // if iys a default column, just set its value , otheriwse update it in the list of extended columns
+    // if it is a default column, just set its value , otheriwse update it in the list of extended columns (i.e. sharepoint columns)
+    debugger;
     if (this.isdeafaultColumn(columnid)) {
       entity[column.name] = value;
     }
     else {
+
       this.updateExtendedColumn(entity, columnid, value);
     }
     this.props.saveList(entity);
   }
   public addList(event): any {
-
     this.props.addList(this.props.pageContext.site.absoluteUrl);
     return;
   }
@@ -223,13 +237,17 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
     return []; // havent fetched parent yet,
   }
-  public getFieldsForlist(listDef: ListDefinition): Array<WebListField> {
+  public getFieldsForlist(listDef: ListDefinition, colType?: string): Array<WebListField> {
     const lists = this.getListsForWeb(listDef);
-
+    debugger;
     for (const list of lists) {
       if (list.id === utils.ParseSPField(listDef.listLookup).id) {
         if (list.fieldsFetched) {
-          return list.fields;
+          if (colType === undefined || colType === null) {
+            return list.fields;
+          } else {
+            return _.filter(list.fields, (f) => f.fieldDefinition.TypeAsString === colType);
+          }
         }
         else {
           this.props.getFieldsForList(utils.ParseSPField(listDef.webLookup).id, utils.ParseSPField(listDef.listLookup).id);
@@ -237,8 +255,18 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         }
       }
     }
-      return [];// havent fetched parent yet,
+    return [];// havent fetched parent yet,
 
+  }
+  /** This method is called just before we ara going to save a field in our listdef. It gets the Field Deefinition from sharepoint. */
+  public getFieldInList(listDef: ListDefinition, internalName): WebListField {
+
+    const fields = this.getFieldsForlist(listDef);
+    for (const field of fields) {
+      if (utils.ParseSPField(field.name).id === internalName) {
+        return field;
+      }
+    }
   }
   public GetColumnReferenence(listDefinition: ListDefinition, columnDefinitionId: string): ColumnReference {
     for (let columnref of listDefinition.columnReferences) {
@@ -280,7 +308,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         let lists = this.getListsForWeb(entity);// the Id portion of the WebLookup is the URL
         return (<ListEditor selectedValue={columnValue} onChange={valueChanged} lists={lists} />);
       case "FieldEditor":
-        const fields = this.getFieldsForlist(entity);
+        const colType = utils.ParseSPField(column.type).id;
+        const fields = this.getFieldsForlist(entity, colType);
         return (<FieldEditor selectedValue={columnValue} onChange={valueChanged} fields={fields} />);
       default:
         return (
@@ -371,6 +400,20 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       canCheck: true,
       onClick: this.addList
     });
+    MenuItems.push({
+      key: "Clear All Lists",
+      name: "Clear All Lists",
+      canCheck: true,
+      onClick: this.addList
+    });
+    MenuItems.push({
+      key: "Allow All Types ",
+      name: "Allow All Types ",
+      canCheck: true,
+      isChecked: true,
+      onClick: this.addList
+    });
+
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>

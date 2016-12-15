@@ -53,7 +53,7 @@ export function getWebsAction(dispatch: any, siteUrl: string): any {
     // need allwebs
 
     // const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").orderBy("Web/Title, List/Title, Field/Title", false).get()
-    const payload = pnp.sp.site.rootWeb.webs.get()
+    const payload = pnp.sp.site.rootWeb.webs.orderBy("Title").get()
         .then((response) => {
             const data = _.map(response, (item: any) => {
                 const web: Web = new Web(item.Id, item.Title, item.Url);
@@ -96,9 +96,9 @@ export function getWebsErrorAction(error) {
 export function getListsForWebAction(dispatch: any, webUrl: string): any {
     const web = new SPWeb(webUrl);
 
-    const payload = web.lists.get()
+    const payload = web.lists.orderBy("Title").get()
         .then((response) => {
-            debugger;
+
             //for (const list of item.Lists) {
             //                     const webList: WebList = new WebList(list.Id, list.Title, list.Url);
             //                     for (const field of list.Fields) {
@@ -143,15 +143,12 @@ export function getListsForWebActionError(error) {
         }
     };
 }
-
 export function getFieldsForListAction(dispatch: any, webUrl: string, listId: string): any {
     const web = new SPWeb(webUrl);
-
-    const payload = web.lists.getById(listId).fields.get()
+    const payload = web.lists.getById(listId).fields.orderBy("Title").get()
         .then((response) => {
-            debugger;
             const data = _.map(response, (item: any) => {
-                return new WebListField(item.id, new utils.ParsedSPField(item.InternalName, item.Title).toString(), item.InternalName, item.type);
+                return new WebListField(item.id, new utils.ParsedSPField(item.InternalName, item.Title).toString(), item);
             });
             console.log(data);
             const gotWebs = gotFieldsForListAction(webUrl, listId, data);

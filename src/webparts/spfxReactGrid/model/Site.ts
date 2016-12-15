@@ -4,10 +4,9 @@ export class WebListField {
     public constructor(public id: string,
         /** the name of the field in the list stored as internalName#;name */
         public name: string,
-        /** the internalname of the field. Not used. To be deleted */
-        public internalName: string,
-        /** the type of the field. Not used. To be deleted */
-        public type: string) {
+        /** the Definition of the field iin sharepoint.... Should narrrow trhis down later */
+        public fieldDefinition:any,
+       ) {
     }
 }
 export class WebList {
