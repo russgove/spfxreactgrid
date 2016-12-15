@@ -98,7 +98,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     // }
   }
   public CellContents(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
-    debugger;
+
     const {entity, column} = props;
     //switch (column.formatter) {
     //  case "SharePointLookupCellFormatter":

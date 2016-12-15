@@ -198,51 +198,46 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
     return node;
   }
-  public getWebsForSite(siteUrl: string): Array<Web> {
+  public getWebsForSite(listDef: ListDefinition): Array<Web> {
     for (const site of this.props.sites) {
-      if (site.url === siteUrl) {
+      if (site.url === listDef.siteUrl) {
         return site.webs;
       }
     }
     // not in our cache/ go get it
-    this.props.getWebs(siteUrl);
+    this.props.getWebs(listDef.siteUrl);
     return [];
   }
-  public getListsForWeb(webUrl: string): Array<WebList> {
-    for (const site of this.props.sites) {
-      for (const web of site.webs) {
-        if (web.url === webUrl) {
-          if (web.listsFetched) {
-            return web.lists;
-          }
-          else {
-            this.props.getListsForWeb(webUrl);
-            return [];
-          }
+  public getListsForWeb(listDef: ListDefinition): Array<WebList> {
+    const webs = this.getWebsForSite(listDef);
+    for (const web of webs) {
+      if (web.url === utils.ParseSPField(listDef.webLookup).id) {
+        if (web.listsFetched) {
+          return web.lists;
+        }
+        else {
+          this.props.getListsForWeb(utils.ParseSPField(listDef.webLookup).id);
+          return [];
         }
       }
     }
-    // not in our cache/ go get it
-
+    return []; // havent fetched parent yet,
   }
-  public getFieldsForlist(weburl: string, listId: string): Array<WebListField> {
-    for (const site of this.props.sites) {
-      for (const web of site.webs) {
-        if (web.url === weburl) {
-          for (const list of web.lists) {
-            if (list.id === listId) {
-              if (list.fieldsFetched) {
-                return list.fields;
-              }
-              else {
-                this.props.getFieldsForList(weburl, listId);
-                return [];
-              }
-            }
-          }
+  public getFieldsForlist(listDef: ListDefinition): Array<WebListField> {
+    const lists = this.getListsForWeb(listDef);
+
+    for (const list of lists) {
+      if (list.id === utils.ParseSPField(listDef.listLookup).id) {
+        if (list.fieldsFetched) {
+          return list.fields;
+        }
+        else {
+          this.props.getFieldsForList(utils.ParseSPField(listDef.webLookup).id, utils.ParseSPField(listDef.listLookup).id);
+          return [];
         }
       }
     }
+      return [];// havent fetched parent yet,
 
   }
   public GetColumnReferenence(listDefinition: ListDefinition, columnDefinitionId: string): ColumnReference {
@@ -279,15 +274,13 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     switch (column.editor) {
 
       case "WebEditor":
-        let webs = this.getWebsForSite(entity.siteUrl);
+        let webs = this.getWebsForSite(entity);
         return (<WebEditor webs={webs} selectedValue={columnValue} onChange={valueChanged} />);
       case "ListEditor":
-        let lists = this.getListsForWeb(utils.ParseSPField(entity.webLookup).id);// the Id portion of the WebLookup is the URL
+        let lists = this.getListsForWeb(entity);// the Id portion of the WebLookup is the URL
         return (<ListEditor selectedValue={columnValue} onChange={valueChanged} lists={lists} />);
       case "FieldEditor":
-        const listid = utils.ParseSPField(entity.listLookup).id;
-        const webUrl = utils.ParseSPField(entity.webLookup).id;
-        const fields = this.getFieldsForlist(webUrl, listid);
+        const fields = this.getFieldsForlist(entity);
         return (<FieldEditor selectedValue={columnValue} onChange={valueChanged} fields={fields} />);
       default:
         return (
