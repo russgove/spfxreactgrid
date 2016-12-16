@@ -1,9 +1,11 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
 import { Provider } from "react-redux";
-// import "office-ui-fabric/dist/sass/Fabric.scss";
-// import "office-ui-fabric/dist/components/Persona/Persona.scss";
-// import "office-ui-fabric/dist/components/OrgChart/OrgChart.scss";
+
+require("office-ui-fabric/dist/css/Fabric.css");
+require("office-ui-fabric/dist/css/Fabric.Components.css");
+require("office-ui-fabric/dist/components/CommandBar/CommandBar.css");
+
 
 import configureStore from "./store/configure-store";
 const { Router, createMemoryHistory } = require("react-router");

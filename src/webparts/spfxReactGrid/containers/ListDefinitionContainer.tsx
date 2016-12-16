@@ -8,6 +8,7 @@ import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
 import { Button } from "office-ui-fabric-react/lib/Button";
+import { Fabric } from "office-ui-fabric-react/lib/Fabric";
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 
 import { ContextualMenu, IContextualMenuItem } from "office-ui-fabric-react/lib/ContextualMenu";
@@ -417,6 +418,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>
+        <Fabric>
         <CommandBar items={[{
       key: "Add LIST",
       name: "ADD A LIST",
@@ -437,6 +439,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       isChecked: true,
       onClick: this.addList
     }]} />
+      </Fabric>
         <table border="1">
           <thead>
             <tr>
