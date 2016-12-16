@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface INavigatorProps extends React.Props<any> {
   testid?: string;
@@ -7,7 +7,7 @@ export interface INavigatorProps extends React.Props<any> {
 export default function Navigator({
 
   children = null,
-  testid = ''
+  testid = ""
 }: INavigatorProps) {
   return (
     <nav
