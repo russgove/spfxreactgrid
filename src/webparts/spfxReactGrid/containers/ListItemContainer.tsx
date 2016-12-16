@@ -243,6 +243,11 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         }
         <td data-entityid={entity.GUID} >
         <div>
+
+         <Button width="20"
+            // onClick={this.deleteList}
+            buttonType={ButtonType.hero}
+            icon="Save" />
           <Button width="20"
             // onClick={this.deleteList}
 
@@ -256,10 +261,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             icon="Undo" />
 
 
-          <Button width="20"
-            // onClick={this.deleteList}
-            buttonType={ButtonType.hero}
-            icon="Save" />
+
  </div>
         </td>
       </tr>);
