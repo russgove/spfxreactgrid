@@ -5,7 +5,8 @@ import {
     GET_LISTITEMS,
     GOT_LISTITEMS,
     GET_LISTITEMSERROR,
-    CLEAR_LISTITEMS
+    CLEAR_LISTITEMS,SAVE_LISTITEM
+
 
 } from "../constants";
 import "whatwg-fetch";
@@ -76,7 +77,7 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
 
         const web = new Web(weburl);
 
-        const promise = web.lists.getById(listid).items.select(fieldnames.join(",")).get()
+        const promise = web.lists.getById(listid).items.select(fieldnames.concat("GUID").join(",")).get()
             .then((response) => {
 
                 const data = _.map(response, (item: any) => {
@@ -119,4 +120,13 @@ export function gotListItemsAction(items) {
             items: items
         }
     };
+}
+export function saveListItemAction(listItem: ListItem) {
+    const action = {
+        type: SAVE_LISTITEM,
+        payload: {
+            listItem
+        }
+    };
+    return action;
 }

@@ -152,7 +152,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
     public CellContents(props: { entity: ColumnDefinition, gridColumn: GridColumn, rowChanged: any }): JSX.Element {
         const {entity, gridColumn, rowChanged} = props;
         if (!gridColumn.editable) {
-            return (<span >
+            return (<span>
                 {entity[gridColumn.name]}
             </span>);
         }

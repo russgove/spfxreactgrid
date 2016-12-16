@@ -1,6 +1,10 @@
+/** if status is null row is fresh from server */
 enum GridRowStatus{
   new,
-  synched,
-  unsynched
+  pristine,
+  modified,
+  toBeDeleted
+
 }
+/**Status of row )mew */
 export default GridRowStatus;

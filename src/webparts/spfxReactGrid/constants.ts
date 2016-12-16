@@ -14,7 +14,15 @@ export const GOT_LISTITEMS = "App/GOT_LISTITEMS";
 export const CLEAR_LISTITEMS = "App/CLEAR_LISTITEMS";
 export const GET_LISTITEMSERROR = "App/GET_LISTITEMSERROR";
 export const REMOVE_LISTITEM = "App/REMOVE_LISTITEM";
+/**Save listitem in store */
+export const SAVE_LISTITEM="App/SAVE_LISTITEM";
 
+/** Updates item in shareepoint  */
+export const UPDATE_LISTITEM="App/UPDATE_LISTITEM";
+export const UPDATE_LISTITEM_SUCCESS="App/UPDATE_LISTITEM_SUCCESS";
+export const UPDATE_LISTITEM_ERROR="App/UPDATE_LISTITEM_ERROR";
+
+export const UPDATE_ALLLISTITEMS="App/UPDATE_ALLLISTITEMS";
 
 export const ADD_COLUMN = "App/ADD_COLUMN";
 export const ADD_COLUMNS = "App/ADD_COLUMNS";

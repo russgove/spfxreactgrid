@@ -2,7 +2,7 @@
 import * as React from "react";
 import { SyntheticEvent } from "react";
 const connect = require("react-redux").connect;
-import { addListItem, removeListItem, getListItemsAction } from "../actions/listItemActions";
+import { addListItem, removeListItem, getListItemsAction ,saveListItemAction} from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ColumnReference from "../model/ListDefinition";
@@ -23,6 +23,7 @@ interface IListViewPageProps extends React.Props<any> {
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   updateListItem: (ListItem) => void;
+    saveListItem: (ListItem) => void;
 }
 function mapStateToProps(state) {
 
@@ -52,6 +53,9 @@ function mapDispatchToProps(dispatch) {
     },
     removeListItem: (): void => {
       dispatch(removeListItem(new ListItem("123-123123123-123123-123123")));
+    },
+       saveListItem: (listItem:ListItem): void => {
+      dispatch(saveListItemAction(listItem));
     },
   };
 }
@@ -123,7 +127,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
 
     // now what;
-
+debugger;
+this.props.saveListItem(entity);
 
   }
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, valueChanged: (event) => void; }): JSX.Element {
