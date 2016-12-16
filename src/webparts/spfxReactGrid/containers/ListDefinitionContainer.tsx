@@ -414,7 +414,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     //   isChecked: true,
     //   onClick: this.addList
   //  });
-
+debugger;
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>
@@ -423,6 +423,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       key: "Add LIST",
       name: "ADD A LIST",
            className: 'Charm-List',
+           icon:'alertOutline',
       canCheck: true,
       onClick: this.addList
     },
