@@ -1,5 +1,6 @@
 ﻿import * as utils from "../utils/utils";
 import * as React from "react";
+import { SyntheticEvent } from "react";
 const connect = require("react-redux").connect;
 import { addListItem, removeListItem, getListItemsAction } from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
@@ -89,7 +90,41 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const columnid = attributes.getNamedItem("data-columnid").value;
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
   }
-  private handleRowUpdated(e) {
+  public handleRowUpdated(event): void {
+    debugger;
+    //let xx = new SyntheticEvent();
+    //if (event instanceof  SyntheticEvent) Not working
+    let value;
+    let entityid, columnid: string;
+    if (event.target) { // can get instanceof working. Assum,e if it has a target, then its an event
+      const target = event.target;
+      value = target.value;
+      const parentTD = this.getParent(event.target, "TD");
+      const attributes: NamedNodeMap = parentTD.attributes;
+      const entityitem = attributes.getNamedItem("data-entityid");
+      entityid = entityitem.value;
+      columnid = attributes.getNamedItem("data-columnid").value;
+
+    }
+    else {
+      value = event;
+      entityid = this.state.editing.entityid;
+      columnid = this.state.editing.columnid;
+    }
+    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
+    const internalName = utils.ParseSPField(columnReference.name).id;
+    switch (columnReference.fieldDefinition.TypeAsString){
+    case "DateTime":
+      entity[internalName] = value.getFullYear()+value.getMonth()+1+value.getDate()+"T00:00:00Z";
+      default:
+      entity[internalName] = value;
+    }
+
+    // now what;
+
+
   }
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, valueChanged: (event) => void; }): JSX.Element {
     debugger;
