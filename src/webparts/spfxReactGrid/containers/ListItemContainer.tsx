@@ -2,7 +2,7 @@
 import * as React from "react";
 import { SyntheticEvent } from "react";
 const connect = require("react-redux").connect;
-import { addListItem, removeListItem, getListItemsAction ,saveListItemAction} from "../actions/listItemActions";
+import { addListItem, removeListItem, getListItemsAction, saveListItemAction } from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ColumnReference from "../model/ListDefinition";
@@ -23,7 +23,7 @@ interface IListViewPageProps extends React.Props<any> {
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   updateListItem: (ListItem) => void;
-    saveListItem: (ListItem) => void;
+  saveListItem: (ListItem) => void;
 }
 function mapStateToProps(state) {
 
@@ -54,7 +54,7 @@ function mapDispatchToProps(dispatch) {
     removeListItem: (): void => {
       dispatch(removeListItem(new ListItem("123-123123123-123123-123123")));
     },
-       saveListItem: (listItem:ListItem): void => {
+    saveListItem: (listItem: ListItem): void => {
       dispatch(saveListItemAction(listItem));
     },
   };
@@ -119,16 +119,16 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     const internalName = utils.ParseSPField(columnReference.name).id;
-    switch (columnReference.fieldDefinition.TypeAsString){
-    case "DateTime":
-      entity[internalName] = value.getFullYear()+value.getMonth()+1+value.getDate()+"T00:00:00Z";
+    switch (columnReference.fieldDefinition.TypeAsString) {
+      case "DateTime":
+        entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
       default:
-      entity[internalName] = value;
+        entity[internalName] = value;
     }
 
     // now what;
-debugger;
-this.props.saveListItem(entity);
+    debugger;
+    this.props.saveListItem(entity);
 
   }
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, valueChanged: (event) => void; }): JSX.Element {
@@ -242,11 +242,25 @@ this.props.saveListItem(entity);
           }, this)
         }
         <td data-entityid={entity.GUID} >
-          <Button
+        <div>
+          <Button width="20"
             // onClick={this.deleteList}
+
             buttonType={ButtonType.hero}
             icon="Delete" />
 
+
+          <Button width="20"
+            // onClick={this.deleteList}
+            buttonType={ButtonType.hero}
+            icon="Undo" />
+
+
+          <Button width="20"
+            // onClick={this.deleteList}
+            buttonType={ButtonType.hero}
+            icon="Save" />
+ </div>
         </td>
       </tr>);
   };
@@ -269,6 +283,28 @@ this.props.saveListItem(entity);
     return (
       <Container testid="columns" size={2} center>
         <h1>List Items</h1>
+        <CommandBar items={[{
+          key: "AddItem",
+          name: "Add an Item",
+          icon: "Add",
+
+        },
+        {
+          key: "DleteAll",
+          name: "DeleteAll",
+          icon: "Delete"
+        },
+        {
+          key: "Undo All changes",
+          name: "UndoAll",
+          icon: "Undo"
+        },
+        {
+          key: "Save All  ",
+          name: "Save To SharePoint",
+          icon: "Save"
+
+        }]} />
 
         <table border="1">
           <thead>
