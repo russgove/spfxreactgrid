@@ -95,7 +95,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       id: "SiteUrl",
       name: "siteUrl", // the url to the site
       editable: true,
-      width: 259,
+      width: 359,
       formatter: "",
       type: "Text"
     },
@@ -314,7 +314,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         return (<FieldEditor selectedValue={columnValue} onChange={valueChanged} fields={fields} />);
       default:
         return (
-          <input autoFocus type="text"
+          <input autoFocus type="text" width={column.width}
             value={entity[column.name]}
             onChange={valueChanged} onBlur={valueChanged} />);
     }
@@ -327,7 +327,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       default:
 
         if (this.isdeafaultColumn(column.id)) {
-          return (<a href="#" onFocus={this.toggleEditing}>
+          return (<a href="#" onFocus={this.toggleEditing}  style={{textDecoration:"none" }}>
             {entity[column.name]}
           </a>
           );
@@ -338,7 +338,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
           if (colref != null) {
             displaytext = utils.ParseSPField(colref.name).value;
           }
-          return (<a href="#" onFocus={this.toggleEditing}>
+          return (<a href="#" onFocus={this.toggleEditing}  style={{textDecoration:"none" }}>
             {displaytext}
           </a>
           );
@@ -349,12 +349,12 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   public TableDetail(props: { entity: ListDefinition, column: GridColumn, rowChanged: (event) => void; }): JSX.Element {
     const {entity, column, rowChanged} = props;
     if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id) {
-      return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ border: "2px solid black", padding: "0px" }}>
+      return (<td data-entityid={entity.guid} data-columnid={column.id} style={{width: column.width,  border: "1px solid red", padding: "0px" }}>
         <this.CellContentsEditable entity={entity} column={column} valueChanged={rowChanged} />
       </td>
       );
     } else {
-      return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
+      return (<td data-entityid={entity.guid} data-columnid={column.id} style={{width: column.width,  border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
         <this.CellContents entity={entity} column={column} rowChanged={rowChanged} />
       </td>
       );
@@ -400,7 +400,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>
-        <Fabric>
+
           <CommandBar items={[{
             key: "Add LIST",
             name: "Add a List",
@@ -421,7 +421,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
             icon: "ClearFilter"
 
           }]} />
-        </Fabric>
+
         <table border="1">
           <thead>
             <tr>

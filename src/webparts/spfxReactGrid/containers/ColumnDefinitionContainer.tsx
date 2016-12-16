@@ -4,7 +4,10 @@ const connect = require("react-redux").connect;
 import { DropDownEditor, ISelectChoices } from "../components/DropDownEditor";
 import { addColumn, removeColumn, saveColumn } from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
-import { Button } from "office-ui-fabric-react/lib/Button";
+
+import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
+import { Fabric } from "office-ui-fabric-react/lib/Fabric";
+import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import Container from "../components/container";
 import { Guid, Log } from "@microsoft/sp-client-base";
 import * as utils from "../utils/utils";
@@ -12,7 +15,7 @@ const fieldTypes: Array<ISelectChoices> = [
     { name: "Text", value: "Text" },
     { name: "Integer", value: "Integer" },
     // { name: "Note", value: "Note" },
-     { name: "DateTime", value: "DateTime" },
+    { name: "DateTime", value: "DateTime" },
     // { name: "Counter", value: "Counter" },
     // { name: "Choice", value: "Choice" },
     // { name: "Lookup", value: "Lookup" },
@@ -28,7 +31,7 @@ const fieldTypes: Array<ISelectChoices> = [
     // { name: "Computed", value: "Computed" },
     // { name: "File", value: "File" },
     // { name: "Attachments", value: "Attachments" },
-     { name: "User", value: "User" },
+    { name: "User", value: "User" },
     // { name: "ModStat", value: "ModStat" },
     // { name: "ContentTypeId", value: "ContentTypeId" },
     // { name: "WorkflowStatus", value: "WorkflowStatus" },
@@ -86,7 +89,7 @@ class CellContentsEditable extends React.Component<ICellContentsEditableProps, a
                 );
             default:
                 return (
-                    <input autoFocus style={{ width: "100%" }} type="text"
+                    <input autoFocus style={{ width: "99%", padding: "0px"}} type="text"
                         value={entity[gridColumn.name]}
                         onChange={valueChanged}
                         onBlur={valueChanged}
@@ -157,7 +160,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
             case "SharePointLookupCellFormatter":
                 return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);
             default:
-                return (<a href="#" onFocus={this.toggleEditing}>
+        return (<a href="#" onFocus={this.toggleEditing} style={{textDecoration:"none" }}>
                     {entity[gridColumn.name]}
                 </a>
                 );
@@ -166,12 +169,12 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
     public TableDetail(props): JSX.Element {
         const {entity, column, rowChanged} = props;
         if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id && column.editable) {
-            return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "4px solid black", padding: "0px" }}>
+            return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid red", padding: "0px" }}>
                 <CellContentsEditable entity={entity} gridColumn={column} valueChanged={rowChanged} />
             </td>
             );
         } else {
-            return (<td onClick={this.toggleEditing} data-entityid={entity.guid} data-columnid={column.id} >
+            return (<td onClick={this.toggleEditing} data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid black", padding: "0px" }} >
                 <this.CellContents key={entity.id + column.id} entity={entity} gridColumn={column} rowChanged={rowChanged} />
             </td>
             );
@@ -189,9 +192,11 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                     }, this)
                 }
                 <td data-entityid={entity.guid} >
-                    <a href="#" onClick={this.handleRowdeleted}>
-                        Delete
-        </a>
+                    <Button
+                        onClick={this.handleRowdeleted}
+                        buttonType={ButtonType.hero}
+                        icon="Delete" />
+
                 </td>
             </tr>);
     };
@@ -224,11 +229,12 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         this.props.saveColumn(entity);
     }
     private handleRowdeleted(event) {
+        debugger;
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
         const target = this.getParent(event.target, "TD");
         const attributes: NamedNodeMap = target.attributes;
-        const entity = attributes.getNamedItem("data-entityid").value;
-        const column: ColumnDefinition = this.props.columns.find(temp => utils.ParseSPField(temp.guid).id === entity);
+        const entityId = attributes.getNamedItem("data-entityid").value;
+        const column: ColumnDefinition = this.props.columns.find(cd => cd.guid === entityId);
         this.props.removeColumn(column);
         return;
     }
@@ -250,8 +256,19 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         const {  addColumn, removeColumn } = this.props;
         return (
             <Container testid="columns" size={2} center>
-                <div><h1>Columns</h1>
-                    <Button onClick={addColumn}>add column</Button></div>
+                <h1>Columns</h1>
+                <CommandBar items={[{
+                    key: "AddColumns",
+                    name: "Add a Column",
+                    icon: "Add",
+                    onClick: addColumn
+                },
+                {
+                    key: "ClearAllColums",
+                    name: "Remove All Columns",
+                    canCheck: true,
+                    icon: "Delete"
+                }]} />
                 <table style={{ borderColor: "#600", borderWidth: "0 0 0 0", borderStyle: "solid" }}>
                     <thead>
                         <tr>
