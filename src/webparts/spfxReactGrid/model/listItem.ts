@@ -1,4 +1,8 @@
 export default class ListItem {
+        public __metadata__ListDefinitionId;
+
     public constructor(
-        public guid: string)  { }
+        public GUID: string)  { }
+
+
 }

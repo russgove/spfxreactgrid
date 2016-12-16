@@ -229,7 +229,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         this.props.saveColumn(entity);
     }
     private handleRowdeleted(event) {
-        debugger;
+
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
         const target = this.getParent(event.target, "TD");
         const attributes: NamedNodeMap = target.attributes;

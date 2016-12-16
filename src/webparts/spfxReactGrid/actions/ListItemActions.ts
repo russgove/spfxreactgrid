@@ -80,10 +80,11 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
             .then((response) => {
 
                 const data = _.map(response, (item: any) => {
-                    return new ListItem(item.GUID);
+                   item.__metadata__ListDefinitionId=listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                   return item;
                 });
                 console.log(data);
-                const gotListItems = gotListItemsAction(response);
+                const gotListItems = gotListItemsAction(data);
                 dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
             })
             .catch((error) => {

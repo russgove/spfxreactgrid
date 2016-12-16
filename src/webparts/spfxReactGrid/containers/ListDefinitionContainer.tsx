@@ -184,7 +184,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     const entity: ListDefinition = this.props.lists.find((temp) => temp.guid === entityid);
     const column = this.extendedColumns.find(temp => temp.id === columnid);
     // if it is a default column, just set its value , otheriwse update it in the list of extended columns (i.e. sharepoint columns)
-    debugger;
+
     if (this.isdeafaultColumn(columnid)) {
       entity[column.name] = value;
     }
@@ -240,7 +240,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   public getFieldsForlist(listDef: ListDefinition, colType?: string): Array<WebListField> {
     const lists = this.getListsForWeb(listDef);
-    debugger;
+
     for (const list of lists) {
       if (list.id === utils.ParseSPField(listDef.listLookup).id) {
         if (list.fieldsFetched) {
@@ -299,7 +299,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         columnValue = this.GetColumnReferenence(entity, column.id).name;
       }
     }
-    debugger;
+
     switch (column.editor) {
 
       case "WebEditor":
@@ -396,7 +396,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
 
   public render() {
-    debugger;
+
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>

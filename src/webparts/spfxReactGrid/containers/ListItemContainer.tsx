@@ -1,11 +1,18 @@
-﻿import * as React from "react";
+﻿import * as utils from "../utils/utils";
+import * as React from "react";
 const connect = require("react-redux").connect;
 import { addListItem, removeListItem, getListItemsAction } from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
+import ColumnReference from "../model/ListDefinition";
 import ListDefinition from "../model/ListDefinition";
+import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
+import { Fabric } from "office-ui-fabric-react/lib/Fabric";
+import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
+
+
 import Container from "../components/container";
-import {  Log } from "@microsoft/sp-client-base";
+import { Log } from "@microsoft/sp-client-base";
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 interface IListViewPageProps extends React.Props<any> {
   listItems: Array<ListItem>;
@@ -39,7 +46,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(addListItem(new ListItem("123-123123123-123123-123123")));
     },
     getListItems: (listDefinitions: Array<ListDefinition>): void => {
-        const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
+      const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
     },
     removeListItem: (): void => {
@@ -97,29 +104,36 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         onChange={valueChanged} onBlur={valueChanged} />);
     // }
   }
+  public getListDefinition(listdefid): ListDefinition {
+    return this.props.listDefinitions.find(ld => ld.guid === listdefid);
+  }
   public CellContents(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
-
-    const {entity, column} = props;
+    debugger;
+    const {entity, column, rowChanged} = props;
+    let listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    let colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+let internalName=utils.ParseSPField(colref.name).id;
     //switch (column.formatter) {
     //  case "SharePointLookupCellFormatter":
     //    return (<SharePointLookupCellFormatter value={entity[column.name]} onFocus={this.toggleEditing} />);
     //  default:
     return (<a href="#" onFocus={this.toggleEditing}>
-      {entity[column.name]}
+      {entity[internalName]}
     </a>
     );
     //}
   }
 
   public TableDetail(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
+
     const {entity, column, rowChanged} = props;
-    if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.guid) {
-      return (<td data-entityid={entity.guid} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
+    if (this.state && this.state.editing && this.state.editing.entityid === entity.GUID && this.state.editing.columnid === column.guid) {
+      return (<td data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
         <this.CellContentsEditable entity={entity} column={column} valueChanged={rowChanged} />
       </td>
       );
     } else {
-      return (<td data-entityid={entity.guid} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
+      return (<td data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
         <this.CellContents entity={entity} column={column} rowChanged={rowChanged} />
       </td>
       );
@@ -136,10 +150,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             );
           }, this)
         }
-        <td data-entityid={entity.guid} >
-          <a href="#" >
-            Delete
-        </a>
+        <td data-entityid={entity.GUID} >
+          <Button
+            // onClick={this.deleteList}
+            buttonType={ButtonType.hero}
+            icon="Delete" />
+
         </td>
       </tr>);
   };
@@ -150,7 +166,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         {
           entities.map(function (list) {
             return (
-              <this.TableRow key={list.guid} entity={list} columns={columns} rowChanged={rowChanged} />
+              <this.TableRow key={list.GUID} entity={list} columns={columns} rowChanged={rowChanged} />
             );
           }, this)
         }
