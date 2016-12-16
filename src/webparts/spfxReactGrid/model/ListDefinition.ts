@@ -6,7 +6,8 @@ export class ColumnReference {
         public columnDefinitionId: string,
         /** The field in the Sharepoint list. Stored as 'internalname#;displayname')*/
         public name: string,
-        /** The FULL field Definistion from sharepoint.... need to shave tos donw abit */
+        /** The FULL field Definistion from sharepoint.... need to shave tos donw abit
+         * the Definition of the field iin sharepoint.... Should narrrow trhis down later I need EntityPropertyName and TypeAsString. Required,lookup info. etc...*/
          public fieldDefinition:any
 
     ) { }

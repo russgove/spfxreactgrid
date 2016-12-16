@@ -9,7 +9,7 @@ import ListDefinition from "../model/ListDefinition";
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
-
+import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
 
 import Container from "../components/container";
 import { Log } from "@microsoft/sp-client-base";
@@ -104,6 +104,19 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           <input autoFocus type="text"
             value={columnValue}
             onChange={valueChanged} onBlur={valueChanged} />);
+
+      case "DateTime":
+        const datpickerStrings: IDatePickerStrings = {
+          "months": [""],
+          "shortMonths": [""],
+          "days": [""],
+          "shortDays": [""],
+          goToToday: "yes"
+        };
+        return (
+          <DatePicker strings={datpickerStrings} onSelectDate={valueChanged}
+            allowTextInput={true} isRequired={colref.fieldDefinition.Required}
+            />);
       default:
         return (
           <input autoFocus type="text"
@@ -116,16 +129,16 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     return this.props.listDefinitions.find(ld => ld.guid === listdefid);
   }
 
-//   public getColumnReference(entity: ListItem, column: ColumnDefinition): ColumnReference {
-//     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-//     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
-// return colref;
-//   }
+  //   public getColumnReference(entity: ListItem, column: ColumnDefinition): ColumnReference {
+  //     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+  //     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+  // return colref;
+  //   }
 
   public CellContents(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
 
     const {entity, column, rowChanged} = props;
-        const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
 
     const internalName = utils.ParseSPField(colref.name).id;
