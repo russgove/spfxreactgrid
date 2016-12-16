@@ -2,9 +2,9 @@ import * as React from "react";
 import * as ReactDom from "react-dom";
 import { Provider } from "react-redux";
 
-require("office-ui-fabric/dist/css/Fabric.css");
-require("office-ui-fabric/dist/css/Fabric.Components.css");
-require("office-ui-fabric/dist/components/CommandBar/CommandBar.css");
+// require("office-ui-fabric/dist/css/Fabric.css");
+// require("office-ui-fabric/dist/css/Fabric.Components.css");
+// require("office-ui-fabric/dist/components/CommandBar/CommandBar.css");
 
 
 import configureStore from "./store/configure-store";

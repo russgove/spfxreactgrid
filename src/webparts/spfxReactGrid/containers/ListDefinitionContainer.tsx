@@ -7,7 +7,7 @@ import ListEditor from "../components/ListEditor";
 import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
-import { Button } from "office-ui-fabric-react/lib/Button";
+import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 
@@ -372,9 +372,11 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
           }, this)
         }
         <td data-entityid={entity.guid} >
-          <a href="#" onClick={this.deleteList}>
-            Delete
-        </a>
+          <Button
+            onClick={this.deleteList}
+            buttonType={ButtonType.hero}
+            icon="Delete" />
+
         </td>
       </tr>);
   };
@@ -394,53 +396,32 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
 
   public render() {
-    // let MenuItems = new Array<IContextualMenuItem>();
-    // MenuItems.push({
-    //   key: "Add LIST",
-    //   name: "ADD A LIST",
-    //   canCheck: true,
-    //   onClick: this.addList
-    // });
-    // MenuItems.push({
-    //   key: "Clear All Lists",
-    //   name: "Clear All Lists",
-    //   canCheck: true,
-    //   onClick: this.addList
-    // });
-    // MenuItems.push({
-    //   key: "Allow All Types ",
-    //   name: "Allow All Types ",
-    //   canCheck: true,
-    //   isChecked: true,
-    //   onClick: this.addList
-  //  });
-debugger;
+    debugger;
     return (
       <Container testid="columns" size={2} center>
         <h1>Lists</h1>
         <Fabric>
-        <CommandBar items={[{
-      key: "Add LIST",
-      name: "ADD A LIST",
-           className: 'Charm-List',
-           icon:'alertOutline',
-      canCheck: true,
-      onClick: this.addList
-    },
-    {
-      key: "Clear All Lists",
-      name: "Clear All Lists",
-      canCheck: true,
-      onClick: this.addList
-    },
-   {
-      key: "Allow All Types ",
-      name: "Allow All Types ",
-      canCheck: true,
-      isChecked: true,
-      onClick: this.addList
-    }]} />
-      </Fabric>
+          <CommandBar items={[{
+            key: "Add LIST",
+            name: "Add a List",
+            icon: "Add",
+            onClick: this.addList
+          },
+          {
+            key: "Clear All Lists",
+            name: "Remove All Lists",
+            canCheck: true,
+            icon: "Delete"
+          },
+          {
+            key: "Allow All Types ",
+            name: "Allow All Types ",
+            canCheck: true,
+            isChecked: true,
+            icon: "ClearFilter"
+
+          }]} />
+        </Fabric>
         <table border="1">
           <thead>
             <tr>
