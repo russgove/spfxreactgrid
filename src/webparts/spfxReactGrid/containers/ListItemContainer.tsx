@@ -92,36 +92,74 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   private handleRowUpdated(e) {
   }
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, valueChanged: (event) => void; }): JSX.Element {
+    debugger;
     const {entity, column, valueChanged} = props;
-    let columnValue;
-    columnValue = entity[column.name];
-    // switch (column.editor) {
-
-    //default:
-    return (
-      <input autoFocus type="text"
-        value={entity[column.name]}
-        onChange={valueChanged} onBlur={valueChanged} />);
-    // }
+    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+    const internalName = utils.ParseSPField(colref.name).id;
+    const columnValue = entity[internalName];
+    switch (colref.fieldDefinition.TypeAsString) {
+      case "Text":
+        return (
+          <input autoFocus type="text"
+            value={columnValue}
+            onChange={valueChanged} onBlur={valueChanged} />);
+      default:
+        return (
+          <input autoFocus type="text"
+            value={columnValue}
+            onChange={valueChanged} onBlur={valueChanged} />);
+    }
   }
+
   public getListDefinition(listdefid): ListDefinition {
     return this.props.listDefinitions.find(ld => ld.guid === listdefid);
   }
+
+//   public getColumnReference(entity: ListItem, column: ColumnDefinition): ColumnReference {
+//     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+//     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+// return colref;
+//   }
+
   public CellContents(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
-    debugger;
+
     const {entity, column, rowChanged} = props;
-    let listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-    let colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
-let internalName=utils.ParseSPField(colref.name).id;
-    //switch (column.formatter) {
-    //  case "SharePointLookupCellFormatter":
-    //    return (<SharePointLookupCellFormatter value={entity[column.name]} onFocus={this.toggleEditing} />);
-    //  default:
-    return (<a href="#" onFocus={this.toggleEditing}>
-      {entity[internalName]}
-    </a>
-    );
-    //}
+        const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+
+    const internalName = utils.ParseSPField(colref.name).id;
+
+    switch (colref.fieldDefinition.TypeAsString) {
+      case "Text":
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+          {entity[internalName]}
+        </a>
+        );
+
+      case "DateTime":
+        let value: string;
+        if (entity[internalName] === null) {
+          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+
+          </a>);
+        }
+        if (colref.fieldDefinition.EntityPropertyName === "DateOnly") {
+          value = entity[internalName].split("T")[0];
+        }
+        else {
+          value = entity[internalName];
+        }
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+          {value}
+        </a>
+        );
+      default:
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+          {entity[internalName]}
+        </a>
+        );
+    }
   }
 
   public TableDetail(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {

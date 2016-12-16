@@ -4,7 +4,7 @@ export class WebListField {
     public constructor(public id: string,
         /** the name of the field in the list stored as internalName#;name */
         public name: string,
-        /** the Definition of the field iin sharepoint.... Should narrrow trhis down later */
+        /** the Definition of the field iin sharepoint.... Should narrrow trhis down later I need EntityPropertyName and TypeAsString. lookup info. etc...*/
         public fieldDefinition:any,
        ) {
     }

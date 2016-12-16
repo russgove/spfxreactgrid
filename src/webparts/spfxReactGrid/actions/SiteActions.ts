@@ -13,6 +13,7 @@ import "whatwg-fetch";
 import pnp from "sp-pnp-js";
 import * as utils from "../utils/utils";
 import { Web as SPWeb } from "sp-pnp-js";
+import { Site as SPSite } from "sp-pnp-js";
 import { Web, WebList, WebListField } from "../model/Site";
 // export function getWebsAction(dispatch: any, siteUrl: string): any {
 //     // need allwebs
@@ -53,7 +54,9 @@ export function getWebsAction(dispatch: any, siteUrl: string): any {
     // need allwebs
 
     // const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").orderBy("Web/Title, List/Title, Field/Title", false).get()
-    const payload = pnp.sp.site.rootWeb.webs.orderBy("Title").get()
+    const site:SPSite=new SPSite(siteUrl);
+    //const payload = pnp.sp.site.rootWeb.webs.orderBy("Title").get()
+    const payload = site.rootWeb.webs.orderBy("Title").get()
         .then((response) => {
             const data = _.map(response, (item: any) => {
                 const web: Web = new Web(item.Id, item.Title, item.Url);
