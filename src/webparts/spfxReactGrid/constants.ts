@@ -16,8 +16,10 @@ export const GET_LISTITEMSERROR = "App/GET_LISTITEMSERROR";
 export const REMOVE_LISTITEM = "App/REMOVE_LISTITEM";
 /**Save listitem in store */
 export const SAVE_LISTITEM="App/SAVE_LISTITEM";
+export const UNDO_LISTITEMCHANGES="App/UNDO_LISTITEMCHANGES";
 
 /** Updates item in shareepoint  */
+
 export const UPDATE_LISTITEM="App/UPDATE_LISTITEM";
 export const UPDATE_LISTITEM_SUCCESS="App/UPDATE_LISTITEM_SUCCESS";
 export const UPDATE_LISTITEM_ERROR="App/UPDATE_LISTITEM_ERROR";

@@ -5,7 +5,7 @@ import {
     GET_LISTITEMS,
     GOT_LISTITEMS,
     GET_LISTITEMSERROR,
-    CLEAR_LISTITEMS,SAVE_LISTITEM
+    CLEAR_LISTITEMS,SAVE_LISTITEM,UNDO_LISTITEMCHANGES
 
 
 } from "../constants";
@@ -124,6 +124,15 @@ export function gotListItemsAction(items) {
 export function saveListItemAction(listItem: ListItem) {
     const action = {
         type: SAVE_LISTITEM,
+        payload: {
+            listItem
+        }
+    };
+    return action;
+}
+export function undoListItemChangesAction(listItem: ListItem) {
+    const action = {
+        type: UNDO_LISTITEMCHANGES,
         payload: {
             listItem
         }

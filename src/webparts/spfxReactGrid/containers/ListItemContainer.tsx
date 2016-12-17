@@ -2,7 +2,7 @@
 import * as React from "react";
 import { SyntheticEvent } from "react";
 const connect = require("react-redux").connect;
-import { addListItem, removeListItem, getListItemsAction, saveListItemAction } from "../actions/listItemActions";
+import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction } from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ColumnReference from "../model/ListDefinition";
@@ -23,6 +23,7 @@ interface IListViewPageProps extends React.Props<any> {
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   updateListItem: (ListItem) => void;
+  undoItemChanges: (ListItem) => void;
   saveListItem: (ListItem) => void;
 }
 function mapStateToProps(state) {
@@ -57,6 +58,9 @@ function mapDispatchToProps(dispatch) {
     saveListItem: (listItem: ListItem): void => {
       dispatch(saveListItemAction(listItem));
     },
+    undoItemChanges: (listItem: ListItem): void => {
+      dispatch(undoListItemChangesAction(listItem));
+    },
   };
 }
 interface IGridState {
@@ -75,6 +79,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.TableRows = this.TableRows.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
     this.handleRowUpdated = this.handleRowUpdated.bind(this);
+    this.undoItemChanges = this.undoItemChanges.bind(this);
   }
   public componentWillMount() {
     this.props.getListItems(this.props.listDefinitions);
@@ -93,6 +98,28 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const entityid = attributes.getNamedItem("data-entityid").value;
     const columnid = attributes.getNamedItem("data-columnid").value;
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
+  }
+  public undoItemChanges(event): void {
+    debugger;
+    //let xx = new SyntheticEvent();
+    //if (event instanceof  SyntheticEvent) Not working
+    let value;
+
+    const target = event.target;
+    value = target.value;
+    const parentTD = this.getParent(event.target, "TD");
+    const attributes: NamedNodeMap = parentTD.attributes;
+    const entityitem = attributes.getNamedItem("data-entityid");
+    const entityid = entityitem.value;
+
+
+    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+
+
+
+    debugger;
+    this.props.undoItemChanges(entity);
+
   }
   public handleRowUpdated(event): void {
     debugger;
@@ -242,23 +269,25 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           }, this)
         }
         <td data-entityid={entity.GUID} >
-        <div>
+          <div>
 
-         <Button width="20"
-            // onClick={this.deleteList}
-            buttonType={ButtonType.hero}
-            icon="Save" />
-          <Button width="20"
-            // onClick={this.deleteList}
-            buttonType={ButtonType.hero}
-            icon="Delete" />
-          <Button width="20"
-            // onClick={this.deleteList}
-            buttonType={ButtonType.hero}
-            icon="Undo" />
+            <Button width="20"
+              // onClick={this.deleteList}
+              buttonType={ButtonType.hero}
+              icon="Save" />
+            <Button width="20"
+              // onClick={this.deleteList}
+              buttonType={ButtonType.hero}
+              icon="Delete" />
+            <Button width="20"
+              // onClick={this.deleteList}
+              buttonType={ButtonType.hero}
+              onClick={this.undoItemChanges}
+              icon="Undo" />
 
 
- </div>
+
+          </div>
         </td>
       </tr>);
   };

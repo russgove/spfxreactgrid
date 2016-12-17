@@ -5,7 +5,7 @@ import {
     REMOVE_LISTITEM,
     GOT_LISTITEMS,
     CLEAR_LISTITEMS,
-    SAVE_LISTITEM
+    SAVE_LISTITEM, UNDO_LISTITEMCHANGES
 } from "../constants";
 import { Log } from "@microsoft/sp-client-base";
 const INITIAL_STATE = new Array<ListItem>();
@@ -32,7 +32,14 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
                 item.__metadata__OriginalValues = state.find(item => item.GUID === action.payload.listItem.GUID);
             }
             return newarray2;
-
+        case UNDO_LISTITEMCHANGES:
+            let newarray3 = _.clone(state);
+            let item3 = newarray3.find(item => item.GUID === action.payload.listItem.GUID);
+            item = action.payload.listItem;
+            if (item.__metadata__OriginalValues) {
+                item = item.__metadata__OriginalValues;
+            }
+            return newarray3;
         case GOT_LISTITEMS:
             return _.union(state, action.payload.items);
 
