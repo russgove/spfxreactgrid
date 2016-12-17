@@ -250,16 +250,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             icon="Save" />
           <Button width="20"
             // onClick={this.deleteList}
-
             buttonType={ButtonType.hero}
             icon="Delete" />
-
-
           <Button width="20"
             // onClick={this.deleteList}
             buttonType={ButtonType.hero}
             icon="Undo" />
-
 
 
  </div>
