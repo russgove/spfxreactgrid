@@ -2,11 +2,11 @@
 import * as React from "react";
 import { SyntheticEvent } from "react";
 const connect = require("react-redux").connect;
-import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction } from "../actions/listItemActions";
+import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction, updateListItemAction } from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ColumnReference from "../model/ListDefinition";
-import GridRowStatus  from "../model/GridRowStatus";
+import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
@@ -23,7 +23,7 @@ interface IListViewPageProps extends React.Props<any> {
   addListItem: (ListItem) => void;
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
-  updateListItem: (ListItem) => void;
+  updateListItem: (ListItem:ListItem, ListDef:ListDefinition) => void;
   undoItemChanges: (ListItem) => void;
   saveListItem: (ListItem) => void;
 }
@@ -62,6 +62,11 @@ function mapDispatchToProps(dispatch) {
     undoItemChanges: (listItem: ListItem): void => {
       dispatch(undoListItemChangesAction(listItem));
     },
+    updateListItem: (listItem: ListItem, listDef:ListDefinition): void => {
+       const promise: Promise<any> = updateListItemAction(dispatch, listDef,listItem)
+      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+
+    },
   };
 }
 interface IGridState {
@@ -81,6 +86,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.toggleEditing = this.toggleEditing.bind(this);
     this.handleRowUpdated = this.handleRowUpdated.bind(this);
     this.undoItemChanges = this.undoItemChanges.bind(this);
+    this.updateListItem = this.updateListItem.bind(this);
+
   }
   public componentWillMount() {
     this.props.getListItems(this.props.listDefinitions);
@@ -101,29 +108,32 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
   }
   public undoItemChanges(event): void {
-    debugger;
-    //let xx = new SyntheticEvent();
-    //if (event instanceof  SyntheticEvent) Not working
-    let value;
 
+    let value;
     const target = event.target;
     value = target.value;
     const parentTD = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityitem = attributes.getNamedItem("data-entityid");
     const entityid = entityitem.value;
-
-
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
 
-
-
-    debugger;
     this.props.undoItemChanges(entity);
+  }
+    public updateListItem(event): void {
 
+    const parentTD = this.getParent(event.target, "TD");
+    const attributes: NamedNodeMap = parentTD.attributes;
+    // const entityitem = attributes.getNamedItem("data-entityid");
+    // const entityid = entityitem.value;
+    const entityid= attributes.getNamedItem("data-entityid").value;
+    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+    const listDef=this.getListDefinition(entity.__metadata__ListDefinitionId);
+    debugger;
+    this.props.updateListItem(entity,listDef);
   }
   public handleRowUpdated(event): void {
-    debugger;
+
     //let xx = new SyntheticEvent();
     //if (event instanceof  SyntheticEvent) Not working
     let value;
@@ -150,7 +160,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
       entity.__metadata__OriginalValues = _.clone(entity);
     }
-    entity.__metadata__GridRowStatus=GridRowStatus.modified;
+    entity.__metadata__GridRowStatus = GridRowStatus.modified;
     switch (columnReference.fieldDefinition.TypeAsString) {
       case "DateTime":
         entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
@@ -159,12 +169,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
 
     // now what;
-    debugger;
+
     this.props.saveListItem(entity);
 
   }
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, valueChanged: (event) => void; }): JSX.Element {
-    debugger;
+
     const {entity, column, valueChanged} = props;
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
@@ -282,7 +292,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           <div>
 
             <Button width="20"
-              // onClick={this.deleteList}
+               onClick={this.updateListItem}
               buttonType={ButtonType.hero}
               icon="Save" />
             <Button width="20"

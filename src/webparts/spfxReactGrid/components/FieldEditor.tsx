@@ -20,7 +20,7 @@ export default class FieldEditor extends React.Component<IListEditorProps, void>
     this.props.onChange(event);
   }
   public render() {
-    debugger;
+
     return (
       <select value={this.props.selectedValue} onChange={this.handleChange} >
         {this.props.fields.map((field) => {

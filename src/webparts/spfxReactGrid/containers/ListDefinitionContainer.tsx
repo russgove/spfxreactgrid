@@ -177,7 +177,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     return field.fieldDefinition;
   }
   public handleRowUpdated(event): void {
-    debugger;
+
     Log.verbose("Columns-Page", "Row changed-fired when row changed or leaving cell ");
     const target = event.target;
     const value = target.value;
@@ -219,14 +219,14 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     return node;
   }
   public getWebsForSite(listDef: ListDefinition): Array<Web> {
-    debugger;
+
     for (const site of this.props.sites) {
       if (site.url === listDef.siteUrl) {
         return site.webs;
       }
     }
     // not in our cache/ go get it
-    debugger;
+
     this.props.getWebs(listDef.siteUrl);
     return [];
   }
