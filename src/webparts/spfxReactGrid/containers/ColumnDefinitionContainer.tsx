@@ -2,7 +2,7 @@
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 const connect = require("react-redux").connect;
 import { DropDownEditor, ISelectChoices } from "../components/DropDownEditor";
-import { addColumn, removeColumn, saveColumn } from "../actions/columnActions";
+import { addColumn, removeColumn, saveColumn ,removeAllColumns} from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
 
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
@@ -41,6 +41,7 @@ const fieldTypes: Array<ISelectChoices> = [
 interface IColumnsPageProps extends React.Props<any> {
     columns: Array<ColumnDefinition>;
     addColumn: () => void;
+    removeAllColumns: () => void;
     removeColumn: (column) => void;
     saveColumn: (Column) => void;
 }
@@ -65,6 +66,10 @@ function mapDispatchToProps(dispatch) {
         removeColumn: (column): void => {
 
             dispatch(removeColumn(column));
+        },
+          removeAllColumns: (column): void => {
+
+            dispatch(removeAllColumns());
         },
     };
 }
@@ -267,7 +272,8 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                     key: "ClearAllColums",
                     name: "Remove All Columns",
                     canCheck: true,
-                    icon: "Delete"
+                    icon: "Delete",
+                      onClick: this.props.removeAllColumns
                 }]} />
                 <table style={{ borderColor: "#600", borderWidth: "0 0 0 0", borderStyle: "solid" }}>
                     <thead>

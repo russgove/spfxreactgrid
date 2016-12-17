@@ -28,19 +28,23 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
             let newarray2 = _.clone(state);
             let item = newarray2.find(item => item.GUID === action.payload.listItem.GUID);
             item = action.payload.listItem;
+            debugger;
             if (!item.__metadata__OriginalValues) {
                 item.__metadata__OriginalValues = state.find(item => item.GUID === action.payload.listItem.GUID);
             }
             return newarray2;
         case UNDO_LISTITEMCHANGES:
+            debugger;
             let newarray3 = _.clone(state);
-            let item3 = newarray3.find(item => item.GUID === action.payload.listItem.GUID);
-            item = action.payload.listItem;
-            if (item.__metadata__OriginalValues) {
-                item = item.__metadata__OriginalValues;
+            // let item3 = newarray3.find(item => item.GUID === action.payload.listItem.GUID);
+            // item3 = action.payload.listItem.__metadata__OriginalValues;
+            let index = _.findIndex(newarray3, { GUID: action.payload.listItem.GUID });
+            if (newarray3[index].__metadata__OriginalValues){
+                newarray3[index] = newarray3[index].__metadata__OriginalValues;
             }
             return newarray3;
         case GOT_LISTITEMS:
+            debugger;
             return _.union(state, action.payload.items);
 
         default:

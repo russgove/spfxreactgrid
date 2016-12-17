@@ -5,7 +5,7 @@ import { SharePointLookupCellFormatter } from "../components/SharePointFormatter
 import WebEditor from "../components/WebEditor";
 import ListEditor from "../components/ListEditor";
 import FieldEditor from "../components/FieldEditor";
-import { addList, removeList, saveList } from "../actions/listActions";
+import { addList, removeList, saveList,removeAllLists } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
@@ -35,7 +35,8 @@ interface IListViewPageProps extends React.Props<any> {
   sites: Array<Site>;
   addList: (siteUrl: string) => void;
   removeList: (List) => void;
-  saveList: (List) => void;
+   removeAllLists: () => void;
+ saveList: (List) => void;
   getWebs: (siteUrl) => Promise<any>;
   getListsForWeb: (webUrl) => Promise<any>;
   getFieldsForList: (webUrl, listId) => Promise<any>;
@@ -59,6 +60,9 @@ function mapDispatchToProps(dispatch) {
     },
     removeList: (list: ListDefinition): void => {
       dispatch(removeList(list));
+    },
+        removeAllLists: (): void => {
+      dispatch(removeAllLists());
     },
     getWebs: (siteUrl): Promise<any> => {
       return dispatch(getWebsAction(dispatch, siteUrl));
@@ -414,7 +418,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
             key: "Clear All Lists",
             name: "Remove All Lists",
             canCheck: true,
-            icon: "Delete"
+            icon: "Delete",
+            onClick: this.props.removeAllLists
           },
           {
             key: "Allow All Types ",

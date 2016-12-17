@@ -4,7 +4,7 @@ import {
     ADD_COLUMN,
     ADD_COLUMNS,
     REMOVE_COLUMN,
-    SAVE_COLUMN
+    SAVE_COLUMN,REMOVE_ALLCOLUMNS
 } from "../constants";
 import { Log } from "@microsoft/sp-client-base";
 const INITIAL_STATE = new Array<ColumnDefinition>();
@@ -24,6 +24,9 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
         case REMOVE_COLUMN:
             let newArr = _.filter(state, (o) => { return o.guid !== action.payload.column.guid; });
             return newArr;
+             case REMOVE_ALLCOLUMNS:
+
+            return [];
         case ADD_COLUMNS:
             return _.union(state, action.payload.columns);
         default:

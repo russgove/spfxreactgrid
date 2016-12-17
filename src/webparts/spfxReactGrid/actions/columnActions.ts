@@ -2,6 +2,7 @@ import {
     ADD_COLUMN,
     ADD_COLUMNS,
     REMOVE_COLUMN,
+    REMOVE_ALLCOLUMNS,
 SAVE_COLUMN
 } from "../constants";
 
@@ -20,6 +21,14 @@ export function removeColumn(column: ColumnDefinition) {
         type: REMOVE_COLUMN,
         payload: {
             column: column
+        }
+    };
+}
+export function removeAllColumns() {
+    return {
+        type: REMOVE_ALLCOLUMNS,
+        payload: {
+
         }
     };
 }

@@ -3,7 +3,7 @@ import {
     ADD_LIST,
     SAVE_LIST,
     ADD_LISTS,
-    REMOVE_LIST,
+    REMOVE_LIST,REMOVE_ALLLISTS
 
 } from "../constants";
 import "whatwg-fetch";
@@ -21,6 +21,14 @@ export function removeList(list: ListDefinition) {
         type: REMOVE_LIST,
         payload: {
             list: list
+        }
+    };
+}
+export function removeAllLists() {
+    return {
+        type: REMOVE_ALLLISTS,
+        payload: {
+
         }
     };
 }

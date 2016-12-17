@@ -6,6 +6,7 @@ import { addListItem, removeListItem, getListItemsAction, saveListItemAction, un
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ColumnReference from "../model/ListDefinition";
+import GridRowStatus  from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
@@ -142,10 +143,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       entityid = this.state.editing.entityid;
       columnid = this.state.editing.columnid;
     }
-    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+    let entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     const internalName = utils.ParseSPField(columnReference.name).id;
+    if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
+      entity.__metadata__OriginalValues = _.clone(entity);
+    }
+    entity.__metadata__GridRowStatus=GridRowStatus.modified;
     switch (columnReference.fieldDefinition.TypeAsString) {
       case "DateTime":
         entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
@@ -207,7 +212,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const {entity, column, rowChanged} = props;
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
-
+    if (colref === undefined) { //Column has not been configured for this list
+      return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+        'Column Not Defined'
+        </a>
+      );
+    }
     const internalName = utils.ParseSPField(colref.name).id;
 
     switch (colref.fieldDefinition.TypeAsString) {

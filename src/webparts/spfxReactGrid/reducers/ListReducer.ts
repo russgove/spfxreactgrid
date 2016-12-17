@@ -1,9 +1,11 @@
 import {
     ADD_LIST,
     REMOVE_LIST,
+    REMOVE_ALLLISTS,
     ADD_LISTS,
     SAVE_LIST,
     REMOVE_COLUMN // remove the dolumn from all lists
+
 
 } from "../constants";
 import * as _ from "lodash";
@@ -24,6 +26,9 @@ function listReducer(state: Array<ListDefinition> = INITIAL_STATE, action: any =
         case REMOVE_LIST:
             let newArr = _.filter(state, (o) => { return o.guid !== action.payload.list.guid; });
             return newArr;
+             case REMOVE_ALLLISTS:
+            return [];
+
         case ADD_LISTS:
             return _.union(state, action.payload.lists);
         case REMOVE_COLUMN:
