@@ -417,8 +417,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
           {
             key: "Clear All Lists",
             name: "Remove All Lists",
-            canCheck: true,
-            icon: "Delete",
+           icon: "Delete",
             onClick: this.props.removeAllLists
           },
           {

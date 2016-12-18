@@ -7,7 +7,6 @@ import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import ColumnReference from "../model/ListDefinition";
 import GridRowStatus from "../model/GridRowStatus";
-import SystemStatus from "../model/SystemStatus";
 import ListDefinition from "../model/ListDefinition";
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
@@ -21,7 +20,6 @@ interface IListViewPageProps extends React.Props<any> {
   listItems: Array<ListItem>;
   columns: Array<ColumnDefinition>;
   listDefinitions: Array<ListDefinition>;
-  systemStatus:SystemStatus
   addListItem: (ListItem) => void;
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
@@ -308,9 +306,6 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
               disabled={!(entity.__metadata__OriginalValues)}
               onClick={this.undoItemChanges}
               icon="Undo" />
-
-
-
           </div>
         </td>
       </tr>);
@@ -333,10 +328,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const { listItems, addListItem, removeListItem, getListItems } = this.props;
     return (
       <Container testid="columns" size={2} center>
-      <div>
-        <h1>List Items</h1>{this.props.systemStatus.currentAction}{this.props.systemStatus.fetchStatus}
-        </div>
-        <CommandBar items={[{
+              <CommandBar items={[{
           key: "AddItem",
           name: "Add an Item",
           icon: "Add",

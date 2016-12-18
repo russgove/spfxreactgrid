@@ -1,16 +1,22 @@
 import * as React from "react";
+import {
+  Button,
+  MessageBar,
+  MessageBarType,
+  Label,
+} from "office-ui-fabric-react";
 const connect = require("react-redux").connect;
+import SystemStatus from "../model/SystemStatus";
 const Link = require("react-router").Link;
 import Content from "../components/content";
 import Navigator from "../components/navigator";
 import NavigatorItem from "../components/navigator-item";
 interface IAppProps extends React.Props<any> {
-  session: any;
+  systemStatus: SystemStatus
 }
 function mapStateToProps(state) {
   return {
-    session: state.session,
-    router: state.router,
+    systemStatus: state.systemStatus,
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -20,23 +26,22 @@ function mapDispatchToProps(dispatch) {
 }
 class App extends React.Component<IAppProps, void> {
   public render() {
+    debugger;
     const { children} = this.props;
     return (
+
       <div>
-        <Navigator testid="navigator">
-           <NavigatorItem  mr>
-            <Link to="/lists">Lists</Link>
-          </NavigatorItem>
-            <NavigatorItem  mr>
-            <Link to="/columns">Columns</Link>
-          </NavigatorItem>
-           <NavigatorItem  mr>
-            <Link to="/">List Items</Link>
-          </NavigatorItem>
-          <div className="flex flex-auto"></div>
-        </Navigator>
-        <Content isVisible={ true }>
-          { children }
+        <Button> <Link to="/lists">List Definitions</Link></Button>
+        <Button> <Link to="/columns">Column Definitions</Link></Button>
+        <Button> <Link to="/">List Items>List Items</Link></Button>
+        <div>
+          <MessageBar hidden={(this.props.systemStatus.fetchStatus === "")} messageBarType={MessageBarType.error} >  {this.props.systemStatus.fetchStatus}
+          </MessageBar>
+          <div>{this.props.systemStatus.currentAction}
+          </div>
+        </div>
+        <Content isVisible={true}>
+          {children}
         </Content>
       </div>
     );
