@@ -7,7 +7,7 @@ import ListEditor from "../components/ListEditor";
 import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList,removeAllLists } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
-import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
+import { Button, ButtonType ,Dropdown} from "office-ui-fabric-react";
 import { Fabric } from "office-ui-fabric-react/lib/Fabric";
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 

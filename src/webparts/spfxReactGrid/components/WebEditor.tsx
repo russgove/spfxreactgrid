@@ -4,6 +4,7 @@ export interface KeyValue {
   value: any;
   displayName: string;
 }
+import { Dropdown, IDropdownOption } from "office-ui-fabric-react";
 export interface IWebEditorProps extends React.Props<any> {
   selectedValue?: string;
   onChange(event): void;
@@ -19,16 +20,27 @@ export default class WebEditor extends React.Component<IWebEditorProps, void> {
     this.props.onChange(event);
   }
   public render() {
-    const { selectedValue} = this.props;
+    const { selectedValue, webs} = this.props;
+    let options: Array<IDropdownOption>;
+    debugger;
+    options = [{ key: null, text: "..Select One" }];
+
+
+    let realOptions = webs.map((web) => {
+      return ({
+        key: web.url + "#;" + web.title,
+        text: web.title
+      });
+    })
+
+    options.concat(realOptions);
+
     return (
-      <select value={selectedValue} onChange={this.handleChange} >
-        {this.props.webs.map((web) => {
-          return (
-            <option key={web.id} value={web.url + "#;" + web.title}  >{web.title}</option>
-          );
-        }, this)
-        }
-      </select >
+      <Dropdown label="" selectedKey={selectedValue} options={options} onChanged={this.handleChange} >
+      </Dropdown >
     );
-  };
-}
+  }
+
+
+};
+
