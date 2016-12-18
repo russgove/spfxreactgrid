@@ -15,47 +15,9 @@ import * as utils from "../utils/utils";
 import { Web as SPWeb } from "sp-pnp-js";
 import { Site as SPSite } from "sp-pnp-js";
 import { Web, WebList, WebListField } from "../model/Site";
-// export function getWebsAction(dispatch: any, siteUrl: string): any {
-//     // need allwebs
 
-//     // const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").orderBy("Web/Title, List/Title, Field/Title", false).get()
-//     const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").get()
-//         .then((response) => {
-
-//             const data = _.map(response, (item: any) => {
-//                 const web: Web = new Web(item.Id, item.Title, item.Url);
-//                 for (const list of item.Lists) {
-//                     const webList: WebList = new WebList(list.Id, list.Title, list.Url);
-//                     for (const field of list.Fields) {
-//                         debugger;
-//                         webList.fields.push(new WebListField(field.Id, field.Title, field.InternalName, field.TypeDisplayName));
-//                     }
-//                     web.lists.push(webList);
-//                 }
-//                 return web;
-//             });
-//             console.log(data);
-//             const gotWebs = gotWebsAction(siteUrl, data);
-//             dispatch(gotWebs); // need to ewname this one to be digfferent from the omported ome
-//         })
-//         .catch((error) => {
-//             console.log(error);
-//             dispatch(getWebsErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
-//         });
-//     const action = {
-//         type: GET_WEBS,
-//         payload: {
-//             promise: payload
-//         }
-//     };
-//     return action;
-// }
 export function getWebsAction(dispatch: any, siteUrl: string): any {
-    // need allwebs
-
-    // const payload = pnp.sp.site.rootWeb.webs.expand("lists,lists/fields").orderBy("Web/Title, List/Title, Field/Title", false).get()
     const site:SPSite=new SPSite(siteUrl);
-    //const payload = pnp.sp.site.rootWeb.webs.orderBy("Title").get()
     const payload = site.rootWeb.webs.orderBy("Title").get()
         .then((response) => {
             const data = _.map(response, (item: any) => {
@@ -148,7 +110,7 @@ export function getListsForWebActionError(error) {
 }
 export function getFieldsForListAction(dispatch: any, webUrl: string, listId: string): any {
     const web = new SPWeb(webUrl);
-    const payload = web.lists.getById(listId).fields.orderBy("Title").get()
+    const payload = web.lists.getById(listId).fields.filter("Hidden eq false").orderBy("Title").get()
         .then((response) => {
             const data = _.map(response, (item: any) => {
                 return new WebListField(item.id, new utils.ParsedSPField(item.InternalName, item.Title).toString(), item);
