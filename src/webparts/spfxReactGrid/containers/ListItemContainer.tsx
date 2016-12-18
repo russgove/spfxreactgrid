@@ -297,7 +297,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             <Button width="20"
                onClick={this.updateListItem}
               buttonType={ButtonType.hero}
-              icon="Save" />
+              icon="Save"  disabled={!(entity.__metadata__OriginalValues)} />
             <Button width="20"
               // onClick={this.deleteList}
               buttonType={ButtonType.hero}
@@ -305,6 +305,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             <Button width="20"
               // onClick={this.deleteList}
               buttonType={ButtonType.hero}
+              disabled={!(entity.__metadata__OriginalValues)}
               onClick={this.undoItemChanges}
               icon="Undo" />
 
