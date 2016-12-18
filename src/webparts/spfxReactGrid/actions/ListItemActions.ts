@@ -102,7 +102,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
         .catch((error) => {
             debugger;
             console.log(error);
-            dispatch(updateListItemSuccessAction(error)); // need to ewname this one to be digfferent from the omported ome
+            dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
         });
     const action = {
         type: UPDATE_LISTITEM,

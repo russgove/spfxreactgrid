@@ -4,6 +4,7 @@ import listItemReducer from "./listItemReducer";
 import ColumnReducer from "./ColumnReducer";
 import PageContextReducer from "./PageContextReducer";
 import SiteReducer from "./SiteReducer";
+import SystemStatus from "./SystemStatus";
 import { Log } from "@microsoft/sp-client-base";
 const { routerReducer } = require("react-router-redux");
 export function RootReducer(state, action) {
@@ -15,7 +16,8 @@ export function RootReducer(state, action) {
             columns: ColumnReducer,
             sites: SiteReducer,
             pageContext: PageContextReducer,
-            routing: routerReducer
+            routing: routerReducer,
+            systemStatus:SystemStatus
         }
     );
     return combinedReducers(state, action);
