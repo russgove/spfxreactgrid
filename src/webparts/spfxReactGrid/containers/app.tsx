@@ -25,6 +25,17 @@ function mapDispatchToProps(dispatch) {
   };
 }
 class App extends React.Component<IAppProps, void> {
+  private messageBar(error:string): JSX.Element {
+    if (error === "") {
+      return (<div />)
+    }
+    else {
+      return (
+        <MessageBar messageBarType={MessageBarType.error}>{error} </MessageBar>
+      );
+    }
+  }
+
   public render() {
     debugger;
     const { children} = this.props;
@@ -35,16 +46,16 @@ class App extends React.Component<IAppProps, void> {
         <Button> <Link to="/columns">Column Definitions</Link></Button>
         <Button> <Link to="/">List Items>List Items</Link></Button>
         <div>
-          <MessageBar hidden={(this.props.systemStatus.fetchStatus === "")} messageBarType={MessageBarType.error} >  {this.props.systemStatus.fetchStatus}
-          </MessageBar>
-          <div>{this.props.systemStatus.currentAction}
-          </div>
+          {this.messageBar(this.props.systemStatus.fetchStatus)}
+
+        <div>{this.props.systemStatus.currentAction}
         </div>
-        <Content isVisible={true}>
-          {children}
-        </Content>
       </div>
-    );
+      <Content isVisible={true}>
+        {children}
+      </Content>
+    </div >
+  );
   };
 }
 
