@@ -9,8 +9,6 @@ const connect = require("react-redux").connect;
 import SystemStatus from "../model/SystemStatus";
 const Link = require("react-router").Link;
 import Content from "../components/content";
-
-
 interface IAppProps extends React.Props<any> {
   systemStatus: SystemStatus
 }
@@ -21,7 +19,6 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-
   };
 }
 class App extends React.Component<IAppProps, void> {
