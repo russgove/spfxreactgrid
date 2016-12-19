@@ -7,7 +7,7 @@ import ListEditor from "../components/ListEditor";
 import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList, removeAllLists } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
-import { Button, ButtonType, Dropdown } from "office-ui-fabric-react";
+import { Button, ButtonType, Dropdown ,TextField} from "office-ui-fabric-react";
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import ListDefinition from "../model/ListDefinition";
 import { ColumnReference } from "../model/ListDefinition";
@@ -327,7 +327,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         return (<WebEditor webs={webs} selectedValue={columnValue} onChange={cellUpdated} />);
       case "ListEditor":
         let lists = this.getListsForWeb(entity);// the Id portion of the WebLookup is the URL
-        return (<ListEditor selectedValue={columnValue} onChange={cellUpdatedEvent} lists={lists} />);
+        return (<ListEditor selectedValue={columnValue} onChange={cellUpdated} lists={lists} width={column.width} />);
       case "FieldEditor":
         const colType = utils.ParseSPField(column.type).id;
         const fields = this.getFieldsForlist(entity, colType);
@@ -335,7 +335,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       default:
       debugger;
         return (
-          <input autoFocus type="text" width={column.width}
+          <TextField   autoFocus width={column.width}
             value={entity[column.name]}
             onChange={cellUpdatedEvent} onBlur={cellUpdatedEvent} />);
     }
