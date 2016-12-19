@@ -9,8 +9,8 @@ const connect = require("react-redux").connect;
 import SystemStatus from "../model/SystemStatus";
 const Link = require("react-router").Link;
 import Content from "../components/content";
-import Navigator from "../components/navigator";
-import NavigatorItem from "../components/navigator-item";
+
+
 interface IAppProps extends React.Props<any> {
   systemStatus: SystemStatus
 }

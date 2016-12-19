@@ -79,7 +79,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     const web = new Web(weburl);
     let typedHash: TypedHash<string | number | boolean> = {};
 
-    for (let fieldName in listItem) {
+    for (const fieldName in listItem) {
         if (!skipFields.includes(fieldName)) {
             if (listItem.hasOwnProperty(fieldName)) {
                 typedHash[fieldName] = listItem[fieldName];

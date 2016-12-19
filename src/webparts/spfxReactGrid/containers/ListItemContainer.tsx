@@ -1,15 +1,15 @@
 ﻿import * as utils from "../utils/utils";
 import * as React from "react";
-import { SyntheticEvent } from "react";
+
 const connect = require("react-redux").connect;
 import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction, updateListItemAction } from "../actions/listItemActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
-import ColumnReference from "../model/ListDefinition";
+
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
 import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
-import { Fabric } from "office-ui-fabric-react/lib/Fabric";
+
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
 
@@ -64,7 +64,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(undoListItemChangesAction(listItem));
     },
     updateListItem: (listItem: ListItem, listDef:ListDefinition): void => {
-       const promise: Promise<any> = updateListItemAction(dispatch, listDef,listItem)
+       const promise: Promise<any> = updateListItemAction(dispatch, listDef,listItem);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
@@ -165,6 +165,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     switch (columnReference.fieldDefinition.TypeAsString) {
       case "DateTime":
         entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
+        break;
       default:
         entity[internalName] = value;
     }
@@ -360,7 +361,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             </tr>
           </thead>
           {
-            <this.TableRows entities={this.props.listItems} columns={this.props.columns} rowChanged={this.handleRowUpdated} />
+            <this.TableRows entities={listItems} columns={this.props.columns} rowChanged={this.handleRowUpdated} />
 
           })}
         </table>

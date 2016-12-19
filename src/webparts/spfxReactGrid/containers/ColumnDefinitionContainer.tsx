@@ -5,8 +5,8 @@ import { DropDownEditor, ISelectChoices } from "../components/DropDownEditor";
 import { addColumn, removeColumn, saveColumn ,removeAllColumns} from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
 
-import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
-import { Fabric } from "office-ui-fabric-react/lib/Fabric";
+import { Button, ButtonType } from "office-ui-fabric-react";
+
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import Container from "../components/container";
 import { Guid, Log } from "@microsoft/sp-client-base";

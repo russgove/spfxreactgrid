@@ -24,8 +24,6 @@ export default class WebEditor extends React.Component<IWebEditorProps, void> {
     let options: Array<IDropdownOption>;
     debugger;
     options = [{ key: null, text: "..Select One" }];
-
-
     let realOptions = webs.map((web) => {
       return ({
         key: web.url + "#;" + web.title,

@@ -10,7 +10,7 @@ import {
     GET_FIELDSFORLIST_ERROR
 } from "../constants";
 import "whatwg-fetch";
-import pnp from "sp-pnp-js";
+
 import * as utils from "../utils/utils";
 import { Web as SPWeb } from "sp-pnp-js";
 import { Site as SPSite } from "sp-pnp-js";

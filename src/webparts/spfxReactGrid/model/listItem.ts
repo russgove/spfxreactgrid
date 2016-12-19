@@ -1,5 +1,4 @@
-import GridRowStatus from "./GridRowStatus"
-
+import GridRowStatus from "./GridRowStatus";
 export default class ListItem {
     /** The listDefinition this item came from. Need this to get to columnMappings */
     public __metadata__ListDefinitionId;
@@ -11,8 +10,6 @@ export default class ListItem {
     public ID:number;
     public constructor(
         public GUID: string) {
-        this.__metadata__GridRowStatus = GridRowStatus.new
+        this.__metadata__GridRowStatus = GridRowStatus.new;
     }
-
-
 }
