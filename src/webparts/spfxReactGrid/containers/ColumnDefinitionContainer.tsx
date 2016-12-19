@@ -1,29 +1,29 @@
 ﻿import * as React from "react";
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 const connect = require("react-redux").connect;
-import { DropDownEditor, ISelectChoices } from "../components/DropDownEditor";
-import { addColumn, removeColumn, saveColumn ,removeAllColumns} from "../actions/columnActions";
+
+import { addColumn, removeColumn, saveColumn, removeAllColumns } from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
 
-import { Button, ButtonType } from "office-ui-fabric-react";
+import { Button, ButtonType, TextField, CommandBar, Dropdown, IDropdownOption } from "office-ui-fabric-react";
 
-import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import Container from "../components/container";
 import { Guid, Log } from "@microsoft/sp-client-base";
 import * as utils from "../utils/utils";
-const fieldTypes: Array<ISelectChoices> = [
-    { name: "Text", value: "Text" },
-    { name: "Integer", value: "Integer" },
-    // { name: "Note", value: "Note" },
-    { name: "DateTime", value: "DateTime" },
-    // { name: "Counter", value: "Counter" },
-    // { name: "Choice", value: "Choice" },
-    // { name: "Lookup", value: "Lookup" },
-    // { name: "Boolean", value: "Boolean" },
-    // { name: "Number", value: "Number" },
-    // { name: "Currency", value: "Currency" },
-    // { name: "URL", value: "URL" },
-    // { name: "Computed", value: "Computed" },
+const fieldTypes: Array<IDropdownOption> = [
+    { key: null, text: "(Selecte one)" },
+    { key: "Text", text: "Text" },
+    { key: "Integer", text: "Integer" },
+    { key: "Note", text: "Note" },
+    { key: "DateTime", text: "DateTime" },
+    // { key: "Counter", text: "Counter" },
+    // { key: "Choice", text: "Choice" },
+    // { key: "Lookup", value: "Lookup" },
+    // { key: "Boolean", value: "Boolean" },
+    { key: "Number", text: "Number" },
+    // { key: "Currency", value: "Currency" },
+    // { key: "URL", value: "URL" },
+    // { key: "Computed", value: "Computed" },
     // { name: "Guid", value: "Guid" },
     // { name: "MultiChoice", value: "MultiChoice" },
     // { name: "Computed", value: "Computed" },
@@ -31,7 +31,7 @@ const fieldTypes: Array<ISelectChoices> = [
     // { name: "Computed", value: "Computed" },
     // { name: "File", value: "File" },
     // { name: "Attachments", value: "Attachments" },
-    { name: "User", value: "User" },
+    { key: "User", text: "User" },
     // { name: "ModStat", value: "ModStat" },
     // { name: "ContentTypeId", value: "ContentTypeId" },
     // { name: "WorkflowStatus", value: "WorkflowStatus" },
@@ -67,41 +67,41 @@ function mapDispatchToProps(dispatch) {
 
             dispatch(removeColumn(column));
         },
-          removeAllColumns: (column): void => {
+        removeAllColumns: (column): void => {
 
             dispatch(removeAllColumns());
         },
     };
 }
-interface ICellContentsEditableProps extends React.Props<any> {
-    entity: ColumnDefinition; // the row  in the list of columns
-    gridColumn: GridColumn;// the column in the list taht changed
-    valueChanged: any;
-}
-class CellContentsEditable extends React.Component<ICellContentsEditableProps, any>{
-    public handleFocus(event) {
-        event.target.select();
-    }
-    public getFieldTypesEditorChoices(): Array<ISelectChoices> {
-        return fieldTypes;
-    }
-    public render() {
-        const {entity, gridColumn, valueChanged} = this.props;
-        switch (gridColumn.editor) {
-            case "FieldTypesEditor":
-                return (
-                    <DropDownEditor getChoices={this.getFieldTypesEditorChoices} value={entity[gridColumn.name]} onChange={valueChanged} />
-                );
-            default:
-                return (
-                    <input autoFocus style={{ width: "99%", padding: "0px"}} type="text"
-                        value={entity[gridColumn.name]}
-                        onChange={valueChanged}
-                        onBlur={valueChanged}
-                        onFocus={this.handleFocus} />);
-        }
-    }
-}
+// interface ICellContentsEditableProps extends React.Props<any> {
+//     entity: ColumnDefinition; // the row  in the list of columns
+//     gridColumn: GridColumn;// the column in the list taht changed
+//     valueChanged: any;
+// }
+// class CellContentsEditable extends React.Component<ICellContentsEditableProps, any>{
+//     public handleFocus(event) {
+//         event.target.select();
+//     }
+//     public getFieldTypesEditorChoices(): Array<ISelectChoices> {
+//         return fieldTypes;
+//     }
+//     public render() {
+//         const {entity, gridColumn, valueChanged} = this.props;
+//         switch (gridColumn.editor) {
+//             case "FieldTypesEditor":
+//                 return (
+//                     <DropDownEditor getChoices={this.getFieldTypesEditorChoices} value={entity[gridColumn.name]} onChange={valueChanged} />
+//                 );
+//             default:
+//                 return (
+//                     <input autoFocus style={{ width: "99%", padding: "0px" }} type="text"
+//                         value={entity[gridColumn.name]}
+//                         onChange={valueChanged}
+//                         onBlur={valueChanged}
+//                         onFocus={this.handleFocus} />);
+//         }
+//     }
+// }
 export interface GridColumn {
     id: string;
     name: string;
@@ -124,7 +124,8 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         this.TableRow = this.TableRow.bind(this);
         this.TableRows = this.TableRows.bind(this);
         this.toggleEditing = this.toggleEditing.bind(this);
-        this.handleRowUpdated = this.handleRowUpdated.bind(this);
+        this.handleCellUpdated = this.handleCellUpdated.bind(this);
+        this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
         this.handleRowdeleted = this.handleRowdeleted.bind(this);
     }
     public gridColulumns: Array<GridColumn> = [{
@@ -144,95 +145,42 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         name: "type",
         editable: true,
         editor: "FieldTypesEditor",
-        formatter: "SharePointLookupCellFormatter",
-        width: 20
+        formatter: "",
+        width: 80
     },
     {
         id: "editable",
         name: "editable",
         editable: true,
         editor: "BooleanEditor",
-        width: 300
+        width: 99
     }];
-    public CellContents(props: { entity: ColumnDefinition, gridColumn: GridColumn, rowChanged: any }): JSX.Element {
-        const {entity, gridColumn, rowChanged} = props;
-        if (!gridColumn.editable) {
-            return (<span>
-                {entity[gridColumn.name]}
-            </span>);
-        }
-        switch (gridColumn.formatter) {
-            case "SharePointLookupCellFormatter":
-                return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);
-            default:
-        return (<a href="#" onFocus={this.toggleEditing} style={{textDecoration:"none" }}>
-                    {entity[gridColumn.name]}
-                </a>
-                );
-        }
-    }
-    public TableDetail(props): JSX.Element {
-        const {entity, column, rowChanged} = props;
-        if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id && column.editable) {
-            return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid red", padding: "0px" }}>
-                <CellContentsEditable entity={entity} gridColumn={column} valueChanged={rowChanged} />
-            </td>
-            );
-        } else {
-            return (<td onClick={this.toggleEditing} data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid black", padding: "0px" }} >
-                <this.CellContents key={entity.id + column.id} entity={entity} gridColumn={column} rowChanged={rowChanged} />
-            </td>
-            );
-        }
-    }
-    public TableRow(props): JSX.Element {
-        const {entity, columns, rowChanged} = props;
-        return (
-            <tr>
-                {
-                    columns.map(function (column) {
-                        return (
-                            <this.TableDetail key={column.guid} entity={entity} column={column} rowChanged={rowChanged} />
-                        );
-                    }, this)
-                }
-                <td data-entityid={entity.guid} >
-                    <Button
-                        onClick={this.handleRowdeleted}
-                        buttonType={ButtonType.hero}
-                        icon="Delete" />
 
-                </td>
-            </tr>);
-    };
-    public TableRows(props): JSX.Element {
-        const {entities, columns, rowChanged} = props;
-        return (
-            <tbody>
-                {
-                    entities.map(function (entity) {
-                        return (
-                            <this.TableRow key={entity.guid} entity={entity} columns={columns} rowChanged={rowChanged} />
-                        );
-                    }, this)
-                }
-            </tbody>
-        );
+    private handleCellUpdatedEvent(event) { //native react uses a Synthetic event
+        this.handleCellUpdated(event.target.value);
     }
-    private handleRowUpdated(event) {
-        Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
-        const target = event.target;
-        const value = target.value;
-        const parentTD = this.getParent(event.target, "TD"); // walk up the Dom to the TD, thats where the IDs are stored
-        const attributes: NamedNodeMap = parentTD.attributes;
-        const entityitem = attributes.getNamedItem("data-entityid");
-        const entityid = entityitem.value;
-        const columnid = attributes.getNamedItem("data-columnid").value;
+    private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
+        let {entityid, columnid} = this.state.editing;
         const entity: ColumnDefinition = this.props.columns.find((temp) => temp.guid === entityid);
         const column = this.gridColulumns.find(temp => temp.id === columnid);
         entity[column.name] = value;
         this.props.saveColumn(entity);
+
     }
+    // private handleRowUpdated(event) {
+    //     Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
+    //     const target = event.target;
+    //     const value = target.value;
+    //     const parentTD = this.getParent(event.target, "TD"); // walk up the Dom to the TD, thats where the IDs are stored
+    //     const attributes: NamedNodeMap = parentTD.attributes;
+    //     const entityitem = attributes.getNamedItem("data-entityid");
+    //     const entityid = entityitem.value;
+    //     const columnid = attributes.getNamedItem("data-columnid").value;
+    //     const entity: ColumnDefinition = this.props.columns.find((temp) => temp.guid === entityid);
+    //     const column = this.gridColulumns.find(temp => temp.id === columnid);
+    //     entity[column.name] = value;
+    //     this.props.saveColumn(entity);
+    // }
     private handleRowdeleted(event) {
 
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
@@ -257,11 +205,104 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         const columnid = attributes.getNamedItem("data-columnid").value;
         this.setState({ "editing": { entityid: entityid, columnid: columnid } });
     }
+    public CellContentsEditable(props: { entity: ColumnDefinition, gridColumn: GridColumn, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+        const {entity, gridColumn, cellUpdated, cellUpdatedEvent} = props;
+        if (!gridColumn.editable) {
+            return (<span>
+                {entity[gridColumn.name]}
+            </span>);
+        }
+        switch (gridColumn.editor) {
+            case "FieldTypesEditor":
+                return (
+                    <Dropdown label="" selectedKey={entity[gridColumn.name]} options={fieldTypes} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
+                    </Dropdown >
+                );
+            default:
+                return (
+                    <TextField autoFocus width={gridColumn.width}
+                        value={entity[gridColumn.name]}
+                        onChanged={cellUpdated} // this does not use eventing. It just calls the method. onChanged NOT onChange
+                        />);
+        }
+    }
+    public CellContents(props: { entity: ColumnDefinition, gridColumn: GridColumn }): JSX.Element {
+        const {entity, gridColumn} = props;
+        if (!gridColumn.editable) {
+            return (<span>
+                {entity[gridColumn.name]}
+            </span>);
+        }
+        switch (gridColumn.formatter) {
+            case "SharePointLookupCellFormatter":
+                return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);
+            default:
+                return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }}>
+                    {entity[gridColumn.name]}
+                </a>
+                );
+        }
+    }
+    public TableDetail(props): JSX.Element {
+        const {entity, column, rowChanged} = props;
+        if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id && column.editable) {
+            return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid red", padding: "0px" }}>
+                <this.CellContentsEditable entity={entity} gridColumn={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
+            </td>
+            );
+        } else {
+            return (<td onClick={this.toggleEditing} data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid black", padding: "0px" }} >
+                <this.CellContents key={entity.id + column.id} entity={entity} gridColumn={column} />
+            </td>
+            );
+        }
+    }
+    public TableRow(props: { isFirst: boolean, isLast:boolean, entity: ColumnDefinition, columns: Array<GridColumn>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+        const {entity, columns, cellUpdated, cellUpdatedEvent,isLast,isFirst} = props;
+        return (
+            <tr>
+                {
+                    columns.map(function (column) {
+                        return (
+                            <this.TableDetail key={column.id} entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
+                        );
+                    }, this)
+                }
+                <td data-entityid={entity.guid} data-columnid={null} onClick={this.toggleEditing}>
+                    <Button
+                        onClick={this.handleRowdeleted}
+                        buttonType={ButtonType.icon}
+                        icon="Delete" />
+                    <Button
+                        buttonType={ButtonType.icon}
+                        icon="Up" disabled={isFirst}  />
+                    <Button
+                        buttonType={ButtonType.icon}
+                        icon="Down" disabled={isLast} />
+
+
+                </td>
+            </tr>);
+    };
+    public TableRows(props: { entities: Array<ColumnDefinition>, columns: Array<GridColumn>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+        const {entities, columns, cellUpdated, cellUpdatedEvent} = props;
+        return (
+            <tbody>
+                {
+                    entities.map(function (entity, index, entities) {
+                        return (
+                            <this.TableRow isFirst={index===0} isLast={index===entities.length-1} key={entity.guid} columns={columns} entity={entity} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
+                        );
+                    }, this)
+                }
+            </tbody>
+        );
+    }
     public render() {
         const {  addColumn, removeColumn } = this.props;
         return (
             <Container testid="columns" size={2} center>
-                <h1>Columns</h1>
+                <h1>Column Definitions</h1>
                 <CommandBar items={[{
                     key: "AddColumns",
                     name: "Add a Column",
@@ -273,7 +314,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                     name: "Remove All Columns",
                     canCheck: true,
                     icon: "Delete",
-                      onClick: this.props.removeAllColumns
+                    onClick: this.props.removeAllColumns
                 }]} />
                 <table style={{ borderColor: "#600", borderWidth: "0 0 0 0", borderStyle: "solid" }}>
                     <thead>
@@ -284,7 +325,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                         </tr>
                     </thead>
                     {
-                        <this.TableRows entities={this.props.columns} columns={this.gridColulumns} rowChanged={this.handleRowUpdated} />
+                        <this.TableRows entities={this.props.columns} columns={this.gridColulumns} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
                     })}
         </table>
             </Container>

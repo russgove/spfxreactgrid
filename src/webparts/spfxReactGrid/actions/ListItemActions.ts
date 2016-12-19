@@ -9,7 +9,6 @@ import {
     SAVE_LISTITEM,//save locally
     UNDO_LISTITEMCHANGES,
     UPDATE_LISTITEM,//save to sharepoint
-
     UPDATE_LISTITEM_ERROR,
     UPDATE_LISTITEM_SUCCESS
 
@@ -78,7 +77,6 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
     let typedHash: TypedHash<string | number | boolean> = {};
-
     for (const fieldName in listItem) {
         if (!skipFields.includes(fieldName)) {
             if (listItem.hasOwnProperty(fieldName)) {
@@ -86,21 +84,14 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
             }
         }
     }
-
     const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
         .then((response) => {
-
             // shouwld have an option to rfresh here in cas of calculated columns
-            const data = _.map(response, (item: any) => {
-                item.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
-                return item;
-            });
-            console.log(data);
-            const gotListItems = updateListItemSuccessAction(data);
+            debugger;
+            const gotListItems = updateListItemSuccessAction(listItem);
             dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
         })
         .catch((error) => {
-
             console.log(error);
             dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
         });
@@ -113,21 +104,19 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     return action;
 }
 export function updateListItemErrorAction(error) {
-
     return {
         type: UPDATE_LISTITEM_ERROR,
         payload: {
             error: error
         }
     };
-
 }
-export function updateListItemSuccessAction(items) {
+export function updateListItemSuccessAction(listItem) {
 
     return {
         type: UPDATE_LISTITEM_SUCCESS,
         payload: {
-            items: items
+            listItem: listItem
         }
     };
 }

@@ -8,7 +8,7 @@ import ColumnDefinition from "../model/ColumnDefinition";
 
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
-import { Button, ButtonType } from "office-ui-fabric-react/lib/Button";
+import { Button, ButtonType, TextField } from "office-ui-fabric-react";
 
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
@@ -23,7 +23,7 @@ interface IListViewPageProps extends React.Props<any> {
   addListItem: (ListItem) => void;
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
-  updateListItem: (ListItem:ListItem, ListDef:ListDefinition) => void;
+  updateListItem: (ListItem: ListItem, ListDef: ListDefinition) => void;
   undoItemChanges: (ListItem) => void;
   saveListItem: (ListItem) => void;
 }
@@ -33,7 +33,7 @@ function mapStateToProps(state) {
     listItems: state.items,
     columns: state.columns,
     listDefinitions: state.lists,
-    systemStatus:state.systemStatus
+    systemStatus: state.systemStatus
   };
 }
 export class GridColumn {
@@ -63,8 +63,8 @@ function mapDispatchToProps(dispatch) {
     undoItemChanges: (listItem: ListItem): void => {
       dispatch(undoListItemChangesAction(listItem));
     },
-    updateListItem: (listItem: ListItem, listDef:ListDefinition): void => {
-       const promise: Promise<any> = updateListItemAction(dispatch, listDef,listItem);
+    updateListItem: (listItem: ListItem, listDef: ListDefinition): void => {
+      const promise: Promise<any> = updateListItemAction(dispatch, listDef, listItem);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
@@ -85,7 +85,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.TableRow = this.TableRow.bind(this);
     this.TableRows = this.TableRows.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
-    this.handleRowUpdated = this.handleRowUpdated.bind(this);
+
+    this.handleCellUpdated = this.handleCellUpdated.bind(this);
+    this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
     this.undoItemChanges = this.undoItemChanges.bind(this);
     this.updateListItem = this.updateListItem.bind(this);
 
@@ -99,6 +101,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
     return node;
   }
+
   public toggleEditing(event) {
     Log.verbose("list-Page", "focus event fired editing  when entering cell");
 
@@ -121,40 +124,24 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     this.props.undoItemChanges(entity);
   }
-    public updateListItem(event): void {
+  public updateListItem(event): void {
 
     const parentTD = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = parentTD.attributes;
     // const entityitem = attributes.getNamedItem("data-entityid");
     // const entityid = entityitem.value;
-    const entityid= attributes.getNamedItem("data-entityid").value;
+    const entityid = attributes.getNamedItem("data-entityid").value;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
-    const listDef=this.getListDefinition(entity.__metadata__ListDefinitionId);
+    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
 
-    this.props.updateListItem(entity,listDef);
+    this.props.updateListItem(entity, listDef);
   }
-  public handleRowUpdated(event): void {
-
-    //let xx = new SyntheticEvent();
-    //if (event instanceof  SyntheticEvent) Not working
-    let value;
-    let entityid, columnid: string;
-    if (event.target) { // can get instanceof working. Assum,e if it has a target, then its an event
-      const target = event.target;
-      value = target.value;
-      const parentTD = this.getParent(event.target, "TD");
-      const attributes: NamedNodeMap = parentTD.attributes;
-      const entityitem = attributes.getNamedItem("data-entityid");
-      entityid = entityitem.value;
-      columnid = attributes.getNamedItem("data-columnid").value;
-
-    }
-    else {
-      value = event;
-      entityid = this.state.editing.entityid;
-      columnid = this.state.editing.columnid;
-    }
-    let entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+  private handleCellUpdatedEvent(event) { //native react uses a Synthetic event
+    this.handleCellUpdated(event.target.value);
+  }
+  private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
+    let {entityid, columnid} = this.state.editing;
+    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     const internalName = utils.ParseSPField(columnReference.name).id;
@@ -169,15 +156,52 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       default:
         entity[internalName] = value;
     }
-
-    // now what;
-
     this.props.saveListItem(entity);
-
   }
-  public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, valueChanged: (event) => void; }): JSX.Element {
+  // public handleRowUpdated(event): void {
 
-    const {entity, column, valueChanged} = props;
+  //   //let xx = new SyntheticEvent();
+  //   //if (event instanceof  SyntheticEvent) Not working
+  //   let value;
+  //   let entityid, columnid: string;
+  //   if (event.target) { // can get instanceof working. Assum,e if it has a target, then its an event
+  //     const target = event.target;
+  //     value = target.value;
+  //     const parentTD = this.getParent(event.target, "TD");
+  //     const attributes: NamedNodeMap = parentTD.attributes;
+  //     const entityitem = attributes.getNamedItem("data-entityid");
+  //     entityid = entityitem.value;
+  //     columnid = attributes.getNamedItem("data-columnid").value;
+  //   }
+  //   else {
+  //     value = event;
+  //     entityid = this.state.editing.entityid;
+  //     columnid = this.state.editing.columnid;
+  //   }
+  //   let entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+  //   const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+  //   const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
+  //   const internalName = utils.ParseSPField(columnReference.name).id;
+  //   if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
+  //     entity.__metadata__OriginalValues = _.clone(entity);
+  //   }
+  //   entity.__metadata__GridRowStatus = GridRowStatus.modified;
+  //   switch (columnReference.fieldDefinition.TypeAsString) {
+  //     case "DateTime":
+  //       entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
+  //       break;
+  //     default:
+  //       entity[internalName] = value;
+  //   }
+
+  //   // now what;
+
+  //   this.props.saveListItem(entity);
+
+  // }
+  public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+
+    const {entity, column, cellUpdated, cellUpdatedEvent} = props;
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
     const internalName = utils.ParseSPField(colref.name).id;
@@ -187,7 +211,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         return (
           <input autoFocus type="text"
             value={columnValue}
-            onChange={valueChanged} onBlur={valueChanged} />);
+            onChange={cellUpdatedEvent}  />);
+      case "Note":
+        return (
+          <TextField autoFocus
+            value={columnValue}
+            onChanged={cellUpdated} />);
 
       case "DateTime":
         const datpickerStrings: IDatePickerStrings = {
@@ -198,14 +227,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           goToToday: "yes"
         };
         return (
-          <DatePicker strings={datpickerStrings} onSelectDate={valueChanged}
+          <DatePicker strings={datpickerStrings} onSelectDate={cellUpdated}
             allowTextInput={true} isRequired={colref.fieldDefinition.Required}
             />);
       default:
         return (
           <input autoFocus type="text"
             value={columnValue}
-            onChange={valueChanged} onBlur={valueChanged} />);
+            onChange={cellUpdatedEvent}  />);
     }
   }
 
@@ -219,9 +248,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   // return colref;
   //   }
 
-  public CellContents(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
+  public CellContents(props: { entity: ListItem, column: ColumnDefinition }): JSX.Element {
 
-    const {entity, column, rowChanged} = props;
+    const {entity, column} = props;
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
     if (colref === undefined) { //Column has not been configured for this list
@@ -236,6 +265,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       case "Text":
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
           {entity[internalName]}
+        </a>
+        );
+      case "Note":
+        let content= (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+        </a>);
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{__html:entity[internalName]}} >
         </a>
         );
 
@@ -264,46 +299,46 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
   }
 
-  public TableDetail(props: { entity: ListItem, column: ColumnDefinition, rowChanged: (event) => void; }): JSX.Element {
+  public TableDetail(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
-    const {entity, column, rowChanged} = props;
+    const {entity, column, cellUpdated, cellUpdatedEvent} = props;
     if (this.state && this.state.editing && this.state.editing.entityid === entity.GUID && this.state.editing.columnid === column.guid) {
       return (<td data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
-        <this.CellContentsEditable entity={entity} column={column} valueChanged={rowChanged} />
+        <this.CellContentsEditable entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
       </td>
       );
     } else {
       return (<td data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
-        <this.CellContents entity={entity} column={column} rowChanged={rowChanged} />
+        <this.CellContents entity={entity} column={column} />
       </td>
       );
     }
   }
-  public TableRow(props: { entity: ListItem, columns: Array<ColumnDefinition>, rowChanged: (event) => void; }): JSX.Element {
-    const {entity, columns, rowChanged} = props;
+  public TableRow(props: { entity: ListItem, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+    const {entity, columns, cellUpdated, cellUpdatedEvent} = props;
     return (
       <tr>
         {
           columns.map(function (column) {
             return (
-              <this.TableDetail key={column.guid} entity={entity} column={column} rowChanged={rowChanged} />
+              <this.TableDetail key={column.guid} entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
             );
           }, this)
         }
-        <td data-entityid={entity.GUID} >
+        <td data-entityid={entity.GUID} data-columnid={null} width="200" onClick={this.toggleEditing} >
           <div>
 
-            <Button width="20"
-               onClick={this.updateListItem}
-              buttonType={ButtonType.hero}
-              icon="Save"  disabled={!(entity.__metadata__OriginalValues)} />
-            <Button width="20"
+            <Button width="20" style={{padding:0}}
+              onClick={this.updateListItem} alt="Save to Sharepoint"
+              buttonType={ButtonType.icon}
+              icon="Save" disabled={!(entity.__metadata__OriginalValues)} />
+            <Button width="20" style={{padding:0}}
               // onClick={this.deleteList}
-              buttonType={ButtonType.hero}
+              buttonType={ButtonType.icon}
               icon="Delete" />
-            <Button width="20"
+            <Button width="20" style={{padding:0}}
               // onClick={this.deleteList}
-              buttonType={ButtonType.hero}
+              buttonType={ButtonType.icon}
               disabled={!(entity.__metadata__OriginalValues)}
               onClick={this.undoItemChanges}
               icon="Undo" />
@@ -311,14 +346,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </td>
       </tr>);
   };
-  public TableRows(props: { entities: Array<ListItem>, columns: Array<ColumnDefinition>, rowChanged: (event) => void; }): JSX.Element {
-    const {entities, columns, rowChanged} = props;
+  public TableRows(props: { entities: Array<ListItem>, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+    const {entities, columns, cellUpdated, cellUpdatedEvent} = props;
     return (
       <tbody>
         {
           entities.map(function (list) {
             return (
-              <this.TableRow key={list.GUID} entity={list} columns={columns} rowChanged={rowChanged} />
+              <this.TableRow key={list.GUID} entity={list} columns={columns} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
             );
           }, this)
         }
@@ -329,7 +364,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const { listItems, addListItem, removeListItem, getListItems } = this.props;
     return (
       <Container testid="columns" size={2} center>
-              <CommandBar items={[{
+        <CommandBar items={[{
           key: "AddItem",
           name: "Add an Item",
           icon: "Add",
@@ -361,7 +396,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             </tr>
           </thead>
           {
-            <this.TableRows entities={listItems} columns={this.props.columns} rowChanged={this.handleRowUpdated} />
+            <this.TableRows entities={listItems} columns={this.props.columns} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
 
           })}
         </table>
