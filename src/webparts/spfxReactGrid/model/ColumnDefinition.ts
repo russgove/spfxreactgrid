@@ -6,7 +6,7 @@ export default class ColumnDefinition {
         public width: number,
         public editable: boolean = true,
         public gridRowStatus: GridRowStatus = GridRowStatus.new,
-        public type: string = "Text",
+        public type: string = "Text#;Text",
     )
     { }
 }

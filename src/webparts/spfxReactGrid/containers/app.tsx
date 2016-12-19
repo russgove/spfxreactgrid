@@ -34,7 +34,7 @@ class App extends React.Component<IAppProps, void> {
   }
 
   public render() {
-    debugger;
+
     const { children} = this.props;
     return (
 

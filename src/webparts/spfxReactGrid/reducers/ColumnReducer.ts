@@ -6,10 +6,10 @@ import {
     REMOVE_COLUMN,
     SAVE_COLUMN,REMOVE_ALLCOLUMNS
 } from "../constants";
-import { Log } from "@microsoft/sp-client-base";
+
 const INITIAL_STATE = new Array<ColumnDefinition>();
 function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
-    Log.verbose("listItemReducer", "In listItemReducer of listItemReducer ActionType is " + action.type);
+
     switch (action.type) {
         case ADD_COLUMN:
             let newarray = _.clone(state);
@@ -30,7 +30,7 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
         case ADD_COLUMNS:
             return _.union(state, action.payload.columns);
         default:
-            Log.verbose("listItemReducer", " listItemReducer returning default  " + state);
+
             return state;
     }
 }

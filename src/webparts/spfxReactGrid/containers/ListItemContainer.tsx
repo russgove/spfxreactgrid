@@ -28,7 +28,7 @@ interface IListViewPageProps extends React.Props<any> {
   saveListItem: (ListItem) => void;
 }
 function mapStateToProps(state) {
-debugger;
+
   return {
     listItems: state.items,
     columns: state.columns,
@@ -130,7 +130,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const entityid= attributes.getNamedItem("data-entityid").value;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef=this.getListDefinition(entity.__metadata__ListDefinitionId);
-    debugger;
+
     this.props.updateListItem(entity,listDef);
   }
   public handleRowUpdated(event): void {

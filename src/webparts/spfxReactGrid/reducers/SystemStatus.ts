@@ -1,4 +1,4 @@
-﻿import { Log } from "@microsoft/sp-client-base";
+﻿
 import SystemStatus from "../Model/SystemStatus";
 let defaultStatus: SystemStatus = {
     currentAction: "",

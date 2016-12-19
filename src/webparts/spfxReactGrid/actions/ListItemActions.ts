@@ -86,10 +86,10 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
             }
         }
     }
-      debugger;
+
     const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
         .then((response) => {
-            debugger;
+
             // shouwld have an option to rfresh here in cas of calculated columns
             const data = _.map(response, (item: any) => {
                 item.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
@@ -100,7 +100,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
             dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
         })
         .catch((error) => {
-            debugger;
+
             console.log(error);
             dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
         });
@@ -113,7 +113,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     return action;
 }
 export function updateListItemErrorAction(error) {
-    debugger;
+
     return {
         type: UPDATE_LISTITEM_ERROR,
         payload: {
@@ -123,7 +123,7 @@ export function updateListItemErrorAction(error) {
 
 }
 export function updateListItemSuccessAction(items) {
-    debugger;
+
     return {
         type: UPDATE_LISTITEM_SUCCESS,
         payload: {

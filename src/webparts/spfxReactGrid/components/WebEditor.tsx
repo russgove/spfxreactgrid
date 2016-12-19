@@ -13,28 +13,23 @@ export interface IWebEditorProps extends React.Props<any> {
 export default class WebEditor extends React.Component<IWebEditorProps, void> {
   constructor() {
     super();
-
     this.handleChange = this.handleChange.bind(this);
   }
-  private handleChange(event) {
-    this.props.onChange(event);
+  private handleChange(selectedItem:IDropdownOption) {
+    this.props.onChange(selectedItem.key);
   }
   public render() {
     const { selectedValue, webs} = this.props;
-    let options: Array<IDropdownOption>;
-    debugger;
-    options = [{ key: null, text: "..Select One" }];
-    let realOptions = webs.map((web) => {
+
+    let options: Array<IDropdownOption> = webs.map((web) => {
       return ({
         key: web.url + "#;" + web.title,
         text: web.title
       });
     })
-
-    options.concat(realOptions);
-
+    options.unshift({ key: null, text: "..Select One" });
     return (
-      <Dropdown label="" selectedKey={selectedValue} options={options} onChanged={this.handleChange} >
+      <Dropdown label="" selectedKey={selectedValue} options={options}  onChanged={this.handleChange} >
       </Dropdown >
     );
   }

@@ -64,14 +64,6 @@ export function getListsForWebAction(dispatch: any, webUrl: string): any {
     const payload = web.lists.orderBy("Title").get()
         .then((response) => {
 
-            //for (const list of item.Lists) {
-            //                     const webList: WebList = new WebList(list.Id, list.Title, list.Url);
-            //                     for (const field of list.Fields) {
-            //                         debugger;
-            //                         webList.fields.push(new WebListField(field.Id, field.Title, field.InternalName, field.TypeDisplayName));
-            //                     }
-            //                     web.lists.push(webList);
-            //                 }
             const data = _.map(response, (item: any) => {
                 return new WebList(item.Id, item.Title, item.Url, );
             });

@@ -7,13 +7,18 @@ import {
 import * as _ from "lodash";
 import { Site } from "../model/Site";
 const INITIAL_STATE: Array<Site> = [];
+function gotWebs(state: Array<Site> = INITIAL_STATE, action: any = { type: "" }): Array<Site> {
+    let site: Site = new Site(action.payload.siteUrl);
+    site.webs = action.payload.webs;
+    let result :Array<Site> =  _.union(state, new Array<Site>(site));
+    return result;
+}
 function siteReducer(state: Array<Site> = INITIAL_STATE, action: any = { type: "" }): Array<Site> {
 
     switch (action.type) {
         case GOT_WEBS:
-            let sitea: Site = new Site(action.payload.siteUrl);
-            sitea.webs = action.payload.webs;
-            return _.union(state, new Array<Site>(sitea));
+
+            return gotWebs(state, action);
         case GET_LISTSFORWEB_SUCCESS:
 
             let newState = _.clone(state);
@@ -34,14 +39,15 @@ function siteReducer(state: Array<Site> = INITIAL_STATE, action: any = { type: "
                 //find the site and add the lists to it
                 for (const site of newState2) {
                     for (const web of site.webs) {
-                        if (web.url ===action.payload.webUrl){
-                        for (const list of web.lists) {
-                            if (list.id === action.payload.listId) {
-                                list.fields = action.payload.fields;
-                                list.fieldsFetched = true;
+                        if (web.url === action.payload.webUrl) {
+                            for (const list of web.lists) {
+                                if (list.id === action.payload.listId) {
+                                    list.fields = action.payload.fields;
+                                    list.fieldsFetched = true;
+                                }
                             }
                         }
-                    }}
+                    }
                 }
                 return newState2;
             }
