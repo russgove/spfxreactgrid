@@ -18,7 +18,7 @@ const fieldTypes: Array<IDropdownOption> = [
     { key: "DateTime", text: "DateTime" },
     // { key: "Counter", text: "Counter" },
      { key: "Choice", text: "Choice" },
-    // { key: "Lookup", value: "Lookup" },
+     { key: "Lookup", text: "Lookup" },
     // { key: "Boolean", value: "Boolean" },
     { key: "Number", text: "Number" },
     // { key: "Currency", value: "Currency" },

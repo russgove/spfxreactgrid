@@ -121,23 +121,30 @@ export function updateListItemSuccessAction(listItem) {
     };
 }
 export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDefinition>): any {
-
+    debugger;
     const promises: Array<Promise<any>> = new Array<Promise<any>>();
     for (const listDefinition of listDefinitions) {
         if (!listDefinitionIsValid(listDefinition)) {
             break;
         }
         let fieldnames = new Array<string>();
+        let expands = new Array<string>();
         for (const columnreference of listDefinition.columnReferences) {
-            const internalName = utils.ParseSPField(columnreference.name).id;
-            fieldnames.push(internalName); // need to split
+            if (columnreference.fieldDefinition.TypeAsString === "Lookup") {
+                expands.push(columnreference.fieldDefinition.InternalName);
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/" + columnreference.fieldDefinition.LookupField);
+
+            } else {
+                const internalName = utils.ParseSPField(columnreference.name).id;
+                fieldnames.push(internalName); // need to split
+            }
         }
         const weburl = utils.ParseSPField(listDefinition.webLookup).id;
         const listid = utils.ParseSPField(listDefinition.listLookup).id;
 
         const web = new Web(weburl);
 
-        const promise = web.lists.getById(listid).items.select(fieldnames.concat("GUID").concat("Id").join(",")).get()
+        const promise = web.lists.getById(listid).items.select(fieldnames.concat("GUID").concat("Id").join(",")).expand(expands.join(",")).get()
             .then((response) => {
 
                 const data = _.map(response, (item: any) => {

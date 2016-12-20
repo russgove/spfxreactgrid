@@ -279,6 +279,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
 
     switch (colref.fieldDefinition.TypeAsString) {
+        case "Lookup":
+        debugger;
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+          {entity[internalName][colref.fieldDefinition.LookupField]}
+        </a>
+        );
       case "Text":
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
           {entity[internalName]}
