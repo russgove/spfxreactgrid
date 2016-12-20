@@ -17,7 +17,7 @@ const fieldTypes: Array<IDropdownOption> = [
     { key: "Note", text: "Note" },
     { key: "DateTime", text: "DateTime" },
     // { key: "Counter", text: "Counter" },
-    // { key: "Choice", text: "Choice" },
+     { key: "Choice", text: "Choice" },
     // { key: "Lookup", value: "Lookup" },
     // { key: "Boolean", value: "Boolean" },
     { key: "Number", text: "Number" },
@@ -153,7 +153,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
     }
 
     private moveColumnUp(event) {
-        debugger;
+
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
         const target = this.getParent(event.target, "TD");
         const attributes: NamedNodeMap = target.attributes;
@@ -163,7 +163,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         return;
     }
     private moveColumnDown(event) {
-        debugger;
+
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
         const target = this.getParent(event.target, "TD");
         const attributes: NamedNodeMap = target.attributes;
@@ -229,7 +229,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 {entity[gridColumn.name]}
             </span>);
         }
-        debugger;
+
         switch (gridColumn.formatter) {
 
             case "BooleanFormatter":

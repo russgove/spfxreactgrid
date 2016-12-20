@@ -331,13 +331,13 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       case "FieldEditor":
         const colType = column.type;
         let fields: Array<IDropdownOption> = this.getFieldsForlist(entity, colType).map(fld => {
-          debugger;
+
           return { key: fld.name, text: utils.ParseSPField(fld.name).value };
         });
         fields.unshift({ key: null, text: "(Select one)" });
         return (<Dropdown options={fields} label="" selectedKey={columnValue} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} />);
       default:
-        debugger;
+
         return (
           <TextField autoFocus width={column.width}
             value={entity[column.name]}

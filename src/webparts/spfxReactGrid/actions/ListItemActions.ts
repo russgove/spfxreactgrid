@@ -87,7 +87,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
         .then((response) => {
             // shouwld have an option to rfresh here in cas of calculated columns
-            debugger;
+
             const gotListItems = updateListItemSuccessAction(listItem);
             dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
         })
