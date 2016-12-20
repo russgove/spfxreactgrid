@@ -238,10 +238,8 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 //         <Toggle label="" checked={entity[gridColumn.name]} disabled={true} >
                 //         </Toggle >
                 //     );
-
-                ///woo tertiary operators in ts!
-                let result = (entity[gridColumn.name]) ? (<div>Yes</div>) : (<div>No</div>);
-                return result
+                           let result = (entity[gridColumn.name]) ? (<div>Yes</div>) : (<div>No</div>);
+                return result;
             case "SharePointLookupCellFormatter":
                 return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);
             default:

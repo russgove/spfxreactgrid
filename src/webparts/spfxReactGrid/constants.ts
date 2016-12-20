@@ -13,7 +13,7 @@ export const ADD_LISTITEMS = "App/ADD_LISTITEMS";
 export const GET_LISTITEMS = "App/GET_LISTITEMS";
 export const GOT_LISTITEMS = "App/GOT_LISTITEMS";
 export const CLEAR_LISTITEMS = "App/CLEAR_LISTITEMS";
-export const GET_LISTITEMSERROR = "App/GET_LISTITEMSERROR";
+export const GET_LISTITEMSERROR = "App/GET_LISTITEMS_ERROR";
 export const REMOVE_LISTITEM = "App/REMOVE_LISTITEM";
 /**Save listitem in store */
 export const SAVE_LISTITEM="App/SAVE_LISTITEM";

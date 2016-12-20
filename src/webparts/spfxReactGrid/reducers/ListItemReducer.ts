@@ -46,7 +46,7 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
             }
             return newarray2;
         case UPDATE_LISTITEM_SUCCESS:
-            debugger;
+
             return updateListItemSuccess(state, action);
         case UNDO_LISTITEMCHANGES:
             let newarray3 = _.clone(state);
