@@ -221,9 +221,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         });
 
         return (
-        <Dropdown label="" selectedKey={entity[columnValue]} options={choices} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
-                    </Dropdown >
-                );
+          <Dropdown label="" selectedKey={entity[columnValue]} options={choices} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
+          </Dropdown >
+        );
       case "Text":
         return (
           <input autoFocus type="text"
@@ -279,12 +279,19 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
 
     switch (colref.fieldDefinition.TypeAsString) {
-        case "Lookup":
+      case "Lookup":
         debugger;
-        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
-          {entity[internalName][colref.fieldDefinition.LookupField]}
-        </a>
-        );
+        if (entity[internalName] === undefined) { // value not set
+          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+
+          </a>
+          );
+        } else {
+          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+            {entity[internalName][colref.fieldDefinition.LookupField]}
+          </a>
+          );
+        }
       case "Text":
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
           {entity[internalName]}
