@@ -5,7 +5,7 @@ const connect = require("react-redux").connect;
 import { addColumn, removeColumn, saveColumn, removeAllColumns, moveCulumnUp, moveCulumnDown } from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
 
-import { Button, ButtonType, TextField, CommandBar, Dropdown, IDropdownOption } from "office-ui-fabric-react";
+import { Button, ButtonType, TextField, CommandBar, Dropdown, IDropdownOption, Toggle } from "office-ui-fabric-react";
 
 import Container from "../components/container";
 import { Guid, Log } from "@microsoft/sp-client-base";
@@ -81,35 +81,7 @@ function mapDispatchToProps(dispatch) {
         },
     };
 }
-// interface ICellContentsEditableProps extends React.Props<any> {
-//     entity: ColumnDefinition; // the row  in the list of columns
-//     gridColumn: GridColumn;// the column in the list taht changed
-//     valueChanged: any;
-// }
-// class CellContentsEditable extends React.Component<ICellContentsEditableProps, any>{
-//     public handleFocus(event) {
-//         event.target.select();
-//     }
-//     public getFieldTypesEditorChoices(): Array<ISelectChoices> {
-//         return fieldTypes;
-//     }
-//     public render() {
-//         const {entity, gridColumn, valueChanged} = this.props;
-//         switch (gridColumn.editor) {
-//             case "FieldTypesEditor":
-//                 return (
-//                     <DropDownEditor getChoices={this.getFieldTypesEditorChoices} value={entity[gridColumn.name]} onChange={valueChanged} />
-//                 );
-//             default:
-//                 return (
-//                     <input autoFocus style={{ width: "99%", padding: "0px" }} type="text"
-//                         value={entity[gridColumn.name]}
-//                         onChange={valueChanged}
-//                         onBlur={valueChanged}
-//                         onFocus={this.handleFocus} />);
-//         }
-//     }
-// }
+
 export interface GridColumn {
     id: string;
     name: string;
@@ -164,6 +136,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         name: "editable",
         editable: true,
         editor: "BooleanEditor",
+        formatter: "BooleanFormatter",
         width: 99
     }];
 
@@ -231,6 +204,11 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
             </span>);
         }
         switch (gridColumn.editor) {
+            case "BooleanEditor":
+                return (
+                    <Toggle label="" checked={entity[gridColumn.name]} onChanged={(val: boolean) => cellUpdated(val)} >
+                    </Toggle >
+                );
             case "FieldTypesEditor":
                 return (
                     <Dropdown label="" selectedKey={entity[gridColumn.name]} options={fieldTypes} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
@@ -251,7 +229,19 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 {entity[gridColumn.name]}
             </span>);
         }
+        debugger;
         switch (gridColumn.formatter) {
+
+            case "BooleanFormatter":
+                // Does not worlk. Does not does not have onFocus
+                //   return (
+                //         <Toggle label="" checked={entity[gridColumn.name]} disabled={true} >
+                //         </Toggle >
+                //     );
+
+                ///woo tertiary operators in ts!
+                let result = (entity[gridColumn.name]) ? (<div>Yes</div>) : (<div>No</div>);
+                return result
             case "SharePointLookupCellFormatter":
                 return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);
             default:
@@ -298,7 +288,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                     <Button
                         buttonType={ButtonType.icon}
                         icon="Down" disabled={isLast}
-                            onClick={this.moveColumnDown} />
+                        onClick={this.moveColumnDown} />
 
 
                 </td>
