@@ -8,7 +8,7 @@ import ColumnDefinition from "../model/ColumnDefinition";
 
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
-import { Button, ButtonType, TextField } from "office-ui-fabric-react";
+import { Button, ButtonType, TextField, IDropdownOption, Dropdown } from "office-ui-fabric-react";
 
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
@@ -140,6 +140,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.handleCellUpdated(event.target.value);
   }
   private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
+    debugger;
     let {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
@@ -207,11 +208,27 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
     const columnValue = entity[internalName];
     switch (colref.fieldDefinition.TypeAsString) {
+      case "Choice":
+        let choices = colref.fieldDefinition.Choices.map((c, i) => {
+          debugger;
+          let opt: IDropdownOption = {
+            index: i,
+            key: c,
+            text: c,
+            isSelected: (c === columnValue)
+          };
+          return opt;
+        });
+
+        return (
+        <Dropdown label="" selectedKey={entity[columnValue]} options={choices} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
+                    </Dropdown >
+                );
       case "Text":
         return (
           <input autoFocus type="text"
             value={columnValue}
-            onChange={cellUpdatedEvent}  />);
+            onChange={cellUpdatedEvent} />);
       case "Note":
         return (
           <TextField autoFocus
@@ -234,7 +251,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         return (
           <input autoFocus type="text"
             value={columnValue}
-            onChange={cellUpdatedEvent}  />);
+            onChange={cellUpdatedEvent} />);
     }
   }
 
@@ -268,9 +285,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </a>
         );
       case "Note":
-        let content= (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+        let content = (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
         </a>);
-        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{__html:entity[internalName]}} >
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{ __html: entity[internalName] }} >
         </a>
         );
 
@@ -328,15 +345,15 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         <td data-entityid={entity.GUID} data-columnid={null} width="200" onClick={this.toggleEditing} >
           <div>
 
-            <Button width="20" style={{padding:0}}
+            <Button width="20" style={{ padding: 0 }}
               onClick={this.updateListItem} alt="Save to Sharepoint"
               buttonType={ButtonType.icon}
               icon="Save" disabled={!(entity.__metadata__OriginalValues)} />
-            <Button width="20" style={{padding:0}}
+            <Button width="20" style={{ padding: 0 }}
               // onClick={this.deleteList}
               buttonType={ButtonType.icon}
               icon="Delete" />
-            <Button width="20" style={{padding:0}}
+            <Button width="20" style={{ padding: 0 }}
               // onClick={this.deleteList}
               buttonType={ButtonType.icon}
               disabled={!(entity.__metadata__OriginalValues)}
