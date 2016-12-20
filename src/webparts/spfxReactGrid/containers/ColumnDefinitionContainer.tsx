@@ -2,7 +2,7 @@
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 const connect = require("react-redux").connect;
 
-import { addColumn, removeColumn, saveColumn, removeAllColumns } from "../actions/columnActions";
+import { addColumn, removeColumn, saveColumn, removeAllColumns, moveCulumnUp, moveCulumnDown } from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
 
 import { Button, ButtonType, TextField, CommandBar, Dropdown, IDropdownOption } from "office-ui-fabric-react";
@@ -44,6 +44,8 @@ interface IColumnsPageProps extends React.Props<any> {
     removeAllColumns: () => void;
     removeColumn: (column) => void;
     saveColumn: (Column) => void;
+    moveColumnUp: (Column: ColumnDefinition) => void;
+    moveColumnDown: (Column: ColumnDefinition) => void;
 }
 interface IContextMenu extends React.Props<any> {
     onRowDelete: AdazzleReactDataGrid.ColumnEventCallback;
@@ -70,6 +72,12 @@ function mapDispatchToProps(dispatch) {
         removeAllColumns: (column): void => {
 
             dispatch(removeAllColumns());
+        },
+        moveColumnUp: (column): void => {
+            dispatch(moveCulumnUp(column));
+        },
+        moveColumnDown: (column): void => {
+            dispatch(moveCulumnDown(column));
         },
     };
 }
@@ -127,6 +135,9 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         this.handleCellUpdated = this.handleCellUpdated.bind(this);
         this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
         this.handleRowdeleted = this.handleRowdeleted.bind(this);
+        this.moveColumnUp = this.moveColumnUp.bind(this);
+        this.moveColumnDown = this.moveColumnDown.bind(this);
+
     }
     public gridColulumns: Array<GridColumn> = [{
         id: "guid",
@@ -167,20 +178,27 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         this.props.saveColumn(entity);
 
     }
-    // private handleRowUpdated(event) {
-    //     Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
-    //     const target = event.target;
-    //     const value = target.value;
-    //     const parentTD = this.getParent(event.target, "TD"); // walk up the Dom to the TD, thats where the IDs are stored
-    //     const attributes: NamedNodeMap = parentTD.attributes;
-    //     const entityitem = attributes.getNamedItem("data-entityid");
-    //     const entityid = entityitem.value;
-    //     const columnid = attributes.getNamedItem("data-columnid").value;
-    //     const entity: ColumnDefinition = this.props.columns.find((temp) => temp.guid === entityid);
-    //     const column = this.gridColulumns.find(temp => temp.id === columnid);
-    //     entity[column.name] = value;
-    //     this.props.saveColumn(entity);
-    // }
+
+    private moveColumnUp(event) {
+        debugger;
+        Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
+        const target = this.getParent(event.target, "TD");
+        const attributes: NamedNodeMap = target.attributes;
+        const entityId = attributes.getNamedItem("data-entityid").value;
+        const column: ColumnDefinition = this.props.columns.find(cd => cd.guid === entityId);
+        this.props.moveColumnUp(column);
+        return;
+    }
+    private moveColumnDown(event) {
+        debugger;
+        Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
+        const target = this.getParent(event.target, "TD");
+        const attributes: NamedNodeMap = target.attributes;
+        const entityId = attributes.getNamedItem("data-entityid").value;
+        const column: ColumnDefinition = this.props.columns.find(cd => cd.guid === entityId);
+        this.props.moveColumnDown(column);
+        return;
+    }
     private handleRowdeleted(event) {
 
         Log.verbose("list-Page", "Row changed-fired when row changed or leaving cell ");
@@ -257,8 +275,8 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
             );
         }
     }
-    public TableRow(props: { isFirst: boolean, isLast:boolean, entity: ColumnDefinition, columns: Array<GridColumn>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
-        const {entity, columns, cellUpdated, cellUpdatedEvent,isLast,isFirst} = props;
+    public TableRow(props: { isFirst: boolean, isLast: boolean, entity: ColumnDefinition, columns: Array<GridColumn>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+        const {entity, columns, cellUpdated, cellUpdatedEvent, isLast, isFirst} = props;
         return (
             <tr>
                 {
@@ -268,17 +286,19 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                         );
                     }, this)
                 }
-                <td data-entityid={entity.guid} data-columnid={null} onClick={this.toggleEditing}>
+                <td data-entityid={entity.guid} data-columnid={"XX"} onClick={this.toggleEditing}>
                     <Button
                         onClick={this.handleRowdeleted}
                         buttonType={ButtonType.icon}
                         icon="Delete" />
                     <Button
                         buttonType={ButtonType.icon}
-                        icon="Up" disabled={isFirst}  />
+                        icon="Up" disabled={isFirst}
+                        onClick={this.moveColumnUp} />
                     <Button
                         buttonType={ButtonType.icon}
-                        icon="Down" disabled={isLast} />
+                        icon="Down" disabled={isLast}
+                            onClick={this.moveColumnDown} />
 
 
                 </td>
@@ -291,7 +311,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 {
                     entities.map(function (entity, index, entities) {
                         return (
-                            <this.TableRow isFirst={index===0} isLast={index===entities.length-1} key={entity.guid} columns={columns} entity={entity} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
+                            <this.TableRow isFirst={index === 0} isLast={index === entities.length - 1} key={entity.guid} columns={columns} entity={entity} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
                         );
                     }, this)
                 }

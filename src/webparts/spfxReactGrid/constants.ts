@@ -32,6 +32,9 @@ export const ADD_COLUMNS = "App/ADD_COLUMNS";
 export const REMOVE_COLUMN = "App/REMOVE_COLUMN";
 export const REMOVE_ALLCOLUMNS = "App/REMOVE_ALLCOLUMNS";
 export const SAVE_COLUMN = "App/SAVE_COLUMN";
+export const MOVE_COLUMN_UP = "App/MOVE_COLUMN_UP";
+export const MOVE_COLUMN_DOWN = "App/MOVE_COLUMN_DOWN";
+
 
 export const GET_WEBS = "App/GET_WEBS";
 export const GOT_WEBS = "App/GOT_WEBS";

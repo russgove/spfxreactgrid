@@ -3,6 +3,8 @@ import {
     ADD_COLUMNS,
     REMOVE_COLUMN,
     REMOVE_ALLCOLUMNS,
+    MOVE_COLUMN_UP,
+    MOVE_COLUMN_DOWN,
 SAVE_COLUMN
 } from "../constants";
 
@@ -19,6 +21,22 @@ export function addColumn(column: ColumnDefinition) {
 export function removeColumn(column: ColumnDefinition) {
     return {
         type: REMOVE_COLUMN,
+        payload: {
+            column: column
+        }
+    };
+}
+export function moveCulumnUp(column: ColumnDefinition) {
+    return {
+        type: MOVE_COLUMN_UP,
+        payload: {
+            column: column
+        }
+    };
+}
+export function moveCulumnDown(column: ColumnDefinition) {
+    return {
+        type: MOVE_COLUMN_DOWN,
         payload: {
             column: column
         }
