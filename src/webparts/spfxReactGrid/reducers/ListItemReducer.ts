@@ -12,7 +12,7 @@ import {
 } from "../constants";
 
 import { Log } from "@microsoft/sp-client-base";
-const INITIAL_STATE = new Array<ListItem>();
+const INITIAL_STATE = [];
 function updateListItemSuccess(state: Array<ListItem>, action) {
     let newState = _.clone(state);
     let index = _.findIndex(newState, { GUID: action.payload.listItem.GUID });
@@ -62,6 +62,7 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
             return _.union(state, action.payload.items);
 
         default:
+
             Log.verbose("listItemReducer", " listItemReducer returning default  " + state);
             return state;
     }

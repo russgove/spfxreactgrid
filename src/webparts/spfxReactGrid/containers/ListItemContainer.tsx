@@ -2,13 +2,15 @@
 import * as React from "react";
 
 const connect = require("react-redux").connect;
-import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction, updateListItemAction } from "../actions/listItemActions";
+import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction, updateListItemAction, } from "../actions/listItemActions";
+import { getLookupOptionAction } from "../actions/lookupOptionsActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
+import { LookupOption, LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
 
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
-import { Button, ButtonType, TextField, IDropdownOption, Dropdown } from "office-ui-fabric-react";
+import { Button, ButtonType, TextField, IDropdownOption, Dropdown, Spinner, SpinnerType, ISpinnerProps, } from "office-ui-fabric-react";
 
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
@@ -18,12 +20,14 @@ import { Log } from "@microsoft/sp-client-base";
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 interface IListViewPageProps extends React.Props<any> {
   listItems: Array<ListItem>;
+  lookupOptions: Array<LookupOptions>;
   columns: Array<ColumnDefinition>;
   listDefinitions: Array<ListDefinition>;
   addListItem: (ListItem) => void;
   removeListItem: (ListItem) => void;
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   updateListItem: (ListItem: ListItem, ListDef: ListDefinition) => void;
+  getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField) => void;
   undoItemChanges: (ListItem) => void;
   saveListItem: (ListItem) => void;
 }
@@ -33,7 +37,8 @@ function mapStateToProps(state) {
     listItems: state.items,
     columns: state.columns,
     listDefinitions: state.lists,
-    systemStatus: state.systemStatus
+    systemStatus: state.systemStatus,
+    lookupOptions: state.lookupOptions
   };
 }
 export class GridColumn {
@@ -50,10 +55,7 @@ function mapDispatchToProps(dispatch) {
     addListItem: (): void => {
       dispatch(addListItem(new ListItem("123-123123123-123123-123123")));
     },
-    getListItems: (listDefinitions: Array<ListDefinition>): void => {
-      const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
-      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
-    },
+
     removeListItem: (): void => {
       dispatch(removeListItem(new ListItem("123-123123123-123123-123123")));
     },
@@ -65,6 +67,16 @@ function mapDispatchToProps(dispatch) {
     },
     updateListItem: (listItem: ListItem, listDef: ListDefinition): void => {
       const promise: Promise<any> = updateListItemAction(dispatch, listDef, listItem);
+      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+
+    },
+    getListItems: (listDefinitions: Array<ListDefinition>): void => {
+      const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
+      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+    },
+    getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField): void => {
+      debugger;
+      const promise: Promise<any> = getLookupOptionAction(dispatch, lookupSite, lookupWebId, lookupListId, lookupField);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
@@ -90,6 +102,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
     this.undoItemChanges = this.undoItemChanges.bind(this);
     this.updateListItem = this.updateListItem.bind(this);
+    this.getLookupOptions=this.getLookupOptions.bind(this);
 
   }
   public componentWillMount() {
@@ -140,19 +153,23 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.handleCellUpdated(event.target.value);
   }
   private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
-    debugger;
+debugger;
     let {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     const internalName = utils.ParseSPField(columnReference.name).id;
     if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
-      entity.__metadata__OriginalValues = _.clone(entity);
+      entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
     }
     entity.__metadata__GridRowStatus = GridRowStatus.modified;
     switch (columnReference.fieldDefinition.TypeAsString) {
       case "DateTime":
         entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
+        break;
+            case "Lookup":
+        entity[internalName]["Id"] = value.key;
+        entity[internalName][columnReference.fieldDefinition.LookupField] = value.text;
         break;
       default:
         entity[internalName] = value;
@@ -160,10 +177,20 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.props.saveListItem(entity);
   }
   /** gets the options to display for a lookupField */
- public getLookupOptions(lookupSite:string, lookupWebId:string, lookupListId:string, lookupField:string):IDropdownOption[]{
-   // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
-   return [];
- }
+  public getLookupOptions(lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): LookupOptions {
+    // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
+    let lookupoptions = this.props.lookupOptions.find(x => {
+      return (x.lookupField === lookupField) &&
+        (x.lookupListId === lookupListId) &&
+        (x.lookupSite === lookupSite) &&
+        (x.lookupWebId === lookupWebId)
+    });
+    if (lookupoptions === undefined) {
+      this.props.getLookupOptionAction(lookupSite, lookupWebId, lookupListId, lookupField);
+    }
+
+    return lookupoptions;
+  }
 
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
@@ -178,16 +205,43 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         let lookupField = colref.fieldDefinition.LookupField;
         let lookupListId = colref.fieldDefinition.LookupList;
         let lookupWebId = colref.fieldDefinition.LookupWebId;
+        /**
+         * We are assuming here that the lookup listy is in the same web.
+         *
+         */
+        lookupWebId=utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
         let lookupSite = listDef.siteUrl;
-        let options = this.getLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField)
-
-        return (
-          <Dropdown label="" options={options} selectedKey={entity[columnValue]} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
-          </Dropdown >
-        );
+        let lookupOptions = this.getLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+        if (lookupOptions) {
+          switch (lookupOptions.status) {
+            case LookupOptionStatus.fetched:
+              let options: IDropdownOption[] = lookupOptions.lookupOption.map((opt, index, options) => {
+                return { key: opt.id, text: opt.value };
+              });
+              return (
+                <Dropdown label="" options={options} selectedKey={columnValue.Id} onChanged={(selection: IDropdownOption) =>{debugger; cellUpdated(selection)}} >
+                </Dropdown >
+              );
+            case LookupOptionStatus.fetching:
+              return (
+                <Spinner type={SpinnerType.normal} />
+              );
+            case LookupOptionStatus.error:
+              return (
+                <Spinner label="Error" type={SpinnerType.normal} />
+              );
+            default:
+              return (
+                <Spinner type={SpinnerType.normal} />
+              );
+          }
+        } else {
+          return (
+            <Spinner type={SpinnerType.normal} />
+          );
+        }
       case "Choice":
         let choices = colref.fieldDefinition.Choices.map((c, i) => {
-
           let opt: IDropdownOption = {
             index: i,
             key: c,
@@ -196,9 +250,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           };
           return opt;
         });
-
         return (
-          <Dropdown label="" selectedKey={entity[columnValue]} options={choices} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
+          <Dropdown label="" selectedKey={entity[columnValue]} options={choices} onChanged={(selection: IDropdownOption) => cellUpdated(selection)} >
           </Dropdown >
         );
       case "Text":

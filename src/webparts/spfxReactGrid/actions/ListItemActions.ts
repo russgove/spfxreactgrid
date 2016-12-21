@@ -121,7 +121,7 @@ export function updateListItemSuccessAction(listItem) {
     };
 }
 export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDefinition>): any {
-    debugger;
+
     const promises: Array<Promise<any>> = new Array<Promise<any>>();
     for (const listDefinition of listDefinitions) {
         if (!listDefinitionIsValid(listDefinition)) {
@@ -133,6 +133,7 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
             if (columnreference.fieldDefinition.TypeAsString === "Lookup") {
                 expands.push(columnreference.fieldDefinition.InternalName);
                 fieldnames.push(columnreference.fieldDefinition.InternalName + "/" + columnreference.fieldDefinition.LookupField);
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
 
             } else {
                 const internalName = utils.ParseSPField(columnreference.name).id;

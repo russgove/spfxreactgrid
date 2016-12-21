@@ -3,6 +3,7 @@ import ListReducer from "./ListReducer";
 import listItemReducer from "./listItemReducer";
 import ColumnReducer from "./ColumnReducer";
 import PageContextReducer from "./PageContextReducer";
+import LookupOptionsReducer from "./LookupOptionsReducer";
 import SiteReducer from "./SiteReducer";
 import SystemStatus from "./SystemStatus";
 const { routerReducer } = require("react-router-redux");
@@ -15,7 +16,8 @@ export function RootReducer(state, action) {
             sites: SiteReducer,
             pageContext: PageContextReducer,
             routing: routerReducer,
-            systemStatus:SystemStatus
+            systemStatus:SystemStatus,
+            lookupOptions:LookupOptionsReducer
         }
     );
     return combinedReducers(state, action);

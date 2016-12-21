@@ -189,9 +189,8 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
        * hmmmm... can i construct it (dont store the Id of the we, store the path instead?)
        * need this for lookup columns..  they only stote a weid and list id...ohhhh noooo
       */
-      debugger;
+
       entity[column.name] = value;
-      debugger;
 
     }
     else {

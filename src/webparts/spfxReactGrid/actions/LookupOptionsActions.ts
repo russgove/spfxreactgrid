@@ -6,71 +6,61 @@ import {
 import "whatwg-fetch";
 import { Promise } from "es6-promise";
 import * as utils from "../utils/utils";
-
-import { Site } from "sp-pnp-js";
-import ListItem from "../model/ListItem";
+import { Site, Web } from "sp-pnp-js";
+import { LookupOptions, LookupOption, LookupOptionStatus } from "../model/LookupOptions";
 import ListDefinition from "../model/ListDefinition";
-
 export function getLookupOptionAction(dispatch: any, lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): any {
-    debugger;
-    // let fieldnames = new Array<string>();
-    // let expands = new Array<string>();
-    // for (const columnreference of listDefinition.columnReferences) {
-    //     if (columnreference.fieldDefinition.TypeAsString === "Lookup") {
-    //         expands.push(columnreference.fieldDefinition.InternalName);
-    //         fieldnames.push(columnreference.fieldDefinition.InternalName + "/" + columnreference.fieldDefinition.LookupField);
 
-    //     } else {
-    //         const internalName = utils.ParseSPField(columnreference.name).id;
-    //         fieldnames.push(internalName); // need to split
-    //     }
-    // }
-    // const weburl = utils.ParseSPField(listDefinition.webLookup).id;
-    // const listid = utils.ParseSPField(listDefinition.listLookup).id;
+    let lookupOptions = new LookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+    // first add the empty header record to the store, then issue a request to get the details
 
-    const site = new Site(lookupSite);
+    const web = new Web(lookupWebId);
+    let fields = ["Id"];
+    fields.push(lookupField);
 
-    const promise = site.web.lists.getById(listid).items.select(fieldnames.concat("GUID").concat("Id").join(",")).expand(expands.join(",")).get()
+    const promise = web.lists.getById(lookupListId).items.select(fields.join(",")).get()
         .then((response) => {
-
-            const data = _.map(response, (item: any) => {
-                item.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
-                return item;
+            debugger;
+            const data: LookupOption[] = _.map(response, (item: any) => {
+                return new LookupOption(item.Id, item[lookupField]);
             });
-            console.log(data);
-            const gotListItems = gotListItemsAction(data);
-            dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+            lookupOptions.lookupOption = data;
+            lookupOptions.status=LookupOptionStatus.fetched;
+            const gotLookupOptions = gotLookupOptionAction(lookupOptions);
+            debugger;
+            dispatch(gotLookupOptions); // need to ewname this one to be digfferent from the omported ome
         })
         .catch((error) => {
             console.log(error);
-            dispatch(getListItemsErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
+            debugger;
+            lookupOptions.status = LookupOptionStatus.error;
+            dispatch(getLookupOptionErrorAction(error, lookupOptions)); // need to ewname this one to be digfferent from the omported ome
         });
-    promises.push(promise);
-
-
-
     const action = {
         type: GET_LOOKUPOPTIONS,
         payload: {
-            promise: Promise.all(promises)
+            promise: promise,
+            lookupOptions: lookupOptions
         }
     };
     return action;
 }
-export function ggetLookupOptionErrorAction(error) {
+function getLookupOptionErrorAction(error, lookupOptions: LookupOptions) {
+    debugger;
     return {
         type: GET_LOOKUPOPTIONS_ERROR,
         payload: {
-            error: error
+            error: error,
+            lookupOptions: LookupOption
         }
     };
-
 }
-export function gotListItemsAction(items) {
+function gotLookupOptionAction(lookupOptions: LookupOptions) {
+    debugger;
     return {
         type: GET_LOOKUPOPTIONS_SUCCESS,
         payload: {
-            items: items
+            lookupOptions: lookupOptions
         }
     };
 }
