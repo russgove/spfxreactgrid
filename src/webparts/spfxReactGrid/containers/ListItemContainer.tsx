@@ -159,47 +159,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
     this.props.saveListItem(entity);
   }
-  // public handleRowUpdated(event): void {
+  /** gets the options to display for a lookupField */
+ public getLookupOptions(lookupSite:string, lookupWebId:string, lookupListId:string, lookupField:string):IDropdownOption[]{
+   // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
+   return [];
+ }
 
-  //   //let xx = new SyntheticEvent();
-  //   //if (event instanceof  SyntheticEvent) Not working
-  //   let value;
-  //   let entityid, columnid: string;
-  //   if (event.target) { // can get instanceof working. Assum,e if it has a target, then its an event
-  //     const target = event.target;
-  //     value = target.value;
-  //     const parentTD = this.getParent(event.target, "TD");
-  //     const attributes: NamedNodeMap = parentTD.attributes;
-  //     const entityitem = attributes.getNamedItem("data-entityid");
-  //     entityid = entityitem.value;
-  //     columnid = attributes.getNamedItem("data-columnid").value;
-  //   }
-  //   else {
-  //     value = event;
-  //     entityid = this.state.editing.entityid;
-  //     columnid = this.state.editing.columnid;
-  //   }
-  //   let entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
-  //   const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-  //   const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
-  //   const internalName = utils.ParseSPField(columnReference.name).id;
-  //   if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
-  //     entity.__metadata__OriginalValues = _.clone(entity);
-  //   }
-  //   entity.__metadata__GridRowStatus = GridRowStatus.modified;
-  //   switch (columnReference.fieldDefinition.TypeAsString) {
-  //     case "DateTime":
-  //       entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
-  //       break;
-  //     default:
-  //       entity[internalName] = value;
-  //   }
-
-  //   // now what;
-
-  //   this.props.saveListItem(entity);
-
-  // }
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
@@ -208,9 +173,21 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
     const columnValue = entity[internalName];
     switch (colref.fieldDefinition.TypeAsString) {
+      case "Lookup":
+        debugger;
+        let lookupField = colref.fieldDefinition.LookupField;
+        let lookupListId = colref.fieldDefinition.LookupList;
+        let lookupWebId = colref.fieldDefinition.LookupWebId;
+        let lookupSite = listDef.siteUrl;
+        let options = this.getLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField)
+
+        return (
+          <Dropdown label="" options={options} selectedKey={entity[columnValue]} onChanged={(selection: IDropdownOption) => cellUpdated(selection.key)} >
+          </Dropdown >
+        );
       case "Choice":
         let choices = colref.fieldDefinition.Choices.map((c, i) => {
-          debugger;
+
           let opt: IDropdownOption = {
             index: i,
             key: c,
@@ -254,8 +231,11 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             onChange={cellUpdatedEvent} />);
     }
   }
-
-  public getListDefinition(listdefid): ListDefinition {
+  /** Returns the ListDefinition for the given ListDefinionId */
+  public getListDefinition(
+    /** The id of the list definition to be retrieved */
+    listdefid: string
+  ): ListDefinition {
     return this.props.listDefinitions.find(ld => ld.guid === listdefid);
   }
 
@@ -280,7 +260,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     switch (colref.fieldDefinition.TypeAsString) {
       case "Lookup":
-        debugger;
+
         if (entity[internalName] === undefined) { // value not set
           return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
 
