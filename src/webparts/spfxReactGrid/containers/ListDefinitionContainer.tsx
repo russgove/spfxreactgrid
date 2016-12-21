@@ -183,7 +183,15 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     const column = this.extendedColumns.find(temp => temp.id === columnid);
     // if it is a default column, just set its value , otheriwse update it in the list of extended columns (i.e. sharepoint columns)
     if (this.isdeafaultColumn(columnid)) {
+      /** need to save the web url if the web column was updated
+       * Sharepoint rest wont let me go from an SPSite to an SPWeb using just the id.
+       * I need the url to the Web.
+       * hmmmm... can i construct it (dont store the Id of the we, store the path instead?)
+      */
+      debugger;
       entity[column.name] = value;
+      debugger;
+
     }
     else {
       this.updateExtendedColumn(entity, columnid, value);
