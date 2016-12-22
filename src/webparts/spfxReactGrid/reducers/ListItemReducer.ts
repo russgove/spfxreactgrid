@@ -22,7 +22,7 @@ function updateListItemSuccess(state: Array<ListItem>, action) {
     return newState;
 }
 function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
-    Log.verbose("listItemReducer", "In listItemReducer of listItemReducer ActionType is " + action.type);
+
 
     switch (action.type) {
         case ADD_LISTITEM:
@@ -63,7 +63,6 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
 
         default:
 
-            Log.verbose("listItemReducer", " listItemReducer returning default  " + state);
             return state;
     }
 }

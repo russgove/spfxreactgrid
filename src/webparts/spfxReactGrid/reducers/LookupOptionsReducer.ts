@@ -8,14 +8,14 @@ import {
 } from "../constants";
 
 function getLookupOptions(state: Array<LookupOptions>, action) {
-    debugger;
+
     let newstate = _.clone(state);
     newstate.push(action.payload.lookupOptions);
     Log.info("getLookupOptions", "Added Header Record");
     return newstate;
 }
 function updateLookupOption(state: Array<LookupOptions>, action: { payload: { lookupOptions: LookupOptions } }) {
-    debugger;
+
     let newstate = _.clone(state);
     let index = _.findIndex<LookupOptions>(newstate, x =>
         (x.lookupField === action.payload.lookupOptions.lookupField) &&
@@ -36,11 +36,17 @@ const INITIAL_STATE = [];
 function lookupOptionReducer(state = INITIAL_STATE, action: any = { type: "" }) {
 
     switch (action.type) {
-        case GET_LOOKUPOPTIONS_SUCCESS:
-        case GET_LOOKUPOPTIONS_ERROR:
-            return updateLookupOption(state, action);
         case GET_LOOKUPOPTIONS:
+            Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS listItemReducer ActionType is " + action.type);
             return getLookupOptions(state, action);
+        case GET_LOOKUPOPTIONS_SUCCESS:
+            Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS_SUCCESSof listItemReducer ActionType is " + action.type);
+            return updateLookupOption(state, action);
+        case GET_LOOKUPOPTIONS_ERROR:
+            Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS_ERRORof listItemReducer ActionType is " + action.type);
+
+            return updateLookupOption(state, action);
+
         default:
             return state;
     }

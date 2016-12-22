@@ -98,7 +98,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     //     }
     // }
     let typedHash: TypedHash<string | number | boolean> = {};
-    debugger;
+
     for (const columnRef of listDefinition.columnReferences) {
         let fieldName = utils.ParseSPField(columnRef.name).id;
         switch (columnRef.fieldDefinition.TypeAsString) {
@@ -112,7 +112,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
                 typedHash[fieldName] = listItem[fieldName];
         }
     }
-    debugger;
+
     const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
         .then((response) => {
             // shouwld have an option to rfresh here in cas of calculated columns

@@ -20,19 +20,19 @@ export function getLookupOptionAction(dispatch: any, lookupSite: string, lookupW
 
     const promise = web.lists.getById(lookupListId).items.select(fields.join(",")).get()
         .then((response) => {
-            debugger;
+
             const data: LookupOption[] = _.map(response, (item: any) => {
                 return new LookupOption(item.Id, item[lookupField]);
             });
             lookupOptions.lookupOption = data;
             lookupOptions.status=LookupOptionStatus.fetched;
             const gotLookupOptions = gotLookupOptionAction(lookupOptions);
-            debugger;
+
             dispatch(gotLookupOptions); // need to ewname this one to be digfferent from the omported ome
         })
         .catch((error) => {
             console.log(error);
-            debugger;
+
             lookupOptions.status = LookupOptionStatus.error;
             dispatch(getLookupOptionErrorAction(error, lookupOptions)); // need to ewname this one to be digfferent from the omported ome
         });
@@ -46,7 +46,7 @@ export function getLookupOptionAction(dispatch: any, lookupSite: string, lookupW
     return action;
 }
 function getLookupOptionErrorAction(error, lookupOptions: LookupOptions) {
-    debugger;
+
     return {
         type: GET_LOOKUPOPTIONS_ERROR,
         payload: {
@@ -56,7 +56,7 @@ function getLookupOptionErrorAction(error, lookupOptions: LookupOptions) {
     };
 }
 function gotLookupOptionAction(lookupOptions: LookupOptions) {
-    debugger;
+
     return {
         type: GET_LOOKUPOPTIONS_SUCCESS,
         payload: {

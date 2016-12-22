@@ -122,6 +122,29 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const attributes: NamedNodeMap = target.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value;
     const columnid = attributes.getNamedItem("data-columnid").value;
+    /**
+     * Need to fire events here to get data needed for the rerender
+     */
+    const listitem = this.props.listItems.find(li => li.GUID===entityid);
+    const listDef = this.getListDefinition(listitem.__metadata__ListDefinitionId);
+    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
+    switch (colref.fieldDefinition.TypeAsString) {
+      case "Lookup":
+        let lookupField = colref.fieldDefinition.LookupField;
+        let lookupListId = colref.fieldDefinition.LookupList;
+        let lookupWebId = colref.fieldDefinition.LookupWebId;
+        /**
+         * We are assuming here that the lookup listy is in the same web.
+         *
+         */
+        lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
+        let lookupSite = listDef.siteUrl;
+        this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+        break;
+      default:
+        break;
+    }
+
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
   }
   public undoItemChanges(event): void {
@@ -179,8 +202,10 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
     this.props.saveListItem(entity);
   }
-  /** gets the options to display for a lookupField */
-  public getLookupOptions(lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): LookupOptions {
+    /** if the the options for a lookup listy are not in th ecache, fire an event to get them
+     *  This method i scalled when  a lookup column receives focus
+     */
+  public ensureLookupOptions(lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): LookupOptions {
     // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
     let lookupoptions = this.props.lookupOptions.find(x => {
       return (x.lookupField === lookupField) &&
@@ -192,6 +217,20 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       this.props.getLookupOptionAction(lookupSite, lookupWebId, lookupListId, lookupField);
     }
 
+    return lookupoptions;
+  }
+  /** gets the options to display for a lookupField
+   * This method i scalled when  a lookup column gets displayed
+   *  When I
+  */
+  public getLookupOptions(lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): LookupOptions {
+    // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
+    let lookupoptions = this.props.lookupOptions.find(x => {
+      return (x.lookupField === lookupField) &&
+        (x.lookupListId === lookupListId) &&
+        (x.lookupSite === lookupSite) &&
+        (x.lookupWebId === lookupWebId)
+    });
     return lookupoptions;
   }
 
@@ -215,7 +254,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
         let lookupSite = listDef.siteUrl;
         let lookupOptions = this.getLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
-        debugger;
+
 
         if (lookupOptions) {
           switch (lookupOptions.status) {
@@ -224,7 +263,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
                 return { key: opt.id, text: opt.value };
               });
               return (
-                <Dropdown label="" options={options} selectedKey={(columnValue ? columnValue.Id : null)} onChanged={(selection: IDropdownOption) => { debugger; cellUpdated(selection) } } >
+                <Dropdown label="" options={options} selectedKey={(columnValue ? columnValue.Id : null)} onChanged={(selection: IDropdownOption) => { cellUpdated(selection); } } >
                 </Dropdown >
               );
             case LookupOptionStatus.fetching:
@@ -430,6 +469,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   }
   public render() {
     const { listItems, addListItem, removeListItem, getListItems } = this.props;
+    Log.info("ListItemContainer", "In Render");
     return (
       <Container testid="columns" size={2} center>
         <CommandBar items={[{
