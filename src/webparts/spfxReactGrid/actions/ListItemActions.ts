@@ -103,7 +103,9 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
         let fieldName = utils.ParseSPField(columnRef.name).id;
         switch (columnRef.fieldDefinition.TypeAsString) {
             case "Lookup":
-                typedHash[fieldName + "Id"] = listItem[fieldName].Id;
+                if (listItem[fieldName]) {// field may not be set
+                    typedHash[fieldName + "Id"] = listItem[fieldName].Id;
+                }
                 break;
 
             default:
