@@ -212,6 +212,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         lookupWebId=utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
         let lookupSite = listDef.siteUrl;
         let lookupOptions = this.getLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+        debugger;
+
         if (lookupOptions) {
           switch (lookupOptions.status) {
             case LookupOptionStatus.fetched:
@@ -219,7 +221,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
                 return { key: opt.id, text: opt.value };
               });
               return (
-                <Dropdown label="" options={options} selectedKey={columnValue.Id} onChanged={(selection: IDropdownOption) =>{debugger; cellUpdated(selection)}} >
+                <Dropdown label="" options={options} selectedKey={(columnValue?columnValue.Id:null)} onChanged={(selection: IDropdownOption) =>{debugger; cellUpdated(selection)}} >
                 </Dropdown >
               );
             case LookupOptionStatus.fetching:
