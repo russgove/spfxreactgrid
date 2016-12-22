@@ -75,7 +75,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
     },
     getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField): void => {
-      debugger;
+
       const promise: Promise<any> = getLookupOptionAction(dispatch, lookupSite, lookupWebId, lookupListId, lookupField);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
@@ -153,7 +153,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.handleCellUpdated(event.target.value);
   }
   private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
-debugger;
+
     let {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
@@ -201,7 +201,7 @@ debugger;
     const columnValue = entity[internalName];
     switch (colref.fieldDefinition.TypeAsString) {
       case "Lookup":
-        debugger;
+
         let lookupField = colref.fieldDefinition.LookupField;
         let lookupListId = colref.fieldDefinition.LookupList;
         let lookupWebId = colref.fieldDefinition.LookupWebId;
@@ -388,7 +388,7 @@ debugger;
             );
           }, this)
         }
-        <td data-entityid={entity.GUID} data-columnid={null} width="200" onClick={this.toggleEditing} >
+        <td data-entityid={entity.GUID} data-columnid={""} width="200" onClick={this.toggleEditing} >
           <div>
 
             <Button width="20" style={{ padding: 0 }}

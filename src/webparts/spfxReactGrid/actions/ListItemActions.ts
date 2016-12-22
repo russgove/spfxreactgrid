@@ -77,10 +77,24 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
     let typedHash: TypedHash<string | number | boolean> = {};
+    debugger;
     for (const fieldName in listItem) {
         if (!skipFields.includes(fieldName)) {
             if (listItem.hasOwnProperty(fieldName)) {
-                typedHash[fieldName] = listItem[fieldName];
+                const columnRef = listDefinition.columnReferences.find(cr => utils.ParseSPField(cr.name).id == fieldName);
+                if (columnRef) {
+                    debugger;
+                    switch (columnRef.fieldDefinition.TypeAsString) {
+
+                        case "Lookup":
+                            typedHash[fieldName + "Id"] = listItem[fieldName].Id;
+                        default:
+                            typedHash[fieldName] = listItem[fieldName];
+                    }
+                } else {
+                    typedHash[fieldName] = listItem[fieldName];
+                }
+
             }
         }
     }

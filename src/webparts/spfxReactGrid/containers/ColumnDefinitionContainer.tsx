@@ -274,7 +274,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                         );
                     }, this)
                 }
-                <td data-entityid={entity.guid} data-columnid={"XX"} onClick={this.toggleEditing}>
+                <td data-entityid={entity.guid} data-columnid={""} onClick={this.toggleEditing}>
                     <Button
                         onClick={this.handleRowdeleted}
                         buttonType={ButtonType.icon}

@@ -404,7 +404,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
             );
           }, this)
         }
-        <td data-entityid={entity.guid} >
+        <td data-entityid={entity.guid} data-columnid={""}>
           <Button
             onClick={this.deleteList}
             buttonType={ButtonType.icon}

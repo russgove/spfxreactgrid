@@ -15,14 +15,16 @@ export default function SystemStatusReducer(state: SystemStatus=defaultStatus, a
      *
      *
      */
-    //  let newstate = _.clone(state);
-    //  if (action.type.startsWith("App/")) {
-    //      newstate.currentAction = action.type;
-    //  }
-    //  if (action.type.endsWith("_ERROR")) {
-    //      newstate.fetchStatus = action.payload.error.message;
-    //  }
-    //  return newstate;
+      let newstate = _.clone(state);
+     if (action.type.startsWith("App/")) {
+         debugger;
+        newstate.currentAction = action.type;
+      }
+       if (action.type.endsWith("_ERROR")) {
+           debugger;
+           newstate.fetchStatus = action.payload.error.message;
+       }
+    //   return newstate;
     return state;
 }
 
