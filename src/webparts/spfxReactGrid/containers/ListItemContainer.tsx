@@ -102,7 +102,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
     this.undoItemChanges = this.undoItemChanges.bind(this);
     this.updateListItem = this.updateListItem.bind(this);
-    this.getLookupOptions=this.getLookupOptions.bind(this);
+    this.getLookupOptions = this.getLookupOptions.bind(this);
 
   }
   public componentWillMount() {
@@ -167,8 +167,11 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       case "DateTime":
         entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
         break;
-            case "Lookup":
-        entity[internalName]["Id"] = value.key;
+      case "Lookup":
+        if (!entity[internalName]) {// if  value was not previously set , then this is undefined//
+          entity[internalName] = {};// set new value to an empty objecte
+        }
+        entity[internalName]["Id"] = value.key;//and then fill in the values
         entity[internalName][columnReference.fieldDefinition.LookupField] = value.text;
         break;
       default:
@@ -209,7 +212,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
          * We are assuming here that the lookup listy is in the same web.
          *
          */
-        lookupWebId=utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
+        lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
         let lookupSite = listDef.siteUrl;
         let lookupOptions = this.getLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
         debugger;
@@ -221,7 +224,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
                 return { key: opt.id, text: opt.value };
               });
               return (
-                <Dropdown label="" options={options} selectedKey={(columnValue?columnValue.Id:null)} onChanged={(selection: IDropdownOption) =>{debugger; cellUpdated(selection)}} >
+                <Dropdown label="" options={options} selectedKey={(columnValue ? columnValue.Id : null)} onChanged={(selection: IDropdownOption) => { debugger; cellUpdated(selection) } } >
                 </Dropdown >
               );
             case LookupOptionStatus.fetching:
