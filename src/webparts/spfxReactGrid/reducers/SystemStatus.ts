@@ -1,9 +1,9 @@
 ﻿
 import SystemStatus from "../Model/SystemStatus";
-let defaultStatus: SystemStatus = {
+const defaultStatus: SystemStatus = {
     currentAction: "",
     fetchStatus: ""
-}
+};
 import { Log } from "@microsoft/sp-client-base";
 export default function SystemStatusReducer(state: SystemStatus = defaultStatus, action: any = { type: "" }) {
     /**
@@ -16,7 +16,7 @@ export default function SystemStatusReducer(state: SystemStatus = defaultStatus,
      *
      *
      */
-    let newstate = _.clone(state);
+    const newstate = _.clone(state);
     if (action.type.startsWith("App/")) {
 
         newstate.currentAction = action.type;

@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as utils from "../utils/utils";
 export interface KeyValue {
   value: any;
   displayName: string;
@@ -9,7 +8,7 @@ export interface IListEditorProps extends React.Props<any> {
   selectedValue?: string;
   onChange(event): void;
   lists: Array<{ id: string, title: string }>;
-  }
+}
 export default class ListEditor extends React.Component<IListEditorProps, void> {
   constructor() {
     super();
@@ -29,11 +28,11 @@ export default class ListEditor extends React.Component<IListEditorProps, void> 
     })
     options.unshift({ key: null, text: "..Select One" });
     return (
-  <Dropdown label="" selectedKey={selectedValue} options={options} onChanged={this.handleChange} >
+      <Dropdown label="" selectedKey={selectedValue} options={options} onChanged={this.handleChange} >
       </Dropdown >
     );
   }
-};
+}
 
 
 

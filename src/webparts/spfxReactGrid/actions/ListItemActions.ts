@@ -64,41 +64,14 @@ export function listDefinitionIsValid(listDefinition: ListDefinition): boolean {
 
     return true;
 }
+/**
+ * Action to update a listitem in sharepoint
+ */
 export function updateListItemAction(dispatch: any, listDefinition: ListDefinition, listItem: ListItem): any {
-    //   listItem.__metadata__ListDefinitionId
-    //   const promises: Array<Promise<any>> = new Array<Promise<any>>();
-    //   let fieldnames = new Array<string>();
-    // for (const columnreference of listDefinition.columnReferences) {
-    //     const internalName = utils.ParseSPField(columnreference.name).id;
-    //     fieldnames.push(internalName); // need to split
-    // }
-    const skipFields = ["GUID", "odata.etag", "odata.editLink", "odata.id", "odata.type", "__metadata__ListDefinitionId", "__metadata__GridRowStatus", "__metadata__OriginalValues"];
-    const weburl = utils.ParseSPField(listDefinition.webLookup).id;
+   const weburl = utils.ParseSPField(listDefinition.webLookup).id;
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
-
-    // for (const fieldName in listItem) {
-    //     if (!skipFields.includes(fieldName)) {
-    //         if (listItem.hasOwnProperty(fieldName)) {
-    //             const columnRef = listDefinition.columnReferences.find(cr => utils.ParseSPField(cr.name).id == fieldName);
-    //             if (columnRef) {
-    //                 debugger;
-    //                 switch (columnRef.fieldDefinition.TypeAsString) {
-
-    //                     case "Lookup":
-    //                         typedHash[fieldName + "Id"] = listItem[fieldName].Id;
-    //                     default:
-    //                         typedHash[fieldName] = listItem[fieldName];
-    //                 }
-    //             } else {
-    //                 typedHash[fieldName] = listItem[fieldName];
-    //             }
-
-    //         }
-    //     }
-    // }
     let typedHash: TypedHash<string | number | boolean> = {};
-
     for (const columnRef of listDefinition.columnReferences) {
         let fieldName = utils.ParseSPField(columnRef.name).id;
         switch (columnRef.fieldDefinition.TypeAsString) {

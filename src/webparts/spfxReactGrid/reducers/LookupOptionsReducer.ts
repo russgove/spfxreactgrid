@@ -1,4 +1,4 @@
-﻿import { LookupOption, LookupOptions, LookupOptionStatus } from "../Model/LookupOptions";
+﻿import {  LookupOptions } from "../Model/LookupOptions";
 import { Log } from "@microsoft/sp-client-base";
 import * as _ from "lodash";
 import {
@@ -43,8 +43,8 @@ function lookupOptionReducer(state = INITIAL_STATE, action: any = { type: "" }) 
             Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS_SUCCESSof listItemReducer ActionType is " + action.type);
             return updateLookupOption(state, action);
         case GET_LOOKUPOPTIONS_ERROR:
+            /** The ActionCreator has set the state to error , so i just update the item */
             Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS_ERRORof listItemReducer ActionType is " + action.type);
-
             return updateLookupOption(state, action);
 
         default:

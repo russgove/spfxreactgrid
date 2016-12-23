@@ -8,7 +8,7 @@ import { fromJS } from "immutable";
 import { createMemoryHistory } from "react-router";
 import { routerMiddleware } from "react-router-redux";
 import thunk from "redux-thunk";
-const persistState = require("redux-localstorage");
+
 import promiseMiddleware from "redux-promise-middleware";
 import logger from "./logger";
 import { RootReducer } from "../reducers/rootReducer";

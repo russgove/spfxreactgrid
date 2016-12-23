@@ -4,65 +4,79 @@ import {
     ADD_LISTITEM,
     REMOVE_LISTITEM,
     GOT_LISTITEMS,
-    CLEAR_LISTITEMS,
-    SAVE_LISTITEM, UNDO_LISTITEMCHANGES,
-    UPDATE_LISTITEM,
-    UPDATE_LISTITEM_SUCCESS,
-    UPDATE_LISTITEM_ERROR
+     SAVE_LISTITEM,
+      UNDO_LISTITEMCHANGES,
+    UPDATE_LISTITEM_SUCCESS
 } from "../constants";
-
-import { Log } from "@microsoft/sp-client-base";
 const INITIAL_STATE = [];
-function updateListItemSuccess(state: Array<ListItem>, action) {
-    let newState = _.clone(state);
+/**
+ * deletes the originalvalues of a listitem, after itt has been saved to sharepoint,. This in effec disables the undo button,
+ */
+function updateListItemSuccess(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
+    let newState = _.cloneDeep(state);
     let index = _.findIndex(newState, { GUID: action.payload.listItem.GUID });
     if (newState[index].__metadata__OriginalValues) {
         delete newState[index].__metadata__OriginalValues;
     }
     return newState;
 }
+/**
+ * reverts a listimes values to thos originally retrived from sharepoint
+ */
+function undoListItemChanges(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
+    let newarray3 = _.cloneDeep(state);
+    let index = _.findIndex(newarray3, { GUID: action.payload.listItem.GUID });
+    if (newarray3[index].__metadata__OriginalValues) {
+        newarray3[index] = newarray3[index].__metadata__OriginalValues;
+    }
+    return newarray3;
+}
+/**
+ * Adds a new listitem to the store
+ */
+function addListItem(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
+    let newarray = _.cloneDeep(state);
+    newarray.push(action.payload.listItem);
+    return newarray;
+}
+/**
+ * removes a listitem from the store
+ */
+function removeListItem(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
+    // set status to tobedeleted
+    alert("not implemented");
+    let newArr = _.filter(state, (o) => { return o.GUID !== action.payload.listItem.GUID; });
+    return newArr;
+}
+/**
+ * updates a Listitem in the store
+ */
+function saveListItem(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
+    let newarray2 = _.cloneDeep(state);
+    let item = newarray2.find(i => i.GUID === action.payload.listItem.GUID);
+    item = action.payload.listItem;
+
+    if (!item.__metadata__OriginalValues) {
+        item.__metadata__OriginalValues = state.find(i => i.GUID === action.payload.listItem.GUID);
+    }
+    return newarray2;
+}
+
 function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
-
-
     switch (action.type) {
         case ADD_LISTITEM:
-            let newarray = _.clone(state);
-            newarray.push(action.payload.listItem);
-            return newarray;
+            return addListItem(state, action);
         case REMOVE_LISTITEM:
-            // st status to tobedeleted
-            alert("not implemented");
-            let newArr = _.filter(state, (o) => { return o.GUID !== action.payload.listItem.guid; });
-            return newArr;
-        case CLEAR_LISTITEMS:
-            return [];
+            return removeListItem(state, action);
         case SAVE_LISTITEM:
-            let newarray2 = _.clone(state);
-            let item = newarray2.find(item => item.GUID === action.payload.listItem.GUID);
-            item = action.payload.listItem;
-
-            if (!item.__metadata__OriginalValues) {
-                item.__metadata__OriginalValues = state.find(item => item.GUID === action.payload.listItem.GUID);
-            }
-            return newarray2;
+            return saveListItem(state, action);
         case UPDATE_LISTITEM_SUCCESS:
-
             return updateListItemSuccess(state, action);
         case UNDO_LISTITEMCHANGES:
-            let newarray3 = _.clone(state);
-            // let item3 = newarray3.find(item => item.GUID === action.payload.listItem.GUID);
-            // item3 = action.payload.listItem.__metadata__OriginalValues;
-            let index = _.findIndex(newarray3, { GUID: action.payload.listItem.GUID });
-            if (newarray3[index].__metadata__OriginalValues) {
-                newarray3[index] = newarray3[index].__metadata__OriginalValues;
-            }
-            return newarray3;
+            return undoListItemChanges(state, action);
         case GOT_LISTITEMS:
-
             return _.union(state, action.payload.items);
-
         default:
-
             return state;
     }
 }

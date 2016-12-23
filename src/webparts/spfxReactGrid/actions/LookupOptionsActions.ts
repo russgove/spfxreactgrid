@@ -4,11 +4,8 @@ import {
     GET_LOOKUPOPTIONS_ERROR,
 } from "../constants";
 import "whatwg-fetch";
-import { Promise } from "es6-promise";
-import * as utils from "../utils/utils";
-import { Site, Web } from "sp-pnp-js";
+import { Web } from "sp-pnp-js";
 import { LookupOptions, LookupOption, LookupOptionStatus } from "../model/LookupOptions";
-import ListDefinition from "../model/ListDefinition";
 export function getLookupOptionAction(dispatch: any, lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): any {
 
     let lookupOptions = new LookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);

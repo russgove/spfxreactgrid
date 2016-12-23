@@ -2,15 +2,14 @@ import * as React from "react";
 import {
   Button,
   MessageBar,
-  MessageBarType,
-  Label,
+  MessageBarType
 } from "office-ui-fabric-react";
 const connect = require("react-redux").connect;
 import SystemStatus from "../model/SystemStatus";
 const Link = require("react-router").Link;
 import Content from "../components/content";
 interface IAppProps extends React.Props<any> {
-  systemStatus: SystemStatus
+  systemStatus: SystemStatus;
 }
 function mapStateToProps(state) {
   return {
@@ -24,7 +23,7 @@ function mapDispatchToProps(dispatch) {
 class App extends React.Component<IAppProps, void> {
   private messageBar(error:string): JSX.Element {
     if (error === "") {
-      return (<div />)
+      return (<div />);
     }
     else {
       return (
@@ -32,19 +31,15 @@ class App extends React.Component<IAppProps, void> {
       );
     }
   }
-
   public render() {
-
     const { children} = this.props;
     return (
-
       <div>
         <Button> <Link to="/lists">List Definitions</Link></Button>
         <Button> <Link to="/columns">Column Definitions</Link></Button>
         <Button> <Link to="/">List Items>List Items</Link></Button>
         <div>
           {this.messageBar(this.props.systemStatus.fetchStatus)}
-
         <div>{this.props.systemStatus.currentAction}
         </div>
       </div>
@@ -55,7 +50,6 @@ class App extends React.Component<IAppProps, void> {
   );
   };
 }
-
 export default connect(
   mapStateToProps,
   mapDispatchToProps

@@ -12,7 +12,7 @@ import {
 function moveColumnUp(state: Array<ColumnDefinition>, action) {
     let newstate = _.clone(state);
 
-    let index = _.findIndex<ColumnDefinition>(newstate, c => c.guid === action.payload.column.guid);
+    const index = _.findIndex<ColumnDefinition>(newstate, c => c.guid === action.payload.column.guid);
     newstate[index] = newstate.splice(index - 1, 1, newstate[index])[0];
     return newstate;
 }

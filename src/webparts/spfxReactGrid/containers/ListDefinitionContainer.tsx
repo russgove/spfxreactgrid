@@ -4,11 +4,9 @@ const connect = require("react-redux").connect;
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 import WebEditor from "../components/WebEditor";
 import ListEditor from "../components/ListEditor";
-import FieldEditor from "../components/FieldEditor";
 import { addList, removeList, saveList, removeAllLists } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
 import { Button, ButtonType, Dropdown, IDropdownOption, TextField,CommandBar } from "office-ui-fabric-react";
-
 import ListDefinition from "../model/ListDefinition";
 import { ColumnReference } from "../model/ListDefinition";
 import { Site, Web, WebList, WebListField } from "../model/Site";
@@ -159,7 +157,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   private updateExtendedColumn(entity: ListDefinition, columnid: string, value: any) {
     const internalName = utils.ParseSPField(value).id;
-    let fieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
+    const fieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
     for (const col of entity.columnReferences) {
       if (col.columnDefinitionId === columnid) {
         col.name = value;
@@ -171,14 +169,14 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     entity.columnReferences.push(x);
   }
   public getFieldDefinition(listdef: ListDefinition, internalName: string): {} {
-    let field = this.getFieldInList(listdef, internalName);
+    const field = this.getFieldInList(listdef, internalName);
     return field.fieldDefinition;
   }
   private handleCellUpdatedEvent(event) { //native react uses a Synthetic event
     this.handleCellUpdated(event.target.value);
   }
   private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
-    let {entityid, columnid} = this.state.editing;
+    const {entityid, columnid} = this.state.editing;
     const entity: ListDefinition = this.props.lists.find((temp) => temp.guid === entityid);
     const column = this.extendedColumns.find(temp => temp.id === columnid);
     // if it is a default column, just set its value , otheriwse update it in the list of extended columns (i.e. sharepoint columns)
@@ -298,7 +296,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
   }
   public GetColumnReferenence(listDefinition: ListDefinition, columnDefinitionId: string): ColumnReference {
-    for (let columnref of listDefinition.columnReferences) {
+    for (const columnref of listDefinition.columnReferences) {
       if (columnref.columnDefinitionId === columnDefinitionId) {
         return columnref;
       }

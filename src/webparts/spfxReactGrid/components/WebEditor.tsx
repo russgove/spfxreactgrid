@@ -26,7 +26,7 @@ export default class WebEditor extends React.Component<IWebEditorProps, void> {
         key: web.url + "#;" + web.title,
         text: web.title
       });
-    })
+    });
     options.unshift({ key: null, text: "..Select One" });
     return (
       <Dropdown label="" selectedKey={selectedValue} options={options}  onChanged={this.handleChange} >
@@ -35,5 +35,5 @@ export default class WebEditor extends React.Component<IWebEditorProps, void> {
   }
 
 
-};
+}
 

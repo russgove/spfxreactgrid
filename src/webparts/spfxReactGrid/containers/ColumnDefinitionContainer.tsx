@@ -1,15 +1,12 @@
 ﻿import * as React from "react";
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 const connect = require("react-redux").connect;
-
 import { addColumn, removeColumn, saveColumn, removeAllColumns, moveCulumnUp, moveCulumnDown } from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
-
 import { Button, ButtonType, TextField, CommandBar, Dropdown, IDropdownOption, Toggle } from "office-ui-fabric-react";
-
 import Container from "../components/container";
 import { Guid, Log } from "@microsoft/sp-client-base";
-import * as utils from "../utils/utils";
+
 const fieldTypes: Array<IDropdownOption> = [
     { key: null, text: "(Selecte one)" },
     { key: "Text", text: "Text" },
@@ -250,7 +247,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         }
     }
     public TableDetail(props): JSX.Element {
-        const {entity, column, rowChanged} = props;
+        const {entity, column} = props;
         if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id && column.editable) {
             return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid red", padding: "0px" }}>
                 <this.CellContentsEditable entity={entity} gridColumn={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
@@ -297,9 +294,9 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         return (
             <tbody>
                 {
-                    entities.map(function (entity, index, entities) {
+                    entities.map(function (entity, index, all) {
                         return (
-                            <this.TableRow isFirst={index === 0} isLast={index === entities.length - 1} key={entity.guid} columns={columns} entity={entity} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
+                            <this.TableRow isFirst={index === 0} isLast={index === all.length - 1} key={entity.guid} columns={columns} entity={entity} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
                         );
                     }, this)
                 }
@@ -307,7 +304,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
         );
     }
     public render() {
-        const {  addColumn, removeColumn } = this.props;
+        const {  addColumn } = this.props;
         return (
             <Container testid="columns" size={2} center>
                 <h1>Column Definitions</h1>

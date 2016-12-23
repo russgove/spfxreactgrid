@@ -6,29 +6,40 @@ import { addListItem, removeListItem, getListItemsAction, saveListItemAction, un
 import { getLookupOptionAction } from "../actions/lookupOptionsActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
-import { LookupOption, LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
+import {  LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
 
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
-import { Button, ButtonType, TextField, IDropdownOption, Dropdown, Spinner, SpinnerType, ISpinnerProps, } from "office-ui-fabric-react";
+import { Button, ButtonType, TextField, IDropdownOption, Dropdown, Spinner, SpinnerType } from "office-ui-fabric-react";
 
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
 
 import Container from "../components/container";
 import { Log } from "@microsoft/sp-client-base";
-import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
+
 interface IListViewPageProps extends React.Props<any> {
+  /** An array of ListItems fetched from sharepoint */
   listItems: Array<ListItem>;
+  /** An array of LookupOptions. One for each Lookup Column */
   lookupOptions: Array<LookupOptions>;
+  /** An array of columns to be displayed on the grid */
   columns: Array<ColumnDefinition>;
+  /** The listDefinitions. Says which lists to pull data from */
   listDefinitions: Array<ListDefinition>;
+  /** Redux Action to add a new listitem */
   addListItem: (ListItem) => void;
+  /** Redux Action to add a new remove a list item */
   removeListItem: (ListItem) => void;
+  /** Redux Action to get listitems from a specific list */
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
+  /** Redux Action to update a listitem in sharepoint */
   updateListItem: (ListItem: ListItem, ListDef: ListDefinition) => void;
+  /** Redux Action to  get the lookup options for a specific field */
   getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField) => void;
+  /** Redux Action to undo changes made to the listitem */
   undoItemChanges: (ListItem) => void;
+  /** Redux Action to save the listitem in the store (NOT to sharepoint*/
   saveListItem: (ListItem) => void;
 }
 function mapStateToProps(state) {
@@ -82,12 +93,20 @@ function mapDispatchToProps(dispatch) {
     },
   };
 }
+/**
+ *
+ */
 interface IGridState {
   editing: {
+    /**The Sharepoint GUID of the listitem being edited */
     entityid: string;
+    /**The id  of the column being edited */
     columnid: string;
   };
 }
+/**
+ * This component is the Grid for editing listitems.
+ */
 class ListItemContainer extends React.Component<IListViewPageProps, IGridState> {
   public constructor() {
     super();
@@ -105,19 +124,35 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.getLookupOptions = this.getLookupOptions.bind(this);
 
   }
+  /**
+   * When the component Mounts, call an action to get the listitems for all the listdefinitions
+   */
   public componentWillMount() {
     this.props.getListItems(this.props.listDefinitions);
   }
+  /**
+ * Method to get the parent TD of any cell,
+ * The listItemId and columnID are stored as attributes of the cells parent TD.
+ */
   public getParent(node: Node, type: string): Node {
     while (node.nodeName !== "TD") {
       node = node.parentNode;
     }
     return node;
   }
-
+  /**
+   * This event gets fired whenever a cell on the grid recieves focus.
+   * The "editing" propery of this component determines which cell is being edited.
+   * This method gets the clicked on  (the entityid-- the id of the SPLIstItem) and the columnId (the id of the ColumnDefinition)
+   * and sets them in the "editing"property of state.
+   * When Component then redraws, it draws that cell as an editable (See the TableDetail method).
+   *
+   * If the rendering of that column in edit mode requires additional Info, dispatch a redux action to get the data.
+   * (Dispatching the action from within the render mehod itself cused infinite loop)
+   *
+   */
   public toggleEditing(event) {
     Log.verbose("list-Page", "focus event fired editing  when entering cell");
-
     const target = this.getParent(event.target, "TD"); // walk up the Dom to the TD, thats where the IDs are stored
     const attributes: NamedNodeMap = target.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value;
@@ -125,7 +160,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     /**
      * Need to fire events here to get data needed for the rerender
      */
-    const listitem = this.props.listItems.find(li => li.GUID===entityid);
+    const listitem = this.props.listItems.find(li => li.GUID === entityid);
     const listDef = this.getListDefinition(listitem.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     switch (colref.fieldDefinition.TypeAsString) {
@@ -147,37 +182,46 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
   }
+  /**
+   * This event gets fired to revert any changes made to the ListItem.
+   */
   public undoItemChanges(event): void {
-
-    let value;
-    const target = event.target;
-    value = target.value;
-    const parentTD = this.getParent(event.target, "TD");
+    const parentTD = this.getParent(event.target, "TD"); // the listitemId and the column ID are always stored as attributes of the parent TD.
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityitem = attributes.getNamedItem("data-entityid");
     const entityid = entityitem.value;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
-
     this.props.undoItemChanges(entity);
   }
+  /**
+   * This event gets fired, to save the item back to SharePoint.
+   */
   public updateListItem(event): void {
-
     const parentTD = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = parentTD.attributes;
-    // const entityitem = attributes.getNamedItem("data-entityid");
-    // const entityid = entityitem.value;
-    const entityid = attributes.getNamedItem("data-entityid").value;
-    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
-    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-
+    const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
+    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid); // the listItemItself
+    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);// The list Definition this item is associated with.
     this.props.updateListItem(entity, listDef);
   }
+  /**
+   * This method gets called when react events are used to update a cell in the grid.
+   * It just gets the value and passes it to handleCellUpdated.
+   */
   private handleCellUpdatedEvent(event) { //native react uses a Synthetic event
     this.handleCellUpdated(event.target.value);
   }
-  private handleCellUpdated(value) { // Office UI Fabric does not use events. It just calls this method with the new value
+  /**
+   * This method gets called when react cells in the gid get updated.
+   * Office UI Fabric does not use events. It just calls this method with the new value.
+   * It reformats the data to fit the format we recievbed from SP in the first place ,
+   * and dispatches an action to save the data in the store.
+   *
+   * Also, it saves the original version of the record, so we can undo later.
+   */
+  private handleCellUpdated(value) {
 
-    let {entityid, columnid} = this.state.editing;
+    const {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
@@ -202,26 +246,27 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
     this.props.saveListItem(entity);
   }
-    /** if the the options for a lookup listy are not in th ecache, fire an event to get them
-     *  This method i scalled when  a lookup column receives focus
-     */
+  /**
+   * If the the options for a lookup list are not in the cache, fire an event to get them
+   *  This method is called when  a lookup column receives focus.
+   */
   public ensureLookupOptions(lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): LookupOptions {
     // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
-    let lookupoptions = this.props.lookupOptions.find(x => {
+    const lookupoptions = this.props.lookupOptions.find(x => {
       return (x.lookupField === lookupField) &&
         (x.lookupListId === lookupListId) &&
         (x.lookupSite === lookupSite) &&
-        (x.lookupWebId === lookupWebId)
+        (x.lookupWebId === lookupWebId);
     });
     if (lookupoptions === undefined) {
       this.props.getLookupOptionAction(lookupSite, lookupWebId, lookupListId, lookupField);
     }
-
     return lookupoptions;
   }
-  /** gets the options to display for a lookupField
-   * This method i scalled when  a lookup column gets displayed
-   *  When I
+  /**
+   * Gets the options to display for a lookupField
+   * This method is called when  a lookup column gets rendered... we fire the event to get the data when its focused,
+   * then we use the data when it gets renderd
   */
   public getLookupOptions(lookupSite: string, lookupWebId: string, lookupListId: string, lookupField: string): LookupOptions {
     // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
@@ -229,11 +274,23 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       return (x.lookupField === lookupField) &&
         (x.lookupListId === lookupListId) &&
         (x.lookupSite === lookupSite) &&
-        (x.lookupWebId === lookupWebId)
+        (x.lookupWebId === lookupWebId);
     });
     return lookupoptions;
   }
-
+  /**
+   *  Returns the ListDefinition for the given ListDefinionId
+   *
+   */
+  public getListDefinition(
+    /** The id of the list definition to be retrieved */
+    listdefid: string
+  ): ListDefinition {
+    return this.props.listDefinitions.find(ld => ld.guid === listdefid);
+  }
+  /**
+   * This method renders the contents of an individual cell in an editable format.
+   */
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
@@ -285,7 +342,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           );
         }
       case "Choice":
-        let choices = colref.fieldDefinition.Choices.map((c, i) => {
+        const choices = colref.fieldDefinition.Choices.map((c, i) => {
           let opt: IDropdownOption = {
             index: i,
             key: c,
@@ -328,22 +385,11 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             onChange={cellUpdatedEvent} />);
     }
   }
-  /** Returns the ListDefinition for the given ListDefinionId */
-  public getListDefinition(
-    /** The id of the list definition to be retrieved */
-    listdefid: string
-  ): ListDefinition {
-    return this.props.listDefinitions.find(ld => ld.guid === listdefid);
-  }
 
-  //   public getColumnReference(entity: ListItem, column: ColumnDefinition): ColumnReference {
-  //     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-  //     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
-  // return colref;
-  //   }
-
+  /**
+   *  This method renders the contents of an individual cell in a non-editable format.
+   */
   public CellContents(props: { entity: ListItem, column: ColumnDefinition }): JSX.Element {
-
     const {entity, column} = props;
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
@@ -375,9 +421,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </a>
         );
       case "Note":
-        let content = (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
-        </a>);
-        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{ __html: entity[internalName] }} >
+          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{ __html: entity[internalName] }} >
         </a>
         );
 
@@ -405,7 +449,11 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         );
     }
   }
-
+  /**
+   *  This method renders the A TD for an individual Cell. The TD contains the listItemID and the ColumnID as attributes.
+   *  It calls CellContentsEditable or CellContents based on whether the cell is being edited.
+   * It determines if the cell is being edited by looking at this,props.editing(which got set by ToggleEditing).
+   */
   public TableDetail(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
@@ -421,6 +469,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       );
     }
   }
+  /**
+   * This method renders a tableRow for an individual listitem
+   */
   public TableRow(props: { entity: ListItem, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
     const {entity, columns, cellUpdated, cellUpdatedEvent} = props;
     return (
@@ -453,6 +504,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </td>
       </tr>);
   };
+/**
+ * Render rows for the listItems
+ */
   public TableRows(props: { entities: Array<ListItem>, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
     const {entities, columns, cellUpdated, cellUpdatedEvent} = props;
     return (
@@ -468,7 +522,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     );
   }
   public render() {
-    const { listItems, addListItem, removeListItem, getListItems } = this.props;
+    const { listItems } = this.props;
     Log.info("ListItemContainer", "In Render");
     return (
       <Container testid="columns" size={2} center>
@@ -505,7 +559,6 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           </thead>
           {
             <this.TableRows entities={listItems} columns={this.props.columns} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
-
           })}
         </table>
       </Container>

@@ -1,9 +1,8 @@
-import GridRowStatus from "./GridRowStatus";
+
 export enum LookupOptionStatus {
     fetching,
     fetched,
     error
-
 }
 export class LookupOption {
     constructor(public id: number, public value: string) { }

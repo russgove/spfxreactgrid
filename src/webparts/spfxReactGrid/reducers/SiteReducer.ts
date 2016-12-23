@@ -10,7 +10,7 @@ const INITIAL_STATE: Array<Site> = [];
 function gotWebs(state: Array<Site> = INITIAL_STATE, action: any = { type: "" }): Array<Site> {
     let site: Site = new Site(action.payload.siteUrl);
     site.webs = action.payload.webs;
-    let result :Array<Site> =  _.union(state, new Array<Site>(site));
+    let result: Array<Site> = _.union(state, new Array<Site>(site));
     return result;
 }
 function siteReducer(state: Array<Site> = INITIAL_STATE, action: any = { type: "" }): Array<Site> {
@@ -33,24 +33,21 @@ function siteReducer(state: Array<Site> = INITIAL_STATE, action: any = { type: "
             }
             return newState;
         case GET_FIELDSFORLIST_SUCCESS:
-            {
-
-                let newState2 = _.clone(state);
-                //find the site and add the lists to it
-                for (const site of newState2) {
-                    for (const web of site.webs) {
-                        if (web.url === action.payload.webUrl) {
-                            for (const list of web.lists) {
-                                if (list.id === action.payload.listId) {
-                                    list.fields = action.payload.fields;
-                                    list.fieldsFetched = true;
-                                }
+            let newState2 = _.clone(state);
+            //find the site and add the lists to it
+            for (const site of newState2) {
+                for (const web of site.webs) {
+                    if (web.url === action.payload.webUrl) {
+                        for (const list of web.lists) {
+                            if (list.id === action.payload.listId) {
+                                list.fields = action.payload.fields;
+                                list.fieldsFetched = true;
                             }
                         }
                     }
                 }
-                return newState2;
             }
+            return newState2;
         default:
             return state;
     }

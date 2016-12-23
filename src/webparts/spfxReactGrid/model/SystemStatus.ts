@@ -1,4 +1,4 @@
 ﻿export default class {
-    currentAction:string;
-    fetchStatus:string;
+    public currentAction:string;
+    public fetchStatus:string;
 }
