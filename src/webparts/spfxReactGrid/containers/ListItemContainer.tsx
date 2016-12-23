@@ -116,7 +116,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.TableRow = this.TableRow.bind(this);
     this.TableRows = this.TableRows.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
-this.addListItem = this.addListItem.bind(this);
+    this.addListItem = this.addListItem.bind(this);
 
     this.handleCellUpdated = this.handleCellUpdated.bind(this);
     this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
@@ -131,6 +131,12 @@ this.addListItem = this.addListItem.bind(this);
     for (const column of this.props.columns) {
       listItem[column.name] === null;
     }
+    if (this.props.listDefinitions.length === 1) {
+      listItem.__metadata__ListDefinitionId = this.props.listDefinitions[0].guid;
+    } else {
+      listItem.__metadata__ListDefinitionId = null;
+    }
+
     this.props.addListItem(listItem);
   }
   /**
@@ -238,7 +244,9 @@ this.addListItem = this.addListItem.bind(this);
     if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
       entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
     }
-    entity.__metadata__GridRowStatus = GridRowStatus.modified;
+    if (entity.__metadata__GridRowStatus === GridRowStatus.pristine) {
+      entity.__metadata__GridRowStatus = GridRowStatus.modified;
+    }
     switch (columnReference.fieldDefinition.TypeAsString) {
       case "DateTime":
         entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
@@ -400,6 +408,8 @@ this.addListItem = this.addListItem.bind(this);
    */
   public CellContents(props: { entity: ListItem, column: ColumnDefinition }): JSX.Element {
     const {entity, column} = props;
+    if (!entity.__metadata__ListDefinitionId) { // item is new and list not yet selected
+    }
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
     if (colref === undefined) { //Column has not been configured for this list

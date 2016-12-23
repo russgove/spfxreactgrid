@@ -19,6 +19,8 @@ import * as utils from "../utils/utils";
 
 import { Web, TypedHash } from "sp-pnp-js";
 import ListItem from "../model/ListItem";
+import GridRowStatus from "../Model/GridRowStatus";
+
 import ListDefinition from "../model/ListDefinition";
 export function clearListItems() {
     return {
@@ -68,7 +70,7 @@ export function listDefinitionIsValid(listDefinition: ListDefinition): boolean {
  * Action to update a listitem in sharepoint
  */
 export function updateListItemAction(dispatch: any, listDefinition: ListDefinition, listItem: ListItem): any {
-   const weburl = utils.ParseSPField(listDefinition.webLookup).id;
+    const weburl = utils.ParseSPField(listDefinition.webLookup).id;
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
     let typedHash: TypedHash<string | number | boolean> = {};
@@ -85,25 +87,47 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
                 typedHash[fieldName] = listItem[fieldName];
         }
     }
+    switch (listItem.__metadata__GridRowStatus) {
+        case GridRowStatus.modified:
+            const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
+                .then((response) => {
+                    // shouwld have an option to rfresh here in cas of calculated columns
 
-    const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
-        .then((response) => {
-            // shouwld have an option to rfresh here in cas of calculated columns
+                    const gotListItems = updateListItemSuccessAction(listItem);
+                    dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+                })
+                .catch((error) => {
+                    console.log(error);
+                    dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
+                });
+            const action = {
+                type: UPDATE_LISTITEM,
+                payload: {
+                    promise: promise
+                }
+            };
+            return action;
+        case GridRowStatus.new:
+            const mewpromise = web.lists.getById(listid).items.add(typedHash)
+                .then((response) => {
+                    debugger;
 
-            const gotListItems = updateListItemSuccessAction(listItem);
-            dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
-        })
-        .catch((error) => {
-            console.log(error);
-            dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
-        });
-    const action = {
-        type: UPDATE_LISTITEM,
-        payload: {
-            promise: promise
-        }
-    };
-    return action;
+                    const gotListItems = updateListItemSuccessAction(listItem);
+                    dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+                })
+                .catch((error) => {
+                    console.log(error);
+                    dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
+                });
+            return {
+                type: UPDATE_LISTITEM,
+                payload: {
+                    promise: mewpromise
+                }
+            };
+        default:
+            return; // action called on item with ibalid state
+    }
 }
 export function updateListItemErrorAction(error) {
     return {

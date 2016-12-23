@@ -36,7 +36,7 @@ function undoListItemChanges(state: Array<ListItem>, action: { payload: { listIt
  */
 function addListItem(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
     let newarray = _.cloneDeep(state);
-    newarray.push(action.payload.listItem);
+    newarray.unshift(action.payload.listItem);
     return newarray;
 }
 /**
