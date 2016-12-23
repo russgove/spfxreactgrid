@@ -14,8 +14,8 @@ const fieldTypes: Array<IDropdownOption> = [
     { key: "Note", text: "Note" },
     { key: "DateTime", text: "DateTime" },
     // { key: "Counter", text: "Counter" },
-     { key: "Choice", text: "Choice" },
-     { key: "Lookup", text: "Lookup" },
+    { key: "Choice", text: "Choice" },
+    { key: "Lookup", text: "Lookup" },
     // { key: "Boolean", value: "Boolean" },
     { key: "Number", text: "Number" },
     // { key: "Currency", value: "Currency" },
@@ -235,7 +235,7 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
                 //         <Toggle label="" checked={entity[gridColumn.name]} disabled={true} >
                 //         </Toggle >
                 //     );
-                           let result = (entity[gridColumn.name]) ? (<div>Yes</div>) : (<div>No</div>);
+                let result = (entity[gridColumn.name]) ? (<div>Yes</div>) : (<div>No</div>);
                 return result;
             case "SharePointLookupCellFormatter":
                 return (<SharePointLookupCellFormatter value={entity[gridColumn.name]} onFocus={this.toggleEditing} />);

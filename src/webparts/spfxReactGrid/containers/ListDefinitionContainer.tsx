@@ -15,7 +15,6 @@ import Container from "../components/container";
 import { Guid, Log, PageContext } from "@microsoft/sp-client-base";
 export class GridColumn {
   constructor(
-
     public id: string,
     public name: string,
     public editable: boolean,
