@@ -28,7 +28,9 @@ export default class ListDefinition {
         /** the url of the site holding the list. (only used during setup) */
         public siteUrl: string,
         /** the url of the list. (not used. to be deleted) */
-        public url: string) {
+        public url: string,
+        /** A name for the listDefinition. When users add a new item, they must select the list nby this name */
+        public title: string) {
         this.columnReferences = new Array<ColumnReference>();
         this.guid = Guid.newGuid().toString();
 

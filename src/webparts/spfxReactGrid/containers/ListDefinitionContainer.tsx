@@ -49,7 +49,7 @@ function mapDispatchToProps(dispatch) {
     addList: (siteUrl: string): void => {
 
       const id = Guid.newGuid();
-      const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null);
+      const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null,null);
       dispatch(addList(list));
     },
     removeList: (list: ListDefinition): void => {
@@ -94,6 +94,14 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       name: "siteUrl", // the url to the site
       editable: true,
       width: 359,
+      formatter: "",
+      type: "Text"
+    },
+    {
+      id: "title",
+      name: "title", // the url to the site
+      editable: true,
+      width: 100,
       formatter: "",
       type: "Text"
     },

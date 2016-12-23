@@ -2,21 +2,22 @@ import {
     GOT_WEBS,
     GET_WEBS,
     GET_WEBSERROR,
-     GET_LISTSFORWEB_SUCCESS,
+    GET_LISTSFORWEB_SUCCESS,
     GET_LISTSFORWEB_ERROR,
-
     GET_FIELDSFORLIST_SUCCESS,
     GET_FIELDSFORLIST_ERROR
 } from "../constants";
 import "whatwg-fetch";
-
 import * as utils from "../utils/utils";
 import { Web as SPWeb } from "sp-pnp-js";
 import { Site as SPSite } from "sp-pnp-js";
 import { Web, WebList, WebListField } from "../model/Site";
-
+/**
+ * Action to get all the webs within a site.
+ * This cant currently be done with rest, so this returns all the subsites of the rootweb instead.
+ */
 export function getWebsAction(dispatch: any, siteUrl: string): any {
-    const site:SPSite=new SPSite(siteUrl);
+    const site: SPSite = new SPSite(siteUrl);
     const payload = site.rootWeb.webs.orderBy("Title").get()
         .then((response) => {
             const data = _.map(response, (item: any) => {

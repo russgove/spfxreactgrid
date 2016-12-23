@@ -25,7 +25,7 @@ export default class ListEditor extends React.Component<IListEditorProps, void> 
         key: list.id + "#;" + list.title,
         text: list.title
       });
-    })
+    });
     options.unshift({ key: null, text: "..Select One" });
     return (
       <Dropdown label="" selectedKey={selectedValue} options={options} onChanged={this.handleChange} >

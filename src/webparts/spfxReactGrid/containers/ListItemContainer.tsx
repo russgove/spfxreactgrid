@@ -6,7 +6,7 @@ import { addListItem, removeListItem, getListItemsAction, saveListItemAction, un
 import { getLookupOptionAction } from "../actions/lookupOptionsActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
-import {  LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
+import { LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
 
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
@@ -63,12 +63,12 @@ export class GridColumn {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    addListItem: (): void => {
-      dispatch(addListItem(new ListItem("123-123123123-123123-123123")));
+    addListItem: (listItem: ListItem): void => {
+      dispatch(addListItem(listItem));
     },
 
-    removeListItem: (): void => {
-      dispatch(removeListItem(new ListItem("123-123123123-123123-123123")));
+    removeListItem: (listItem: ListItem): void => {
+      dispatch(removeListItem(listItem));
     },
     saveListItem: (listItem: ListItem): void => {
       dispatch(saveListItemAction(listItem));
@@ -116,6 +116,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.TableRow = this.TableRow.bind(this);
     this.TableRows = this.TableRows.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
+this.addListItem = this.addListItem.bind(this);
 
     this.handleCellUpdated = this.handleCellUpdated.bind(this);
     this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
@@ -123,6 +124,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.updateListItem = this.updateListItem.bind(this);
     this.getLookupOptions = this.getLookupOptions.bind(this);
 
+  }
+  private addListItem(): void {
+    debugger;
+    let listItem = new ListItem();
+    for (const column of this.props.columns) {
+      listItem[column.name] === null;
+    }
+    this.props.addListItem(listItem);
   }
   /**
    * When the component Mounts, call an action to get the listitems for all the listdefinitions
@@ -421,7 +430,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </a>
         );
       case "Note":
-          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{ __html: entity[internalName] }} >
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{ __html: entity[internalName] }} >
         </a>
         );
 
@@ -504,9 +513,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </td>
       </tr>);
   };
-/**
- * Render rows for the listItems
- */
+  /**
+   * Render rows for the listItems
+   */
   public TableRows(props: { entities: Array<ListItem>, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
     const {entities, columns, cellUpdated, cellUpdatedEvent} = props;
     return (
@@ -530,6 +539,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           key: "AddItem",
           name: "Add an Item",
           icon: "Add",
+          onClick: this.addListItem
 
         },
         {

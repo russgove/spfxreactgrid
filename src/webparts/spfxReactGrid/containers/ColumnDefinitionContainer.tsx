@@ -9,6 +9,7 @@ import { Guid, Log } from "@microsoft/sp-client-base";
 
 const fieldTypes: Array<IDropdownOption> = [
     { key: null, text: "(Selecte one)" },
+   { key: "__LISTDEFINITIONTITLE__", text: "List Title" }, //used to display the ListDefinition Title in the grid, for when users add a new item
     { key: "Text", text: "Text" },
     { key: "Integer", text: "Integer" },
     { key: "Note", text: "Note" },
