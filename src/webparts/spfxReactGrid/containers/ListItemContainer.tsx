@@ -172,29 +172,30 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const attributes: NamedNodeMap = target.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value;
     const columnid = attributes.getNamedItem("data-columnid").value;
-    /**
-     * Need to fire events here to get data needed for the rerender
-     */
-    const listitem = this.props.listItems.find(li => li.GUID === entityid);
-    const listDef = this.getListDefinition(listitem.__metadata__ListDefinitionId);
-    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
-    switch (colref.fieldDefinition.TypeAsString) {
-      case "Lookup":
-        let lookupField = colref.fieldDefinition.LookupField;
-        let lookupListId = colref.fieldDefinition.LookupList;
-        let lookupWebId = colref.fieldDefinition.LookupWebId;
-        /**
-         * We are assuming here that the lookup listy is in the same web.
-         *
-         */
-        lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
-        let lookupSite = listDef.siteUrl;
-        this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
-        break;
-      default:
-        break;
+    if (columnid != "") { //user clicked on a column, not a button( Buttons are in a td with am column id of ""
+      /**
+       * Need to fire events here to get data needed for the rerender
+       */
+      const listitem = this.props.listItems.find(li => li.GUID === entityid);
+      const listDef = this.getListDefinition(listitem.__metadata__ListDefinitionId);
+      const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
+      switch (colref.fieldDefinition.TypeAsString) {
+        case "Lookup":
+          let lookupField = colref.fieldDefinition.LookupField;
+          let lookupListId = colref.fieldDefinition.LookupList;
+          let lookupWebId = colref.fieldDefinition.LookupWebId;
+          /**
+           * We are assuming here that the lookup listy is in the same web.
+           *
+           */
+          lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
+          let lookupSite = listDef.siteUrl;
+          this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+          break;
+        default:
+          break;
+      }
     }
-
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
   }
   /**
