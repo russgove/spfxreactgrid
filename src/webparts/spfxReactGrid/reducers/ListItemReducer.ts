@@ -6,7 +6,8 @@ import {
     GOT_LISTITEMS,
      SAVE_LISTITEM,
       UNDO_LISTITEMCHANGES,
-    UPDATE_LISTITEM_SUCCESS
+    UPDATE_LISTITEM_SUCCESS,
+    ADDED_NEW_ITEM_TO_SHAREPOINT
 } from "../constants";
 const INITIAL_STATE = [];
 /**
@@ -49,6 +50,16 @@ function removeListItem(state: Array<ListItem>, action: { payload: { listItem: L
     return newArr;
 }
 /**
+ * After adding a new item to the store, updatiing it, then sending to SP ,
+ *  we need to replace the local copy with the values we fot back from sharepoint
+ */
+function relpaceItemInStore(state: Array<ListItem>, action: { payload: { listItem: ListItem ,localCopy:ListItem} }) {
+    let newState = _.cloneDeep(state);
+    const idx = _.findIndex(newState, { GUID: action.payload.localCopy.GUID });
+    newState[idx]=action.payload.listItem;
+    return newState;
+}
+/**
  * updates a Listitem in the store
  */
 function saveListItem(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
@@ -72,6 +83,8 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
             return saveListItem(state, action);
         case UPDATE_LISTITEM_SUCCESS:
             return updateListItemSuccess(state, action);
+         case ADDED_NEW_ITEM_TO_SHAREPOINT:
+            return relpaceItemInStore(state, action);
         case UNDO_LISTITEMCHANGES:
             return undoListItemChanges(state, action);
         case GOT_LISTITEMS:

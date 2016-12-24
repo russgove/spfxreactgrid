@@ -10,7 +10,9 @@ import {
     UNDO_LISTITEMCHANGES,
     UPDATE_LISTITEM,//save to sharepoint
     UPDATE_LISTITEM_ERROR,
-    UPDATE_LISTITEM_SUCCESS
+    UPDATE_LISTITEM_SUCCESS,
+    ADDED_NEW_ITEM_TO_SHAREPOINT
+
 
 } from "../constants";
 import "whatwg-fetch";
@@ -109,10 +111,15 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
             return action;
         case GridRowStatus.new:
             const mewpromise = web.lists.getById(listid).items.add(typedHash)
-                .then((response) => {
+                .then((response) => {//
                     debugger;
-
-                    const gotListItems = updateListItemSuccessAction(listItem);
+                    response.data.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                    response.data.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
+                    /**
+                         * data recived after adding an item is the same as we recive from a get
+                         * need to swap local item, with the one we got from sharepoint
+                         */
+                    const gotListItems = addedNewItemInSharepouint(response.data, listItem);
                     dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
                 })
                 .catch((error) => {
@@ -134,6 +141,19 @@ export function updateListItemErrorAction(error) {
         type: UPDATE_LISTITEM_ERROR,
         payload: {
             error: error
+        }
+    };
+}
+/**
+ * called after an item was added to the local cache, updated, then sent to sharepoint.
+ * We need to replace our local copy, with the real valuse that we got back from sharepoint
+ */
+export function addedNewItemInSharepouint(listItem, localCopy) {
+    return {
+        type: ADDED_NEW_ITEM_TO_SHAREPOINT,
+        payload: {
+            listItem: listItem,
+            localCopy: localCopy
         }
     };
 }
