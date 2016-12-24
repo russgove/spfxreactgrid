@@ -11,7 +11,9 @@ import {
     UPDATE_LISTITEM,//save to sharepoint
     UPDATE_LISTITEM_ERROR,
     UPDATE_LISTITEM_SUCCESS,
-    ADDED_NEW_ITEM_TO_SHAREPOINT
+    ADDED_NEW_ITEM_TO_SHAREPOINT,
+    REMOVE_LISTITEM_SUCCESS,
+    REMOVE_LISTITEM_ERROR
 
 
 } from "../constants";
@@ -39,9 +41,45 @@ export function addListItem(listItem: ListItem) {
         }
     };
 }
-export function removeListItem(listItem: ListItem) {
+export function removeListItem(dispatch: any, listItem: ListItem, listDefinition: ListDefinition) {
+    const weburl = utils.ParseSPField(listDefinition.webLookup).id;
+    const listid = utils.ParseSPField(listDefinition.listLookup).id;
+    const web = new Web(weburl);
+    switch (listItem.__metadata__GridRowStatus) {
+        case GridRowStatus.modified:
+        case GridRowStatus.pristine:
+            const promise = web.lists.getById(listid).items.getById(listItem.ID).delete()
+                   .then((response) => {
+                    // shouwld have an option to rfresh here in cas of calculated columns
+
+                    const gotListItems = removeListItemSuccessAction(listItem);
+                    dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+                })
+                .catch((error) => {
+                    console.log(error);
+                    dispatch(removeListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
+                });
+            return {
+                type: REMOVE_LISTITEM,
+                payload: {
+                    listItem: listItem
+                }
+            };
+    }
+}
+export function removeListItemSuccessAction(listItem) {
+
     return {
-        type: REMOVE_LISTITEM,
+        type: REMOVE_LISTITEM_SUCCESS,
+        payload: {
+            listItem: listItem
+        }
+    };
+}
+export function removeListItemErrorAction(listItem) {
+
+    return {
+        type: REMOVE_LISTITEM_ERROR,
         payload: {
             listItem: listItem
         }

@@ -30,7 +30,7 @@ interface IListViewPageProps extends React.Props<any> {
   /** Redux Action to add a new listitem */
   addListItem: (ListItem) => void;
   /** Redux Action to add a new remove a list item */
-  removeListItem: (ListItem) => void;
+  removeListItem: (l: ListItem, ListDef: ListDefinition) => void;
   /** Redux Action to get listitems from a specific list */
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   /** Redux Action to update a listitem in sharepoint */
@@ -66,9 +66,15 @@ function mapDispatchToProps(dispatch) {
     addListItem: (listItem: ListItem): void => {
       dispatch(addListItem(listItem));
     },
+    removeListItem: (listItem: ListItem, listDef: ListDefinition): void => {
+      const promise: Promise<any> = removeListItem(dispatch,listItem, listDef);
+      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
-    removeListItem: (listItem: ListItem): void => {
-      dispatch(removeListItem(listItem));
+    },
+    updateListItem: (listItem: ListItem, listDef: ListDefinition): void => {
+      const promise: Promise<any> = updateListItemAction(dispatch, listDef, listItem);
+      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+
     },
     saveListItem: (listItem: ListItem): void => {
       dispatch(saveListItemAction(listItem));
@@ -76,11 +82,7 @@ function mapDispatchToProps(dispatch) {
     undoItemChanges: (listItem: ListItem): void => {
       dispatch(undoListItemChangesAction(listItem));
     },
-    updateListItem: (listItem: ListItem, listDef: ListDefinition): void => {
-      const promise: Promise<any> = updateListItemAction(dispatch, listDef, listItem);
-      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
-    },
     getListItems: (listDefinitions: Array<ListDefinition>): void => {
       const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
@@ -117,7 +119,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.TableRows = this.TableRows.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
     this.addListItem = this.addListItem.bind(this);
-
+    this.removeListItem = this.removeListItem.bind(this);
     this.handleCellUpdated = this.handleCellUpdated.bind(this);
     this.handleCellUpdatedEvent = this.handleCellUpdatedEvent.bind(this);
     this.undoItemChanges = this.undoItemChanges.bind(this);
@@ -138,6 +140,15 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
 
     this.props.addListItem(listItem);
+  }
+  private removeListItem(event): void {
+    debugger;
+    const parentTD = this.getParent(event.target, "TD");
+    const attributes: NamedNodeMap = parentTD.attributes;
+    const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
+    const listItem: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid); // the listItemItself
+    const listDef = this.getListDefinition(listItem.__metadata__ListDefinitionId);// The list Definition this item is associated with.
+    this.props.removeListItem(listItem, listDef);
   }
   /**
    * When the component Mounts, call an action to get the listitems for all the listdefinitions
@@ -511,7 +522,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
               buttonType={ButtonType.icon}
               icon="Save" disabled={!(entity.__metadata__OriginalValues)} />
             <Button width="20" style={{ padding: 0 }}
-              // onClick={this.deleteList}
+              onClick={this.removeListItem}
               buttonType={ButtonType.icon}
               icon="Delete" />
             <Button width="20" style={{ padding: 0 }}

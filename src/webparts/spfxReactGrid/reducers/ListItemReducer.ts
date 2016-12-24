@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import {
     ADD_LISTITEM,
     REMOVE_LISTITEM,
+        REMOVE_LISTITEM_SUCCESS,
     GOT_LISTITEMS,
      SAVE_LISTITEM,
       UNDO_LISTITEMCHANGES,
@@ -44,10 +45,10 @@ function addListItem(state: Array<ListItem>, action: { payload: { listItem: List
  * removes a listitem from the store
  */
 function removeListItem(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
-    // set status to tobedeleted
-    alert("not implemented");
+    // REMOVES ITEM FROM STORE. Called after item is deleted from sharepoint
     let newArr = _.filter(state, (o) => { return o.GUID !== action.payload.listItem.GUID; });
     return newArr;
+
 }
 /**
  * After adding a new item to the store, updatiing it, then sending to SP ,
@@ -77,7 +78,7 @@ function listItemReducer(state = INITIAL_STATE, action: any = { type: "" }) {
     switch (action.type) {
         case ADD_LISTITEM:
             return addListItem(state, action);
-        case REMOVE_LISTITEM:
+        case REMOVE_LISTITEM_SUCCESS:
             return removeListItem(state, action);
         case SAVE_LISTITEM:
             return saveListItem(state, action);

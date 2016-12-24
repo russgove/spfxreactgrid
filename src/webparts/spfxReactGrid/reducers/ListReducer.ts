@@ -14,7 +14,7 @@ const INITIAL_STATE = [];
 function listReducer(state: Array<ListDefinition> = INITIAL_STATE, action: any = { type: "" }): Array<ListDefinition> {
     switch (action.type) {
         case ADD_LIST:
-        //https://spin.atomicobject.com/2016/09/27/typed-redux-reducers-typescript-2-0/
+            //https://spin.atomicobject.com/2016/09/27/typed-redux-reducers-typescript-2-0/
             let newarray = _.clone(state);
             newarray.push(action.payload.list);
             return newarray;
@@ -26,7 +26,7 @@ function listReducer(state: Array<ListDefinition> = INITIAL_STATE, action: any =
         case REMOVE_LIST:
             let newArr = _.filter(state, (o) => { return o.guid !== action.payload.list.guid; });
             return newArr;
-             case REMOVE_ALLLISTS:
+        case REMOVE_ALLLISTS:
             return [];
 
         case ADD_LISTS:
