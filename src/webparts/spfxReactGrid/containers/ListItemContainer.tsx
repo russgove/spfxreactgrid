@@ -67,7 +67,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(addListItem(listItem));
     },
     removeListItem: (listItem: ListItem, listDef: ListDefinition): void => {
-      const promise: Promise<any> = removeListItem(dispatch,listItem, listDef);
+      const promise: Promise<any> = removeListItem(dispatch, listItem, listDef);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
@@ -189,22 +189,24 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
        */
       const listitem = this.props.listItems.find(li => li.GUID === entityid);
       const listDef = this.getListDefinition(listitem.__metadata__ListDefinitionId);
-      const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
-      switch (colref.fieldDefinition.TypeAsString) {
-        case "Lookup":
-          let lookupField = colref.fieldDefinition.LookupField;
-          let lookupListId = colref.fieldDefinition.LookupList;
-          let lookupWebId = colref.fieldDefinition.LookupWebId;
-          /**
-           * We are assuming here that the lookup listy is in the same web.
-           *
-           */
-          lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
-          let lookupSite = listDef.siteUrl;
-          this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
-          break;
-        default:
-          break;
+      if (listDef) {// if user just added an item we may not hava a lisdef yest
+        const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
+        switch (colref.fieldDefinition.TypeAsString) {
+          case "Lookup":
+            let lookupField = colref.fieldDefinition.LookupField;
+            let lookupListId = colref.fieldDefinition.LookupList;
+            let lookupWebId = colref.fieldDefinition.LookupWebId;
+            /**
+             * We are assuming here that the lookup listy is in the same web.
+             *
+             */
+            lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
+            let lookupSite = listDef.siteUrl;
+            this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+            break;
+          default:
+            break;
+        }
       }
     }
     this.setState({ "editing": { entityid: entityid, columnid: columnid } });
@@ -237,6 +239,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    */
   private handleCellUpdatedEvent(event) { //native react uses a Synthetic event
     this.handleCellUpdated(event.target.value);
+
   }
   /**
    * This method gets called when react cells in the gid get updated.
@@ -251,6 +254,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    const titlecolumnid=this.props.columns.find(c=>{ return c.type==="__LISTDEFINITIONTITLE__"}).guid
+    if (columnid=== titlecolumnid){ // user just changed the listDef,
+        entity.__metadata__ListDefinitionId=value.key; // value is a DropDDownOptions
+          this.props.saveListItem(entity);
+          return ;
+    }
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     const internalName = utils.ParseSPField(columnReference.name).id;
     if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
@@ -323,6 +332,21 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
+
+    if (column.type === "__LISTDEFINITIONTITLE__") {
+      entity.__metadata__ListDefinitionId
+      const opts: Array<IDropdownOption> = this.props.listDefinitions.map(ld => {
+        return { key: ld.guid, text: ld.title };
+      });
+      // if (!entity.__metadata__ListDefinitionId) {
+      //   opts.unshift({ key: null, text: "Select one" });
+      // }
+      // should I have a different handler for this?
+      return (
+        <Dropdown options={opts} selectedKey={entity.__metadata__ListDefinitionId} label=""
+          onChanged={(selection: IDropdownOption) => { cellUpdated(selection); } } />
+      );
+    }
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
     const internalName = utils.ParseSPField(colref.name).id;
@@ -423,6 +447,24 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     if (!entity.__metadata__ListDefinitionId) { // item is new and list not yet selected
     }
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    if (column.type === "__LISTDEFINITIONTITLE__") {// this type is sued to show the listdefinition name
+      if (listDef != null) {//listdef has been selected
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+          {listDef.title}
+        </a>);
+      }
+      else {//listdef not yet selected
+        return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+          Select a list
+      </a>);
+      }
+    }
+    if (!listDef) { // cant edit columns til we select a listdef, not NO onFocus={this.toggleEditing}
+      return (<a href="#" style={{ textDecoration: "none" }} >
+        select a list first
+        </a>
+      );
+    }
     const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
     if (colref === undefined) { //Column has not been configured for this list
       return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >

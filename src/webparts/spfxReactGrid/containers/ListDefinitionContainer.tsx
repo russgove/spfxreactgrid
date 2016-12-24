@@ -386,6 +386,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
 
   public TableDetail(props: { entity: ListDefinition, column: GridColumn, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
+
     if (this.state && this.state.editing && this.state.editing.entityid === entity.guid && this.state.editing.columnid === column.id) {
       return (<td data-entityid={entity.guid} data-columnid={column.id} style={{ width: column.width, border: "1px solid red", padding: "0px" }}>
         <this.CellContentsEditable entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
@@ -403,7 +404,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     return (
       <tr>
         {
-          columns.map(function (column) {
+          columns.filter(c=>c.type!=="__LISTDEFINITIONTITLE__").map(function (column) {
             return (
               <this.TableDetail key={column.id} entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
             );
@@ -463,7 +464,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         <table border="1">
           <thead>
             <tr>
-              {this.extendedColumns.map((column) => {
+              {this.extendedColumns.filter(c=>c.type!=="__LISTDEFINITIONTITLE__").map((column) => {
                 return <th key={column.name}>{column.name}</th>;
               })}
             </tr>
