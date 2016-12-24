@@ -41,7 +41,7 @@ export function addListItem(listItem: ListItem) {
         }
     };
 }
-export function removeListItem(dispatch: any, listItem: ListItem, listDefinition: ListDefinition) {
+export function removeListItem(dispatch: any, listItem: ListItem, listDefinition: ListDefinition):any {
     const weburl = utils.ParseSPField(listDefinition.webLookup).id;
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
@@ -234,6 +234,7 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
 
                 const data = _.map(response, (item: any) => {
                     item.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                    item.__metadata__GridRowStatus=GridRowStatus.pristine;
                     return item;
                 });
                 console.log(data);
