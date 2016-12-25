@@ -41,7 +41,7 @@ export function addListItem(listItem: ListItem) {
         }
     };
 }
-export function removeListItem(dispatch: any, listItem: ListItem, listDefinition: ListDefinition):any {
+export function removeListItem(dispatch: any, listItem: ListItem, listDefinition: ListDefinition): any {
     const weburl = utils.ParseSPField(listDefinition.webLookup).id;
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
@@ -49,7 +49,7 @@ export function removeListItem(dispatch: any, listItem: ListItem, listDefinition
         case GridRowStatus.modified:
         case GridRowStatus.pristine:
             const promise = web.lists.getById(listid).items.getById(listItem.ID).delete()
-                   .then((response) => {
+                .then((response) => {
                     // shouwld have an option to rfresh here in cas of calculated columns
 
                     const gotListItems = removeListItemSuccessAction(listItem);
@@ -109,7 +109,9 @@ export function listDefinitionIsValid(listDefinition: ListDefinition): boolean {
 /**
  * Action to update a listitem in sharepoint
  */
-export function updateListItemAction(dispatch: any, listDefinition: ListDefinition, listItem: ListItem): any {
+export function updateListItemAction(dispatch: any, listDefinitions: Array<ListDefinition>, listItem: ListItem): any {
+  //   listDefinition = this.getListDefinition(listItem.__metadata__ListDefinitionId);// The list Definition this item is associated with.
+ const  listDefinition=listDefinitions.find((ld)=>ld.guid===listItem.__metadata__ListDefinitionId);
     const weburl = utils.ParseSPField(listDefinition.webLookup).id;
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
@@ -129,8 +131,30 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     }
     switch (listItem.__metadata__GridRowStatus) {
         case GridRowStatus.modified:
+          case GridRowStatus.pristine:// if user cjust chnage the listedef
+
             const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
                 .then((response) => {
+                    if (listItem.__metadata__ListDefinitionId
+                        !== listItem.__metadata__OriginalValues.__metadata__ListDefinitionId) {// item moved, delet old
+                        // get the old listdefinition
+                        const previousListDefinition = listDefinitions.find((ld)=>ld.guid===listItem.__metadata__OriginalValues.__metadata__ListDefinitionId);
+                        const previousweburl = utils.ParseSPField(previousListDefinition.webLookup).id;
+                        const previouslistid = utils.ParseSPField(previousListDefinition.listLookup).id;
+                        const previousweb = new Web(previousweburl);
+                        const promise = web.lists.getById(previouslistid).items.getById(listItem.__metadata__OriginalValues.ID).delete()
+                            .then((response) => {
+                                // shouwld have an option to rfresh here in cas of calculated columns
+
+                                const gotListItems = removeListItemSuccessAction(listItem);
+                                dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                dispatch(removeListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
+                            });
+
+                    }
                     // shouwld have an option to rfresh here in cas of calculated columns
 
                     const gotListItems = updateListItemSuccessAction(listItem);
@@ -234,7 +258,7 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
 
                 const data = _.map(response, (item: any) => {
                     item.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
-                    item.__metadata__GridRowStatus=GridRowStatus.pristine;
+                    item.__metadata__GridRowStatus = GridRowStatus.pristine;
                     return item;
                 });
                 console.log(data);

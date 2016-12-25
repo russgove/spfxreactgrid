@@ -34,7 +34,7 @@ interface IListViewPageProps extends React.Props<any> {
   /** Redux Action to get listitems from a specific list */
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   /** Redux Action to update a listitem in sharepoint */
-  updateListItem: (ListItem: ListItem, ListDef: ListDefinition) => void;
+  updateListItem: (ListItem: ListItem, ListDefs: Array<ListDefinition>) => void;
   /** Redux Action to  get the lookup options for a specific field */
   getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField) => void;
   /** Redux Action to undo changes made to the listitem */
@@ -71,8 +71,8 @@ function mapDispatchToProps(dispatch) {
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
-    updateListItem: (listItem: ListItem, listDef: ListDefinition): void => {
-      const promise: Promise<any> = updateListItemAction(dispatch, listDef, listItem);
+    updateListItem: (listItem: ListItem, listDefs: Array<ListDefinition>): void => {
+      const promise: Promise<any> = updateListItemAction(dispatch, listDefs, listItem);
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
@@ -191,21 +191,23 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       const listDef = this.getListDefinition(listitem.__metadata__ListDefinitionId);
       if (listDef) {// if user just added an item we may not hava a lisdef yest
         const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
-        switch (colref.fieldDefinition.TypeAsString) {
-          case "Lookup":
-            let lookupField = colref.fieldDefinition.LookupField;
-            let lookupListId = colref.fieldDefinition.LookupList;
-            let lookupWebId = colref.fieldDefinition.LookupWebId;
-            /**
-             * We are assuming here that the lookup listy is in the same web.
-             *
-             */
-            lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
-            let lookupSite = listDef.siteUrl;
-            this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
-            break;
-          default:
-            break;
+        if (colref) {// Listname does not have a columnReference
+          switch (colref.fieldDefinition.TypeAsString) {
+            case "Lookup":
+              let lookupField = colref.fieldDefinition.LookupField;
+              let lookupListId = colref.fieldDefinition.LookupList;
+              let lookupWebId = colref.fieldDefinition.LookupWebId;
+              /**
+               * We are assuming here that the lookup listy is in the same web.
+               *
+               */
+              lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
+              let lookupSite = listDef.siteUrl;
+              this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+              break;
+            default:
+              break;
+          }
         }
       }
     }
@@ -230,8 +232,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid); // the listItemItself
-    const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);// The list Definition this item is associated with.
-    this.props.updateListItem(entity, listDef);
+    this.props.updateListItem(entity, this.props.listDefinitions);// pass in all listdefs, may need to add to one and delte from another
   }
   /**
    * This method gets called when react events are used to update a cell in the grid.
@@ -254,11 +255,15 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-    const titlecolumnid=this.props.columns.find(c=>{ return c.type==="__LISTDEFINITIONTITLE__"}).guid
-    if (columnid=== titlecolumnid){ // user just changed the listDef,
-        entity.__metadata__ListDefinitionId=value.key; // value is a DropDDownOptions
-          this.props.saveListItem(entity);
-          return ;
+    const titlecolumnid = this.props.columns.find(c => { return c.type === "__LISTDEFINITIONTITLE__" }).guid
+    if (columnid === titlecolumnid) { // user just changed the listDef,
+
+      if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
+        entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
+      }
+        entity.__metadata__ListDefinitionId = value.key; // value is a DropDDownOptions
+      this.props.saveListItem(entity);
+      return;
     }
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
     const internalName = utils.ParseSPField(columnReference.name).id;
