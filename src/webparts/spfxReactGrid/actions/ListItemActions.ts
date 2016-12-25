@@ -18,7 +18,6 @@ import {
 
 } from "../constants";
 import "whatwg-fetch";
-import { Promise } from "es6-promise";
 import * as utils from "../utils/utils";
 
 import { Web, TypedHash } from "sp-pnp-js";
