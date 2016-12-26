@@ -34,7 +34,7 @@ interface IListViewPageProps extends React.Props<any> {
   /** Redux Action to get listitems from a specific list */
   getListItems: (listDefinitions: Array<ListDefinition>) => void;
   /** Redux Action to update a listitem in sharepoint */
-  updateListItem: (ListItem: ListItem, ListDefs: Array<ListDefinition>) => void;
+  updateListItem: (ListItem: ListItem, ListDef: ListDefinition) => Promise<any>;
   /** Redux Action to  get the lookup options for a specific field */
   getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField) => void;
   /** Redux Action to undo changes made to the listitem */
@@ -71,9 +71,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(promise); // need to ewname this one to be digfferent from the omported ome
 
     },
-    updateListItem: (listItem: ListItem, listDefs: Array<ListDefinition>): void => {
-      const promise: Promise<any> = updateListItemAction(dispatch, listDefs, listItem);
-      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+    updateListItem: (listItem: ListItem, listDef: ListDefinition): Promise<any> => {
+      const action = updateListItemAction(dispatch, listDef, listItem);
+      dispatch(action); // need to ewname this one to be digfferent from the omported ome
+      return action.payload.promise;
 
     },
     saveListItem: (listItem: ListItem): void => {
@@ -228,11 +229,24 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    * This event gets fired, to save the item back to SharePoint.
    */
   public updateListItem(event): void {
+    debugger;
     const parentTD = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
-    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid); // the listItemItself
-    this.props.updateListItem(entity, this.props.listDefinitions);// pass in all listdefs, may need to add to one and delte from another
+    const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
+    const listDef: ListDefinition = this.getListDefinition(entity.__metadata__ListDefinitionId);
+    if (entity.__metadata__ListDefinitionId === entity.__metadata__OriginalValues.__metadata__ListDefinitionId) {// List not changed
+
+      this.props.updateListItem(entity, listDef);
+    }
+    else {// list changed, add to new, delete from old (will need to do some fiorld mapping in here
+      entity.__metadata__GridRowStatus = GridRowStatus.new;
+      this.props.updateListItem(entity, listDef).then(response => {
+        const oldListDef: ListDefinition = this.getListDefinition(entity.__metadata__OriginalValues.__metadata__ListDefinitionId);
+        this.props.removeListItem(entity.__metadata__OriginalValues, oldListDef);
+      });
+    }
+
   }
   /**
    * This method gets called when react events are used to update a cell in the grid.
@@ -261,7 +275,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
         entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
       }
-        entity.__metadata__ListDefinitionId = value.key; // value is a DropDDownOptions
+      entity.__metadata__ListDefinitionId = value.key; // value is a DropDDownOptions
       this.props.saveListItem(entity);
       return;
     }
