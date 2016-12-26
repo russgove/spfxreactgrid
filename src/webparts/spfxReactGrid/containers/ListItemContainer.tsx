@@ -67,8 +67,8 @@ function mapDispatchToProps(dispatch) {
       dispatch(addListItem(listItem));
     },
     removeListItem: (listItem: ListItem, listDef: ListDefinition): void => {
-      const promise: Promise<any> = removeListItem(dispatch, listItem, listDef);
-      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+      dispatch(removeListItem(dispatch, listItem, listDef));
+
 
     },
     updateListItem: (listItem: ListItem, listDef: ListDefinition): Promise<any> => {
@@ -85,13 +85,12 @@ function mapDispatchToProps(dispatch) {
     },
 
     getListItems: (listDefinitions: Array<ListDefinition>): void => {
-      const promise: Promise<any> = getListItemsAction(dispatch, listDefinitions);
-      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+      dispatch(getListItemsAction(dispatch, listDefinitions));
     },
     getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField): void => {
 
-      const promise: Promise<any> = getLookupOptionAction(dispatch, lookupSite, lookupWebId, lookupListId, lookupField);
-      dispatch(promise); // need to ewname this one to be digfferent from the omported ome
+      dispatch(getLookupOptionAction(dispatch, lookupSite, lookupWebId, lookupListId, lookupField));
+
 
     },
   };
@@ -289,7 +288,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     }
     switch (columnReference.fieldDefinition.TypeAsString) {
       case "DateTime":
-        entity[internalName] = value.getFullYear() + value.getMonth() + 1 + value.getDate() + "T00:00:00Z";
+        const year = value.getFullYear().toString();
+
+        entity[internalName] = (value.getFullYear().toString()) + "-" + (value.getMonth() + 1).toString() + "-" + value.getDate().toString() + "T00:00:00Z";
         break;
       case "Lookup":
         if (!entity[internalName]) {// if  value was not previously set , then this is undefined//
@@ -446,8 +447,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           "shortDays": [""],
           goToToday: "yes"
         };
+        debugger;
+        const year = parseInt(columnValue.substring(0, 34));
+        const month = parseInt(columnValue.substring(5, 7)) - 1;
+        const day = parseInt(columnValue.substring(8, 10));
+        const date = new Date(year, month, day);
+
         return (
-          <DatePicker strings={datpickerStrings} onSelectDate={cellUpdated}
+          <DatePicker strings={datpickerStrings} onSelectDate={cellUpdated} value={date}
             allowTextInput={true} isRequired={colref.fieldDefinition.Required}
             />);
       default:
