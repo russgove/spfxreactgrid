@@ -2,8 +2,12 @@
 import * as React from "react";
 
 const connect = require("react-redux").connect;
-import { addListItem, removeListItem, getListItemsAction, saveListItemAction, undoListItemChangesAction, updateListItemAction, } from "../actions/listItemActions";
+import {
+  addListItem, removeListItem, getListItemsAction, saveListItemAction,
+  undoListItemChangesAction, updateListItemAction,
+} from "../actions/listItemActions";
 import { getLookupOptionAction } from "../actions/lookupOptionsActions";
+import { getSiteUsersAction } from "../actions/siteUsersActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import { LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
@@ -37,6 +41,8 @@ interface IListViewPageProps extends React.Props<any> {
   updateListItem: (ListItem: ListItem, ListDef: ListDefinition) => Promise<any>;
   /** Redux Action to  get the lookup options for a specific field */
   getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField) => void;
+  /** Redux Action to  get the lookup options for a specific field */
+  getSiteUsersAction: (site) => void;
   /** Redux Action to undo changes made to the listitem */
   undoItemChanges: (ListItem) => void;
   /** Redux Action to save the listitem in the store (NOT to sharepoint*/
@@ -49,7 +55,8 @@ function mapStateToProps(state) {
     columns: state.columns,
     listDefinitions: state.lists,
     systemStatus: state.systemStatus,
-    lookupOptions: state.lookupOptions
+    lookupOptions: state.lookupOptions,
+    siteUsers:state.siteUsers
   };
 }
 export class GridColumn {
@@ -68,8 +75,6 @@ function mapDispatchToProps(dispatch) {
     },
     removeListItem: (listItem: ListItem, listDef: ListDefinition): void => {
       dispatch(removeListItem(dispatch, listItem, listDef));
-
-
     },
     updateListItem: (listItem: ListItem, listDef: ListDefinition): Promise<any> => {
       const action = updateListItemAction(dispatch, listDef, listItem);
@@ -88,10 +93,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(getListItemsAction(dispatch, listDefinitions));
     },
     getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField): void => {
-
       dispatch(getLookupOptionAction(dispatch, lookupSite, lookupWebId, lookupListId, lookupField));
-
-
+    },
+    getSiteUsersAction: (site): void => {
+      dispatch(getSiteUsersAction(dispatch, site));
     },
   };
 }
@@ -192,6 +197,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       if (listDef) {// if user just added an item we may not hava a lisdef yest
         const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
         if (colref) {// Listname does not have a columnReference
+          debugger;
           switch (colref.fieldDefinition.TypeAsString) {
             case "Lookup":
               let lookupField = colref.fieldDefinition.LookupField;
@@ -204,6 +210,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
               lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
               let lookupSite = listDef.siteUrl;
               this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
+              break;
+                 case "User":
+
+              lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
+              let site = listDef.siteUrl;
+              this.props.getSiteUsersAction(site);
               break;
             default:
               break;
@@ -501,6 +513,19 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
 
     switch (colref.fieldDefinition.TypeAsString) {
+         case "User":
+debugger;
+        if (entity[internalName] === undefined) { // value not set
+          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+
+          </a>
+          );
+        } else {
+          return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
+            {entity[internalName]["Title"]}
+          </a>
+          );
+        }
       case "Lookup":
 
         if (entity[internalName] === undefined) { // value not set

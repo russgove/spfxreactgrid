@@ -109,7 +109,7 @@ export function listDefinitionIsValid(listDefinition: ListDefinition): boolean {
  * Action to update a listitem in sharepoint
  */
 export function updateListItemAction(dispatch: any, listDefinition: ListDefinition, listItem: ListItem): any {
-  //   listDefinition = this.getListDefinition(listItem.__metadata__ListDefinitionId);// The list Definition this item is associated with.
+    //   listDefinition = this.getListDefinition(listItem.__metadata__ListDefinitionId);// The list Definition this item is associated with.
     const weburl = utils.ParseSPField(listDefinition.webLookup).id;
     const listid = utils.ParseSPField(listDefinition.listLookup).id;
     const web = new Web(weburl);
@@ -129,7 +129,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
     }
     switch (listItem.__metadata__GridRowStatus) {
         case GridRowStatus.modified:
-          case GridRowStatus.pristine:// if user cjust chnage the listedef
+        case GridRowStatus.pristine:// if user cjust chnage the listedef
 
             const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
                 .then((response) => {
@@ -216,17 +216,27 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
         }
         let fieldnames = new Array<string>();
         let expands = new Array<string>();
+        debugger;
         for (const columnreference of listDefinition.columnReferences) {
-            if (columnreference.fieldDefinition.TypeAsString === "Lookup") {
-                expands.push(columnreference.fieldDefinition.InternalName);
-                fieldnames.push(columnreference.fieldDefinition.InternalName + "/" + columnreference.fieldDefinition.LookupField);
-                fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
+            switch (columnreference.fieldDefinition.TypeAsString) {
+                case "Lookup":
+                    expands.push(columnreference.fieldDefinition.InternalName);
+                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/" + columnreference.fieldDefinition.LookupField);
+                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
+                    break;
+                case "User":
+                    // url is ?$select=Author/Name,Author/Title&$expand=Author/Id
+                    expands.push(columnreference.fieldDefinition.InternalName + "/Id");
+                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/Title");
+                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/Name");
+                    break;
+                default:
 
-            } else {
-                const internalName = utils.ParseSPField(columnreference.name).id;
-                fieldnames.push(internalName); // need to split
+                    const internalName = utils.ParseSPField(columnreference.name).id;
+                    fieldnames.push(internalName); // need to split
             }
         }
+
         const weburl = utils.ParseSPField(listDefinition.webLookup).id;
         const listid = utils.ParseSPField(listDefinition.listLookup).id;
 

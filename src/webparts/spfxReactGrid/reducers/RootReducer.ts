@@ -5,6 +5,7 @@ import ColumnReducer from "./ColumnReducer";
 import PageContextReducer from "./PageContextReducer";
 import LookupOptionsReducer from "./LookupOptionsReducer";
 import SiteReducer from "./SiteReducer";
+import SiteUserReducer from "./SiteUsersReducer";
 import SystemStatus from "./SystemStatus";
 const { routerReducer } = require("react-router-redux");
 export function RootReducer(state, action) {
