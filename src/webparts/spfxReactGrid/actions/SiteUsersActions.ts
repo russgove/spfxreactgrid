@@ -16,7 +16,8 @@ export function getSiteUsersAction(dispatch: any, siteUrl: string): any {
     const promise = site.rootWeb.siteUsers.get()
         .then((response) => {
             const data: SiteUser[] = _.map(response, (item: any) => {
-                return new SiteUser(item.Id, item["Name"]);
+                debugger;
+                return new SiteUser(item.Id, item.Title);
             });
             siteUsers.siteUser = data;
             siteUsers.status = SiteUsersStatus.fetched;

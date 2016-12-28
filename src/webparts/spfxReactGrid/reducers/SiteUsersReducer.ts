@@ -30,22 +30,22 @@ function updateSiteUser(state: Array<SiteUsers>, action: { payload: { siteUsers:
 }
 const INITIAL_STATE = [];
 
-function lookupOptionReducer(state = INITIAL_STATE, action: any = { type: "" }) {
+function siteUsersReducer (state = INITIAL_STATE, action: any = { type: "" }) {
 
     switch (action.type) {
         case GET_SITE_USERS:
-            Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS listItemReducer ActionType is " + action.type);
+            Log.verbose("getLookupOptions", "In getLookupOptions GET_SITE_USERS listItemReducer ActionType is " + action.type);
             return getSiteUsers(state, action);
         case GET_SITE_USERS_SUCCESS:
-            Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS_SUCCESSof listItemReducer ActionType is " + action.type);
+            Log.verbose("getLookupOptions", "In getLookupOptions GET_SITE_USERS_SUCCESS listItemReducer ActionType is " + action.type);
             return updateSiteUser(state, action);
         case GET_SITE_USERS_ERROR:
             /** The ActionCreator has set the state to error , so i just update the item */
-            Log.verbose("getLookupOptions", "In getLookupOptions GET_LOOKUPOPTIONS_ERRORof listItemReducer ActionType is " + action.type);
+            Log.verbose("getLookupOptions", "In getLookupOptions GET_SITE_USERS_ERROR listItemReducer ActionType is " + action.type);
             return updateSiteUser(state, action);
 
         default:
             return state;
     }
 }
-export default lookupOptionReducer;
+export default siteUsersReducer;

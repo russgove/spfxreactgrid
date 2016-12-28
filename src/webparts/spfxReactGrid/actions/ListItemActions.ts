@@ -122,6 +122,12 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
                     typedHash[fieldName + "Id"] = listItem[fieldName].Id;
                 }
                 break;
+          case "User":
+          debugger;
+                if (listItem[fieldName]) {// field may not be set
+                    typedHash[fieldName + "Id"] = listItem[fieldName].Name;
+                }
+                break;
 
             default:
                 typedHash[fieldName] = listItem[fieldName];
@@ -153,7 +159,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
         case GridRowStatus.new:
             const mewpromise = web.lists.getById(listid).items.add(typedHash)
                 .then((response) => {//
-                    debugger;
+
                     response.data.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
                     response.data.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
                     /**
@@ -216,7 +222,7 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
         }
         let fieldnames = new Array<string>();
         let expands = new Array<string>();
-        debugger;
+
         for (const columnreference of listDefinition.columnReferences) {
             switch (columnreference.fieldDefinition.TypeAsString) {
                 case "Lookup":

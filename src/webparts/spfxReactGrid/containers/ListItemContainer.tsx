@@ -11,7 +11,7 @@ import { getSiteUsersAction } from "../actions/siteUsersActions";
 import ListItem from "../model/ListItem";
 import ColumnDefinition from "../model/ColumnDefinition";
 import { LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
-
+import { SiteUsers, SiteUsersStatus } from "../model/SiteUsers";
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
 import { Button, ButtonType, TextField, IDropdownOption, Dropdown, Spinner, SpinnerType } from "office-ui-fabric-react";
@@ -23,6 +23,8 @@ import Container from "../components/container";
 import { Log } from "@microsoft/sp-client-base";
 
 interface IListViewPageProps extends React.Props<any> {
+  /** An array of ListItems fetched from sharepoint */
+  siteUsers: Array<SiteUsers>;
   /** An array of ListItems fetched from sharepoint */
   listItems: Array<ListItem>;
   /** An array of LookupOptions. One for each Lookup Column */
@@ -56,7 +58,7 @@ function mapStateToProps(state) {
     listDefinitions: state.lists,
     systemStatus: state.systemStatus,
     lookupOptions: state.lookupOptions,
-    siteUsers:state.siteUsers
+    siteUsers: state.siteUsers
   };
 }
 export class GridColumn {
@@ -133,7 +135,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
   }
   private addListItem(): void {
-    debugger;
+
     let listItem = new ListItem();
     for (const column of this.props.columns) {
       listItem[column.name] === null;
@@ -147,7 +149,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.props.addListItem(listItem);
   }
   private removeListItem(event): void {
-    debugger;
+
     const parentTD = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
@@ -197,7 +199,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       if (listDef) {// if user just added an item we may not hava a lisdef yest
         const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
         if (colref) {// Listname does not have a columnReference
-          debugger;
+
           switch (colref.fieldDefinition.TypeAsString) {
             case "Lookup":
               let lookupField = colref.fieldDefinition.LookupField;
@@ -211,11 +213,11 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
               let lookupSite = listDef.siteUrl;
               this.ensureLookupOptions(lookupSite, lookupWebId, lookupListId, lookupField);
               break;
-                 case "User":
+            case "User":
 
               lookupWebId = utils.ParseSPField(listDef.webLookup).id; // temp fix. Need to use graph to get the web by id in the site
               let site = listDef.siteUrl;
-              this.props.getSiteUsersAction(site);
+              this.ensureSiteUsers(site);
               break;
             default:
               break;
@@ -240,7 +242,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    * This event gets fired, to save the item back to SharePoint.
    */
   public updateListItem(event): void {
-    debugger;
+
     const parentTD = this.getParent(event.target, "TD");
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
@@ -299,6 +301,13 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       entity.__metadata__GridRowStatus = GridRowStatus.modified;
     }
     switch (columnReference.fieldDefinition.TypeAsString) {
+      case "User":
+        if (!entity[internalName]) {// if  value was not previously set , then this is undefined//
+          entity[internalName] = {};// set new value to an empty objecte
+        }
+        entity[internalName].Name = value.key;//and then fill in the values
+        entity[internalName].Title = value.text;
+        break;
       case "DateTime":
         const year = value.getFullYear().toString();
 
@@ -315,6 +324,32 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         entity[internalName] = value;
     }
     this.props.saveListItem(entity);
+  }
+  /**
+  * If the the options for a lookup list are not in the cache, fire an event to get them
+  *  This method is called when  a lookup column receives focus.
+  */
+  public ensureSiteUsers(siteUrl: string): SiteUsers {
+    // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
+    const siteUsers = this.props.siteUsers.find(x => {
+      return (x.siteUrl === siteUrl);
+    });
+    if (siteUsers === undefined) {
+      this.props.getSiteUsersAction(siteUrl);
+    }
+    return siteUsers;
+  }
+  /**
+   * Gets the options to display for a lookupField
+   * This method is called when  a lookup column gets rendered... we fire the event to get the data when its focused,
+   * then we use the data when it gets renderd
+  */
+  public getSiteUsers(siteUrl: string): SiteUsers {
+    // see if the options are in the store, if so, return them, otherwoise dispatch an action to get them
+    const siteUsers = this.props.siteUsers.find(x => {
+      return (x.siteUrl === siteUrl);
+    });
+    return siteUsers;
   }
   /**
    * If the the options for a lookup list are not in the cache, fire an event to get them
@@ -384,6 +419,37 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
     const columnValue = entity[internalName];
     switch (colref.fieldDefinition.TypeAsString) {
+      case "User":
+        let siteUrl = listDef.siteUrl;
+        let siteUsers = this.getSiteUsers(siteUrl);
+        if (siteUsers) {
+          switch (siteUsers.status) {
+            case SiteUsersStatus.fetched:
+              let options: IDropdownOption[] = siteUsers.siteUser.map((opt, index, options) => {
+                return { key: opt.id, text: opt.value };
+              });
+              return (
+                <Dropdown label="" options={options} selectedKey={(columnValue ? columnValue.Name : null)} onChanged={(selection: IDropdownOption) => { cellUpdated(selection); } } >
+                </Dropdown >
+              );
+            case SiteUsersStatus.fetching:
+              return (
+                <Spinner type={SpinnerType.normal} />
+              );
+            case SiteUsersStatus.error:
+              return (
+                <Spinner label="Error" type={SpinnerType.normal} />
+              );
+            default:
+              return (
+                <Spinner type={SpinnerType.normal} />
+              );
+          }
+        } else {
+          return (
+            <Spinner type={SpinnerType.normal} />
+          );
+        }
       case "Lookup":
 
         let lookupField = colref.fieldDefinition.LookupField;
@@ -459,7 +525,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           "shortDays": [""],
           goToToday: "yes"
         };
-        debugger;
+
         const year = parseInt(columnValue.substring(0, 34));
         const month = parseInt(columnValue.substring(5, 7)) - 1;
         const day = parseInt(columnValue.substring(8, 10));
@@ -513,8 +579,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const internalName = utils.ParseSPField(colref.name).id;
 
     switch (colref.fieldDefinition.TypeAsString) {
-         case "User":
-debugger;
+      case "User":
+
         if (entity[internalName] === undefined) { // value not set
           return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
 

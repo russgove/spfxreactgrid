@@ -18,7 +18,8 @@ export function RootReducer(state, action) {
             pageContext: PageContextReducer,
             routing: routerReducer,
             systemStatus:SystemStatus,
-            lookupOptions:LookupOptionsReducer
+            lookupOptions:LookupOptionsReducer,
+            siteUsers:SiteUserReducer
         }
     );
     return combinedReducers(state, action);
