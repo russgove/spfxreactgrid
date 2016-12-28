@@ -161,7 +161,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    * When the component Mounts, call an action to get the listitems for all the listdefinitions
    */
   public componentWillMount() {
+    if (this.props.listItems.length===0){
     this.props.getListItems(this.props.listDefinitions);
+    }
   }
   /**
  * Method to get the parent TD of any cell,
@@ -648,12 +650,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
     if (this.state && this.state.editing && this.state.editing.entityid === entity.GUID && this.state.editing.columnid === column.guid && column.editable) {
-      return (<td data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
+      return (<td key={entity.GUID+column.guid} data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
         <this.CellContentsEditable entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
       </td>
       );
     } else {
-      return (<td data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
+      return (<td key={entity.GUID+column.guid}  data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
         <this.CellContents entity={entity} column={column} />
       </td>
       );
