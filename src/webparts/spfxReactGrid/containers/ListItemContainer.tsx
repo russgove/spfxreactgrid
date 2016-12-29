@@ -161,9 +161,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    * When the component Mounts, call an action to get the listitems for all the listdefinitions
    */
   public componentWillMount() {
-    if (this.props.listItems.length===0){
+
     this.props.getListItems(this.props.listDefinitions);
-    }
   }
   /**
  * Method to get the parent TD of any cell,
@@ -250,7 +249,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef: ListDefinition = this.getListDefinition(entity.__metadata__ListDefinitionId);
-    if (entity.__metadata__ListDefinitionId === entity.__metadata__OriginalValues.__metadata__ListDefinitionId) {// List not changed
+    if (entity.__metadata__ListDefinitionId === entity.__metadata__OriginalValues.__metadata__ListDefinitionId
+      || entity.__metadata__GridRowStatus === GridRowStatus.new) {// List not changed
 
       this.props.updateListItem(entity, listDef);
     }
@@ -272,6 +272,34 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
   }
   /**
+  * This method gets called when user changes the listdefinition for an item.
+  * the old fields are moved to the corresponing new fields and translated as needed
+  */
+  private mapOldListFieldsToNewListFields(listItem: ListItem) {
+
+    const newListDef = this.getListDefinition(listItem.__metadata__ListDefinitionId);
+    const oldListDef = this.getListDefinition(listItem.__metadata__OriginalValues.__metadata__ListDefinitionId);
+    for (const newColRef of newListDef.columnReferences) {
+      // find the old columnReference
+      const oldColRef = oldListDef.columnReferences.find(cr => cr.columnDefinitionId === newColRef.columnDefinitionId);
+      const newFieldName = utils.ParseSPField(newColRef.name).id;
+      const oldFieldName = utils.ParseSPField(oldColRef.name).id;
+      switch (newColRef.fieldDefinition.TypeAsString) {
+        case "User":
+          debugger;
+          const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
+          const siteUsersOnNewSite = this.props.siteUsers.find(su => su.siteUrl === newListDef.siteUrl);
+          const newUser = siteUsersOnNewSite.siteUser.find(user => user.loginName === name);
+          listItem[newFieldName].Id = newUser.id;
+          listItem[newFieldName].Name = newUser.loginName;
+          listItem[newFieldName].Title = newUser.value;
+        default:
+          listItem[newFieldName] = listItem.__metadata__OriginalValues[oldFieldName];
+      }
+
+    }
+  }
+  /**
    * This method gets called when react cells in the gid get updated.
    * Office UI Fabric does not use events. It just calls this method with the new value.
    * It reformats the data to fit the format we recievbed from SP in the first place ,
@@ -291,6 +319,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
       }
       entity.__metadata__ListDefinitionId = value.key; // value is a DropDDownOptions
+      if (entity.__metadata__GridRowStatus !== GridRowStatus.new) {
+        this.mapOldListFieldsToNewListFields(entity);
+      }
       this.props.saveListItem(entity);
       return;
     }
@@ -307,7 +338,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         if (!entity[internalName]) {// if  value was not previously set , then this is undefined//
           entity[internalName] = {};// set new value to an empty objecte
         }
-        entity[internalName].Name = value.key;//and then fill in the values
+        entity[internalName].Id = value.key;//and then fill in the values
         entity[internalName].Title = value.text;
         break;
       case "DateTime":
@@ -430,8 +461,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
               let options: IDropdownOption[] = siteUsers.siteUser.map((opt, index, options) => {
                 return { key: opt.id, text: opt.value };
               });
+              const selectedKey = columnValue ? columnValue.Id : null;
               return (
-                <Dropdown label="" options={options} selectedKey={(columnValue ? columnValue.Name : null)} onChanged={(selection: IDropdownOption) => { cellUpdated(selection); } } >
+                <Dropdown label="" options={options} selectedKey={selectedKey} onChanged={(selection: IDropdownOption) => { cellUpdated(selection); } } >
                 </Dropdown >
               );
             case SiteUsersStatus.fetching:
@@ -496,9 +528,10 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         }
       case "Choice":
         const choices = colref.fieldDefinition.Choices.map((c, i) => {
+          debugger;
           let opt: IDropdownOption = {
             index: i,
-            key: c,
+            key: i,
             text: c,
             isSelected: (c === columnValue)
           };
@@ -650,12 +683,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
     if (this.state && this.state.editing && this.state.editing.entityid === entity.GUID && this.state.editing.columnid === column.guid && column.editable) {
-      return (<td key={entity.GUID+column.guid} data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
+      return (<td key={entity.GUID + column.guid} data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
         <this.CellContentsEditable entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
       </td>
       );
     } else {
-      return (<td key={entity.GUID+column.guid}  data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
+      return (<td key={entity.GUID + column.guid} data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
         <this.CellContents entity={entity} column={column} />
       </td>
       );

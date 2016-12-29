@@ -17,7 +17,7 @@ export function getSiteUsersAction(dispatch: any, siteUrl: string): any {
         .then((response) => {
             const data: SiteUser[] = _.map(response, (item: any) => {
                 debugger;
-                return new SiteUser(item.Id, item.Title);
+                              return new SiteUser(item.Id, item.Title,item.LoginName);
             });
             siteUsers.siteUser = data;
             siteUsers.status = SiteUsersStatus.fetched;

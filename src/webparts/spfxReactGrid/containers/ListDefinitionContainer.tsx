@@ -8,6 +8,7 @@ import { addList, removeList, saveList, removeAllLists } from "../actions/listAc
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
 import { Button, ButtonType, Dropdown, IDropdownOption, TextField,CommandBar } from "office-ui-fabric-react";
 import ListDefinition from "../model/ListDefinition";
+import {FieldDefinition} from "../model/ListDefinition";
 import { ColumnReference } from "../model/ListDefinition";
 import { Site, Web, WebList, WebListField } from "../model/Site";
 import ColumnDefinition from "../model/ColumnDefinition";
@@ -164,7 +165,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   private updateExtendedColumn(entity: ListDefinition, columnid: string, value: any) {
     const internalName = utils.ParseSPField(value).id;
-    const fieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
+    const fieldDefinition:FieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
     for (const col of entity.columnReferences) {
       if (col.columnDefinitionId === columnid) {
         col.name = value;
@@ -175,7 +176,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     const x = new ColumnReference(columnid, value, fieldDefinition);
     entity.columnReferences.push(x);
   }
-  public getFieldDefinition(listdef: ListDefinition, internalName: string): {} {
+  public getFieldDefinition(listdef: ListDefinition, internalName: string): FieldDefinition {
     const field = this.getFieldInList(listdef, internalName);
     return field.fieldDefinition;
   }

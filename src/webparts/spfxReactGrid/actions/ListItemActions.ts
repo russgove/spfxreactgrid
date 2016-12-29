@@ -47,7 +47,7 @@ export function removeListItem(dispatch: any, listItem: ListItem, listDefinition
     switch (listItem.__metadata__GridRowStatus) {
         case GridRowStatus.modified:
         case GridRowStatus.pristine:
-            const promise = web.lists.getById(listid).items.getById(listItem.ID).delete()
+            const promise = web.lists.getById(listid).items.getById(listItem.ID).recycle()
                 .then((response) => {
                     // shouwld have an option to rfresh here in cas of calculated columns
 
@@ -123,9 +123,9 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
                 }
                 break;
           case "User":
-          debugger;
+
                 if (listItem[fieldName]) {// field may not be set
-                    typedHash[fieldName + "Id"] = listItem[fieldName].Name;
+                    typedHash[fieldName + "Id"] = listItem[fieldName].Id;
                 }
                 break;
 
@@ -214,6 +214,7 @@ export function updateListItemSuccessAction(listItem) {
     };
 }
 export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDefinition>): any {
+dispatch(clearListItems());
 
     const promises: Array<Promise<any>> = new Array<Promise<any>>();
     for (const listDefinition of listDefinitions) {
@@ -234,7 +235,8 @@ export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDef
                     // url is ?$select=Author/Name,Author/Title&$expand=Author/Id
                     expands.push(columnreference.fieldDefinition.InternalName + "/Id");
                     fieldnames.push(columnreference.fieldDefinition.InternalName + "/Title");
-                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/Name");
+                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
+                      fieldnames.push(columnreference.fieldDefinition.InternalName + "/Name");
                     break;
                 default:
 

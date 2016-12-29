@@ -5,7 +5,17 @@ export enum SiteUsersStatus {
     error
 }
 export class SiteUser {
-    constructor(public id: number, public value: string) { }
+    /** The integer id for the user within a site */
+    public id: number;
+    /** The display name for the user */
+    public value: string;
+    /** The loginID for a user, userd when moving items from one site to annother*/
+    public loginName: string;
+    constructor(id: number, value: string,loginName:string) {
+        this.id=id;
+        this.value=value;
+        this.loginName=loginName;
+    }
 }
 export class SiteUsers {
     public status: SiteUsersStatus;
