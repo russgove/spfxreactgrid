@@ -279,7 +279,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   * the old fields are moved to the corresponing new fields and translated as needed
   */
   private mapOldListFieldsToNewListFields(listItem: ListItem) {
-
+debugger;
     const newListDef = this.getListDefinition(listItem.__metadata__ListDefinitionId);
     const oldListDef = this.getListDefinition(listItem.__metadata__OriginalValues.__metadata__ListDefinitionId);
     for (const newColRef of newListDef.columnReferences) {
@@ -289,8 +289,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       const oldFieldName = utils.ParseSPField(oldColRef.name).id;
       switch (newColRef.fieldDefinition.TypeAsString) {
         case "User":
-
-          const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
+// should male a local copy befor i start messing with these.// fieldd names may overlap on old and new
+       //   const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
+         const name = listItem[oldFieldName].Name;// the user login name
           const siteUsersOnNewSite = this.props.siteUsers.find(su => su.siteUrl === newListDef.siteUrl);
           const newUser = siteUsersOnNewSite.siteUser.find(user => user.loginName === name);
           listItem[newFieldName].Id = newUser.id;
@@ -299,7 +300,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           break;
 
         default:
-          listItem[newFieldName] = listItem.__metadata__OriginalValues[oldFieldName];
+          listItem[newFieldName] = listItem[oldFieldName];
       }
 
     }

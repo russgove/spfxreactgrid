@@ -18,9 +18,10 @@ const INITIAL_STATE = [];
 function updateListItemSuccess(state: Array<ListItem>, action: { payload: { listItem: ListItem } }) {
     let newState = _.cloneDeep(state);
     let index = _.findIndex(newState, { GUID: action.payload.listItem.GUID });
-    if (newState[index].__metadata__OriginalValues) {
-        delete newState[index].__metadata__OriginalValues;
-    }
+    // if (newState[index].__metadata__OriginalValues) {
+    //     delete newState[index].__metadata__OriginalValues;
+    // }
+    newState[index]=action.payload.listItem;
     return newState;
 }
 /**

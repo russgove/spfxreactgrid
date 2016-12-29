@@ -143,11 +143,15 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
             const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
                 .then((response) => {
 
-
-                    // shouwld have an option to rfresh here in cas of calculated columns
-
-                    const gotListItems = updateListItemSuccessAction(listItem);
-                    dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+                    getListItem(listDefinition, listItem.ID)
+                        .then((response) => {
+                            debugger;
+                            // srfresh here in cas of calculated columns
+                            response.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                            response.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
+                            const gotListItems = updateListItemSuccessAction(response);
+                            dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
+                        });
                 })
                 .catch((error) => {
                     console.log(error);
