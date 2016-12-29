@@ -5,6 +5,9 @@ import {
     GET_LISTITEMS,
     GOT_LISTITEMS,
     GET_LISTITEMSERROR,
+    GET_LISTITEM,
+    GOT_LISTITEM,
+    GET_LISTITEMERROR,
     CLEAR_LISTITEMS,
     SAVE_LISTITEM,//save locally
     UNDO_LISTITEMCHANGES,
@@ -122,7 +125,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
                     typedHash[fieldName + "Id"] = listItem[fieldName].Id;
                 }
                 break;
-          case "User":
+            case "User":
 
                 if (listItem[fieldName]) {// field may not be set
                     typedHash[fieldName + "Id"] = listItem[fieldName].Id;
@@ -139,6 +142,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
 
             const promise = web.lists.getById(listid).items.getById(listItem.ID).update(typedHash, listItem["odata.etag"])
                 .then((response) => {
+
 
                     // shouwld have an option to rfresh here in cas of calculated columns
 
@@ -159,19 +163,24 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
         case GridRowStatus.new:
             const mewpromise = web.lists.getById(listid).items.add(typedHash)
                 .then((response) => {//
+                    debugger;
+                    const itemId = response.data.Id;
+                    getListItem(listDefinition, itemId)
+                        .then((response) => {
+                            /**
+                                  * data recived after adding an item is NOT the same as we recive from a get
+                                  * need to fetch item and wap it in
+                                  */
+                            response.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                            response.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
+                            const actiom = addedNewItemInSharepouint(response, listItem);
+                            dispatch(actiom); // need to ewname this one to be digfferent from the omported ome
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
+                        });
 
-                    response.data.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
-                    response.data.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
-                    /**
-                         * data recived after adding an item is the same as we recive from a get
-                         * need to swap local item, with the one we got from sharepoint
-                         */
-                    const gotListItems = addedNewItemInSharepouint(response.data, listItem);
-                    dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
-                })
-                .catch((error) => {
-                    console.log(error);
-                    dispatch(updateListItemErrorAction(error)); // need to ewname this one to be digfferent from the omported ome
                 });
             return {
                 type: UPDATE_LISTITEM,
@@ -213,8 +222,62 @@ export function updateListItemSuccessAction(listItem) {
         }
     };
 }
+export function getListItem(listDefinition: ListDefinition, itemId: number): Promise<any> {
+
+
+
+    let fieldnames = new Array<string>();
+    let expands = new Array<string>();
+
+    for (const columnreference of listDefinition.columnReferences) {
+        switch (columnreference.fieldDefinition.TypeAsString) {
+            case "Lookup":
+                expands.push(columnreference.fieldDefinition.InternalName);
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/" + columnreference.fieldDefinition.LookupField);
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
+                break;
+            case "User":
+                // url is ?$select=Author/Name,Author/Title&$expand=Author/Id
+                expands.push(columnreference.fieldDefinition.InternalName + "/Id");
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/Title");
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
+                fieldnames.push(columnreference.fieldDefinition.InternalName + "/Name");
+                break;
+            default:
+
+                const internalName = utils.ParseSPField(columnreference.name).id;
+                fieldnames.push(internalName); // need to split
+        }
+    }
+
+    const weburl = utils.ParseSPField(listDefinition.webLookup).id;
+    const listid = utils.ParseSPField(listDefinition.listLookup).id;
+
+    const web = new Web(weburl);
+
+    let promise: Promise<any> = web.lists.getById(listid).items.getById(itemId).select(fieldnames.concat("GUID").concat("Id").join(",")).expand(expands.join(",")).get()
+
+    return promise;
+}
+export function getListItemErrorAction(error) {
+    return {
+        type: GET_LISTITEMERROR,
+        payload: {
+            error: error
+        }
+    };
+
+}
+export function gotListItemAction(item) {
+    return {
+        type: GOT_LISTITEM,
+        payload: {
+            item: item
+        }
+    };
+}
 export function getListItemsAction(dispatch: any, listDefinitions: Array<ListDefinition>): any {
-dispatch(clearListItems());
+    dispatch(clearListItems());
 
     const promises: Array<Promise<any>> = new Array<Promise<any>>();
     for (const listDefinition of listDefinitions) {
@@ -236,7 +299,7 @@ dispatch(clearListItems());
                     expands.push(columnreference.fieldDefinition.InternalName + "/Id");
                     fieldnames.push(columnreference.fieldDefinition.InternalName + "/Title");
                     fieldnames.push(columnreference.fieldDefinition.InternalName + "/Id");
-                      fieldnames.push(columnreference.fieldDefinition.InternalName + "/Name");
+                    fieldnames.push(columnreference.fieldDefinition.InternalName + "/Name");
                     break;
                 default:
 

@@ -44,7 +44,7 @@ interface IListViewPageProps extends React.Props<any> {
   /** Redux Action to  get the lookup options for a specific field */
   getLookupOptionAction: (lookupSite, lookupWebId, lookupListId, lookupField) => void;
   /** Redux Action to  get the lookup options for a specific field */
-  getSiteUsersAction: (site) => void;
+  getSiteUsersAction: (site) => Promise<any>;
   /** Redux Action to undo changes made to the listitem */
   undoItemChanges: (ListItem) => void;
   /** Redux Action to save the listitem in the store (NOT to sharepoint*/
@@ -98,7 +98,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(getLookupOptionAction(dispatch, lookupSite, lookupWebId, lookupListId, lookupField));
     },
     getSiteUsersAction: (site): void => {
-      dispatch(getSiteUsersAction(dispatch, site));
+
+      const action = getSiteUsersAction(dispatch, site);
+      dispatch(action);
+      return action.payload.promise;
     },
   };
 }
@@ -286,13 +289,15 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       const oldFieldName = utils.ParseSPField(oldColRef.name).id;
       switch (newColRef.fieldDefinition.TypeAsString) {
         case "User":
-          debugger;
+
           const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
           const siteUsersOnNewSite = this.props.siteUsers.find(su => su.siteUrl === newListDef.siteUrl);
           const newUser = siteUsersOnNewSite.siteUser.find(user => user.loginName === name);
           listItem[newFieldName].Id = newUser.id;
           listItem[newFieldName].Name = newUser.loginName;
           listItem[newFieldName].Title = newUser.value;
+          break;
+
         default:
           listItem[newFieldName] = listItem.__metadata__OriginalValues[oldFieldName];
       }
@@ -315,14 +320,21 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const titlecolumnid = this.props.columns.find(c => { return c.type === "__LISTDEFINITIONTITLE__" }).guid
     if (columnid === titlecolumnid) { // user just changed the listDef,
 
-      if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
-        entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
+      if (entity.__metadata__GridRowStatus === GridRowStatus.pristine) {
+        if (!entity.__metadata__OriginalValues) { //SAVE  orgininal values so we can undo;
+          entity.__metadata__OriginalValues = _.cloneDeep(entity); // need deep if we have lookup values
+        }
       }
       entity.__metadata__ListDefinitionId = value.key; // value is a DropDDownOptions
       if (entity.__metadata__GridRowStatus !== GridRowStatus.new) {
-        this.mapOldListFieldsToNewListFields(entity);
+        const listDef = this.getListDefinition(value.key);
+        this.props.getSiteUsersAction(listDef.siteUrl).then(r => {
+          this.mapOldListFieldsToNewListFields(entity);
+          this.props.saveListItem(entity);
+        });
+      } else {
+        this.props.saveListItem(entity);
       }
-      this.props.saveListItem(entity);
       return;
     }
     const columnReference = listDef.columnReferences.find(cr => cr.columnDefinitionId === columnid);
@@ -528,7 +540,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         }
       case "Choice":
         const choices = colref.fieldDefinition.Choices.map((c, i) => {
-          debugger;
+
           let opt: IDropdownOption = {
             index: i,
             key: i,

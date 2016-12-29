@@ -16,7 +16,7 @@ export function getSiteUsersAction(dispatch: any, siteUrl: string): any {
     const promise = site.rootWeb.siteUsers.get()
         .then((response) => {
             const data: SiteUser[] = _.map(response, (item: any) => {
-                debugger;
+
                               return new SiteUser(item.Id, item.Title,item.LoginName);
             });
             siteUsers.siteUser = data;
