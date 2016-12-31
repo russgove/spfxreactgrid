@@ -1,6 +1,5 @@
 ﻿import * as utils from "../utils/utils";
 import * as React from "react";
-
 const connect = require("react-redux").connect;
 import {
   addListItem, removeListItem, getListItemsAction, saveListItemAction,
@@ -14,7 +13,7 @@ import { LookupOptions, LookupOptionStatus } from "../model/LookupOptions";
 import { SiteUsers, SiteUsersStatus } from "../model/SiteUsers";
 import GridRowStatus from "../model/GridRowStatus";
 import ListDefinition from "../model/ListDefinition";
-import { Button, ButtonType, TextField, IDropdownOption, Dropdown, Spinner, SpinnerType } from "office-ui-fabric-react";
+import { FocusZone,Button, ButtonType, TextField, IDropdownOption, Dropdown, Spinner, SpinnerType, DetailsList, IColumn } from "office-ui-fabric-react";
 
 import { CommandBar } from "office-ui-fabric-react/lib/CommandBar";
 import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DatePicker";
@@ -22,6 +21,10 @@ import { DatePicker, IDatePickerStrings } from "office-ui-fabric-react/lib/DateP
 import Container from "../components/container";
 import { Log } from "@microsoft/sp-client-base";
 
+interface SPColumn extends IColumn {
+  editable: boolean;
+  type: string;
+}
 interface IListViewPageProps extends React.Props<any> {
   /** An array of ListItems fetched from sharepoint */
   siteUsers: Array<SiteUsers>;
@@ -119,14 +122,12 @@ interface IGridState {
 /**
  * This component is the Grid for editing listitems.
  */
-class ListItemContainer extends React.Component<IListViewPageProps, IGridState> {
+class ListItemContainerUIF extends React.Component<IListViewPageProps, IGridState> {
   public constructor() {
     super();
     this.CellContentsEditable = this.CellContentsEditable.bind(this);
     this.CellContents = this.CellContents.bind(this);
     this.TableDetail = this.TableDetail.bind(this);
-    this.TableRow = this.TableRow.bind(this);
-    this.TableRows = this.TableRows.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
     this.addListItem = this.addListItem.bind(this);
     this.removeListItem = this.removeListItem.bind(this);
@@ -135,6 +136,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.undoItemChanges = this.undoItemChanges.bind(this);
     this.updateListItem = this.updateListItem.bind(this);
     this.getLookupOptions = this.getLookupOptions.bind(this);
+    this.onRenderItemColumn = this.onRenderItemColumn.bind(this);
+
 
   }
   private addListItem(): void {
@@ -153,7 +156,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   }
   private removeListItem(event): void {
 
-    const parentTD = this.getParent(event.target, "TD");
+    const parentTD = this.getParent(event.target, "DIV", "spCell");
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
     const listItem: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid); // the listItemItself
@@ -168,11 +171,12 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     this.props.getListItems(this.props.listDefinitions);
   }
   /**
- * Method to get the parent TD of any cell,
- * The listItemId and columnID are stored as attributes of the cells parent TD.
+ * Method to get the parent span  of any cell whose classnAME IS spcell
+ * The listItemId and columnID are stored as attributes of THAT SPAN
  */
-  public getParent(node: Node, type: string): Node {
-    while (node.nodeName !== "TD") {
+  public getParent(node: Node, type: string, className: string): Node {
+
+    while (node.nodeName !== type && node["className"] !== className) {
       node = node.parentNode;
     }
     return node;
@@ -190,7 +194,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    */
   public toggleEditing(event) {
     Log.verbose("list-Page", "focus event fired editing  when entering cell");
-    const target = this.getParent(event.target, "TD"); // walk up the Dom to the TD, thats where the IDs are stored
+    const target = this.getParent(event.target, "DIV", "spCell"); // walk up the Dom to the TD, thats where the IDs are stored
     const attributes: NamedNodeMap = target.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value;
     const columnid = attributes.getNamedItem("data-columnid").value;
@@ -235,7 +239,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    * This event gets fired to revert any changes made to the ListItem.
    */
   public undoItemChanges(event): void {
-    const parentTD = this.getParent(event.target, "TD"); // the listitemId and the column ID are always stored as attributes of the parent TD.
+    const parentTD = this.getParent(event.target, "DIV", "spCell"); // the listitemId and the column ID are always stored as attributes of the parent TD.
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityitem = attributes.getNamedItem("data-entityid");
     const entityid = entityitem.value;
@@ -247,7 +251,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    */
   public updateListItem(event): void {
 
-    const parentTD = this.getParent(event.target, "TD");
+    const parentTD = this.getParent(event.target, "DIV", "spCell");
     const attributes: NamedNodeMap = parentTD.attributes;
     const entityid = attributes.getNamedItem("data-entityid").value; // theid of the SPListItem
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
@@ -289,9 +293,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       const oldFieldName = utils.ParseSPField(oldColRef.name).id;
       switch (newColRef.fieldDefinition.TypeAsString) {
         case "User":
-// should male a local copy befor i start messing with these.// fieldd names may overlap on old and new
-       //   const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
-         const name = listItem[oldFieldName].Name;// the user login name
+          // should male a local copy befor i start messing with these.// fieldd names may overlap on old and new
+          //   const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
+          const name = listItem[oldFieldName].Name;// the user login name
           const siteUsersOnNewSite = this.props.siteUsers.find(su => su.siteUrl === newListDef.siteUrl);
           const newUser = siteUsersOnNewSite.siteUser.find(user => user.loginName === name);
           listItem[newFieldName].Id = newUser.id;
@@ -442,7 +446,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   /**
    * This method renders the contents of an individual cell in an editable format.
    */
-  public CellContentsEditable(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+  public CellContentsEditable(props: { entity: ListItem, column: SPColumn, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
 
@@ -461,7 +465,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       );
     }
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.key);
     const internalName = utils.ParseSPField(colref.name).id;
     const columnValue = entity[internalName];
     switch (colref.fieldDefinition.TypeAsString) {
@@ -594,7 +598,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
   /**
    *  This method renders the contents of an individual cell in a non-editable format.
    */
-  public CellContents(props: { entity: ListItem, column: ColumnDefinition }): JSX.Element {
+  public CellContents(props: { entity: ListItem, column: SPColumn }): JSX.Element {
     const {entity, column} = props;
     if (!entity.__metadata__ListDefinitionId) { // item is new and list not yet selected
     }
@@ -617,7 +621,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         </a>
       );
     }
-    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.guid);
+    const colref = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.key);
     if (colref === undefined) { //Column has not been configured for this list
       return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
         'Column Not Defined'
@@ -692,114 +696,61 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
    *  It calls CellContentsEditable or CellContents based on whether the cell is being edited.
    * It determines if the cell is being edited by looking at this,props.editing(which got set by ToggleEditing).
    */
-  public TableDetail(props: { entity: ListItem, column: ColumnDefinition, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
+  public TableDetail(props: { entity: ListItem, column: SPColumn, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
-    if (this.state && this.state.editing && this.state.editing.entityid === entity.GUID && this.state.editing.columnid === column.guid && column.editable) {
-      return (<td key={entity.GUID + column.guid} data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "2px solid black", padding: "0px" }}>
+    if (this.state && this.state.editing && this.state.editing.entityid === entity.GUID && this.state.editing.columnid === column.key) {
+      return (<div width={column.minWidth} className="spCell" key={entity.GUID + column.key} data-entityid={entity.GUID} data-columnid={column.key} style={{ border: "2px solid black", padding: "0px" }}>
         <this.CellContentsEditable entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
-      </td>
+      </div>
       );
     } else {
-      return (<td key={entity.GUID + column.guid} data-entityid={entity.GUID} data-columnid={column.guid} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
+      return (<div width={column.minWidth} className="spCell" key={entity.GUID + column.key} data-entityid={entity.GUID} data-columnid={column.key} style={{ border: "1px solid black", padding: "0px" }} onClick={this.toggleEditing} >
         <this.CellContents entity={entity} column={column} />
-      </td>
+      </div>
       );
     }
   }
-  /**
-   * This method renders a tableRow for an individual listitem
-   */
-  public TableRow(props: { entity: ListItem, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
-    const {entity, columns, cellUpdated, cellUpdatedEvent} = props;
-    return (
-      <tr>
-        {
-          columns.map(function (column) {
-            return (
-              <this.TableDetail key={column.guid} entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
-            );
-          }, this)
-        }
-        <td data-entityid={entity.GUID} data-columnid={""} width="200" onClick={this.toggleEditing} >
-          <div>
+  public onRenderItemColumn(item: any, index: number, column: SPColumn): any {
 
-            <Button width="20" style={{ padding: 0 }}
-              onClick={this.updateListItem} alt="Save to Sharepoint"
-              buttonType={ButtonType.icon}
-              icon="Save" disabled={!(entity.__metadata__OriginalValues)} />
-            <Button width="20" style={{ padding: 0 }}
-              onClick={this.removeListItem}
-              buttonType={ButtonType.icon}
-              icon="Delete" />
-            <Button width="20" style={{ padding: 0 }}
-              // onClick={this.deleteList}
-              buttonType={ButtonType.icon}
-              disabled={!(entity.__metadata__OriginalValues)}
-              onClick={this.undoItemChanges}
-              icon="Undo" />
-          </div>
-        </td>
-      </tr>);
-  };
-  /**
-   * Render rows for the listItems
-   */
-  public TableRows(props: { entities: Array<ListItem>, columns: Array<ColumnDefinition>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
-    const {entities, columns, cellUpdated, cellUpdatedEvent} = props;
+    const listDef = this.getListDefinition(item.__metadata__ListDefinitionId);
+    const colRef = listDef.columnReferences.find(cr => cr.columnDefinitionId === column.key);
+    const internalName = utils.ParseSPField(colRef.name).id;
     return (
-      <tbody>
-        {
-          entities.map(function (list) {
-            return (
-              <this.TableRow key={list.GUID} entity={list} columns={columns} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
-            );
-          }, this)
-        }
-      </tbody>
+      <FocusZone>
+      <this.TableDetail entity={item} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
+      </FocusZone>
     );
+
+
   }
+
   public render() {
     const { listItems } = this.props;
     Log.info("ListItemContainer", "In Render");
+
+    const uColumns: SPColumn[] = this.props.columns.map((c, i, a) => {
+      return {
+        key: c.guid,
+        name: c.name,
+        fieldName: c.name,
+        minWidth: 80,
+        maxWidth: 80,
+
+        width: 80,
+
+        type: c.type,
+        editable: c.editable,
+
+      };
+    });
+
     return (
+
       <Container testid="columns" size={2} center>
-        <CommandBar items={[{
-          key: "AddItem",
-          name: "Add an Item",
-          icon: "Add",
-          onClick: this.addListItem
+        <DetailsList columns={uColumns} items={listItems} onRenderItemColumn={this.onRenderItemColumn}>
+        </DetailsList>
 
-        },
-        {
-          key: "DleteAll",
-          name: "DeleteAll",
-          icon: "Delete"
-        },
-        {
-          key: "Undo All changes",
-          name: "UndoAll",
-          icon: "Undo"
-        },
-        {
-          key: "Save All  ",
-          name: "Save To SharePoint",
-          icon: "Save"
-
-        }]} />
-
-        <table border="1">
-          <thead>
-            <tr>
-              {this.props.columns.map((column) => {
-                return <th key={column.name}>{column.name}</th>;
-              })}
-            </tr>
-          </thead>
-          {
-            <this.TableRows entities={listItems} columns={this.props.columns} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
-          })}
-        </table>
       </Container>
     );
   }
@@ -807,4 +758,4 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ListItemContainer);
+)(ListItemContainerUIF);

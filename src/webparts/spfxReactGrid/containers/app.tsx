@@ -21,7 +21,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 class App extends React.Component<IAppProps, void> {
-  private messageBar(error:string): JSX.Element {
+  private messageBar(error: string): JSX.Element {
     if (error === "") {
       return (<div />);
     }
@@ -38,16 +38,17 @@ class App extends React.Component<IAppProps, void> {
         <Button> <Link to="/lists">List Definitions</Link></Button>
         <Button> <Link to="/columns">Column Definitions</Link></Button>
         <Button> <Link to="/">List Items</Link></Button>
+        <Button> <Link to="/listItemsUIF">List Items (UI Fabric)</Link></Button>
         <div>
           {this.messageBar(this.props.systemStatus.fetchStatus)}
-        <div>{this.props.systemStatus.currentAction}
+          <div>{this.props.systemStatus.currentAction}
+          </div>
         </div>
-      </div>
-      <Content isVisible={true}>
-        {children}
-      </Content>
-    </div >
-  );
+        <Content isVisible={true}>
+          {children}
+        </Content>
+      </div >
+    );
   };
 }
 export default connect(

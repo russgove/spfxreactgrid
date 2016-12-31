@@ -6,9 +6,9 @@ import WebEditor from "../components/WebEditor";
 import ListEditor from "../components/ListEditor";
 import { addList, removeList, saveList, removeAllLists } from "../actions/listActions";
 import { getWebsAction, getListsForWebAction, getFieldsForListAction } from "../actions/SiteActions";
-import { Button, ButtonType, Dropdown, IDropdownOption, TextField,CommandBar } from "office-ui-fabric-react";
+import { Button, ButtonType, Dropdown, IDropdownOption, TextField, CommandBar } from "office-ui-fabric-react";
 import ListDefinition from "../model/ListDefinition";
-import {FieldDefinition} from "../model/ListDefinition";
+import { FieldDefinition } from "../model/ListDefinition";
 import { ColumnReference } from "../model/ListDefinition";
 import { Site, Web, WebList, WebListField } from "../model/Site";
 import ColumnDefinition from "../model/ColumnDefinition";
@@ -18,6 +18,7 @@ export class GridColumn {
   constructor(
     public id: string,
     public name: string,
+    public title: string,
     public editable: boolean,
     public width: number,
     public type: string,
@@ -50,7 +51,7 @@ function mapDispatchToProps(dispatch) {
     addList: (siteUrl: string): void => {
 
       const id = Guid.newGuid();
-      const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null,null);
+      const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null, null);
       dispatch(addList(list));
     },
     removeList: (list: ListDefinition): void => {
@@ -85,6 +86,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     {
       id: "rowGuid",
       name: "guid",
+      title: "List Definition ID",
       editable: false,
       width: 250,
       formatter: "",
@@ -93,14 +95,16 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     {
       id: "SiteUrl",
       name: "siteUrl", // the url to the site
+      title: "SiteUrl",
       editable: true,
       width: 359,
       formatter: "",
       type: "Text"
     },
     {
-      id: "title",
-      name: "title", // the url to the site
+      id: "listDefTitle",
+      name: "listDefTitle",
+      title: "List Definition Title",
       editable: true,
       width: 100,
       formatter: "",
@@ -109,6 +113,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     {
       id: "WebLookup",
       name: "webLookup", // the name of the field in the model
+      title: "Web Containing List",
       editable: true,
       width: 300,
       editor: "WebEditor",
@@ -119,6 +124,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
       id: "listlookup",
       width: 300,
       name: "listLookup",
+      title: "List",
       editable: true,
       editor: "ListEditor",
       formatter: "SharePointLookupCellFormatter",
@@ -153,7 +159,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     this.extendedColumns = _.clone(this.defaultColumns);
     for (const columnRef of this.props.columnRefs) {
 
-      const newCol = new GridColumn(columnRef.guid, columnRef.name, columnRef.editable, columnRef.width, columnRef.type, "FieldFormatter", "FieldEditor");
+      const newCol = new GridColumn(columnRef.guid, columnRef.name, columnRef.name, columnRef.editable, columnRef.width, columnRef.type, "FieldFormatter", "FieldEditor");
       this.extendedColumns.push(newCol);
     }
   }
@@ -165,7 +171,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   private updateExtendedColumn(entity: ListDefinition, columnid: string, value: any) {
     const internalName = utils.ParseSPField(value).id;
-    const fieldDefinition:FieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
+    const fieldDefinition: FieldDefinition = this.getFieldDefinition(entity, internalName); // values is the fueld just selected.... get the definition for it
     for (const col of entity.columnReferences) {
       if (col.columnDefinitionId === columnid) {
         col.name = value;
@@ -204,28 +210,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     }
     this.props.saveList(entity);
   }
-  // public handleRowUpdated(event): void {
 
-  //   Log.verbose("Columns-Page", "Row changed-fired when row changed or leaving cell ");
-  //   const target = event.target;
-  //   const value = target.value;
-  //   const parentTD = this.getParent(event.target, "TD");
-  //   const attributes: NamedNodeMap = parentTD.attributes;
-  //   const entityitem = attributes.getNamedItem("data-entityid");
-  //   const entityid = entityitem.value;
-  //   const columnid = attributes.getNamedItem("data-columnid").value;
-  //   const entity: ListDefinition = this.props.lists.find((temp) => temp.guid === entityid);
-  //   const column = this.extendedColumns.find(temp => temp.id === columnid);
-  //   // if it is a default column, just set its value , otheriwse update it in the list of extended columns (i.e. sharepoint columns)
-  //   if (this.isdeafaultColumn(columnid)) {
-  //     entity[column.name] = value;
-  //   }
-  //   else {
-  //     this.updateExtendedColumn(entity, columnid, value);
-  //   }
-  //   this.props.saveList(entity);
-
-  // }
   public addList(event): any {
     this.props.addList(this.props.pageContext.site.absoluteUrl);
     return;
@@ -402,10 +387,11 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   public TableRow(props: { entity: ListDefinition, columns: Array<GridColumn>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
     const {entity, columns, cellUpdated, cellUpdatedEvent} = props;
+    debugger;
     return (
       <tr>
         {
-          columns.filter(c=>c.type!=="__LISTDEFINITIONTITLE__").map(function (column) {
+          columns.filter(c => c.type !== "__LISTDEFINITIONTITLE__").map(function (column) {
             return (
               <this.TableDetail key={column.id} entity={entity} column={column} cellUpdated={this.handleCellUpdated} cellUpdatedEvent={this.handleCellUpdatedEvent} />
             );
@@ -436,7 +422,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
 
   public render() {
-
+debugger;
     return (
       <Container testid="columns" size={2} center>
         <h1>List Definitions</h1>
@@ -465,8 +451,9 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
         <table border="1">
           <thead>
             <tr>
-              {this.extendedColumns.filter(c=>c.type!=="__LISTDEFINITIONTITLE__").map((column) => {
-                return <th key={column.name}>{column.name}</th>;
+
+              {this.extendedColumns.filter(c => c.type !== "__LISTDEFINITIONTITLE__").map((column) => {
+                return <th key={column.name}>{column.title}</th>;
               })}
             </tr>
           </thead>

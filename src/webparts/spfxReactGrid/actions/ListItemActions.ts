@@ -145,7 +145,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
 
                     getListItem(listDefinition, listItem.ID)
                         .then((response) => {
-                            debugger;
+
                             // srfresh here in cas of calculated columns
                             response.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
                             response.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
@@ -167,7 +167,7 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
         case GridRowStatus.new:
             const mewpromise = web.lists.getById(listid).items.add(typedHash)
                 .then((response) => {//
-                    debugger;
+
                     const itemId = response.data.Id;
                     getListItem(listDefinition, itemId)
                         .then((response) => {
