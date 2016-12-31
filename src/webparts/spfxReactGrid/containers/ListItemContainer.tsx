@@ -294,9 +294,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           const name = listItem[oldFieldName].Name;// the user login name
           const siteUsersOnNewSite = this.props.siteUsers.find(su => su.siteUrl === newListDef.siteUrl);
           const newUser = siteUsersOnNewSite.siteUser.find(user => user.loginName === name);
-          listItem[newFieldName].Id = newUser.id;
-          listItem[newFieldName].Name = newUser.loginName;
-          listItem[newFieldName].Title = newUser.value;
+          if (newUser) {
+            listItem[newFieldName].Id = newUser.id;
+            listItem[newFieldName].Name = newUser.loginName;
+            listItem[newFieldName].Title = newUser.value;
+          }
+          else {
+            delete listItem[newFieldName];
+          }
           break;
 
         default:
@@ -353,6 +358,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         }
         entity[internalName].Id = value.key;//and then fill in the values
         entity[internalName].Title = value.text;
+        break;
+      case "Choice":
+        entity[internalName] = value.text;
         break;
       case "DateTime":
 
@@ -448,7 +456,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     if (column.type === "__LISTDEFINITIONTITLE__") {
 
       const opts: Array<IDropdownOption> = this.props.listDefinitions.map(ld => {
-        return { key: ld.guid, text: ld.title };
+        return { key: ld.guid, text: ld.listDefTitle };
       });
       // if (!entity.__metadata__ListDefinitionId) {
       //   opts.unshift({ key: null, text: "Select one" });
@@ -574,11 +582,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           "shortDays": [""],
           goToToday: "yes"
         };
+        let date = null;
+        if (columnValue !== null) {
+          const year = parseInt(columnValue.substring(0, 34));
+          const month = parseInt(columnValue.substring(5, 7)) - 1;
+          const day = parseInt(columnValue.substring(8, 10));
+          date = new Date(year, month, day);
+        }
 
-        const year = parseInt(columnValue.substring(0, 34));
-        const month = parseInt(columnValue.substring(5, 7)) - 1;
-        const day = parseInt(columnValue.substring(8, 10));
-        const date = new Date(year, month, day);
 
         return (
           <DatePicker strings={datpickerStrings} onSelectDate={cellUpdated} value={date}
@@ -603,7 +614,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     if (column.type === "__LISTDEFINITIONTITLE__") {// this type is sued to show the listdefinition name
       if (listDef != null) {//listdef has been selected
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
-          {listDef.title}
+          {listDef.listDefTitle}
         </a>);
       }
       else {//listdef not yet selected

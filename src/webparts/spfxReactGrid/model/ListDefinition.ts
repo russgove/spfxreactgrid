@@ -49,7 +49,7 @@ export default class ListDefinition {
         /** the url of the list. (not used. to be deleted) */
         public url: string,
         /** A name for the listDefinition. When users add a new item, they must select the list nby this name */
-        public title: string) {
+        public listDefTitle: string) {
         this.columnReferences = new Array<ColumnReference>();
         this.guid = Guid.newGuid().toString();
 
