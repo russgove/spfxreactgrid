@@ -18,6 +18,6 @@ Usage:
 ![alt tag](/src/images/ListDefinitions.PNG)
 
 3. Edit the info
-![alt tag](/src/images/EditListItems.PNG)
+![alt tag](/src/images/editListItems.PNG)
 
 
