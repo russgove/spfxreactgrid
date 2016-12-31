@@ -1,6 +1,6 @@
 ## spfxreactgrid
 
-An SPFX Webpart that uses React and Redux to let users edit list data from multiple Webs and Multiple Sites in a single grid.
+An SPFX Webpart that uses React, Office-UI-Fabric, and Redux to let users edit list data from multiple Webs and Multiple Sites in a single grid.
 
 ### Building the code
 
