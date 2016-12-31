@@ -10,4 +10,13 @@ npm i
 gulp serve
 ```
 
+Usage
+
+1. Define the columns to be shown in the grid
+![alt tag](.//src/images/columnDefinitions.PNG)
+
+2. Define the lists to be edited
+
+3. Edit the indfo
+
 
