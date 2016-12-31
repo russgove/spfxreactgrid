@@ -2,7 +2,6 @@ import ListItem from "../Model/ListItem";
 import * as _ from "lodash";
 import {
     ADD_LISTITEM,
-    REMOVE_LISTITEM,
     REMOVE_LISTITEM_SUCCESS,
     GOT_LISTITEMS,
     SAVE_LISTITEM,
@@ -21,7 +20,7 @@ function updateListItemSuccess(state: Array<ListItem>, action: { payload: { list
     // if (newState[index].__metadata__OriginalValues) {
     //     delete newState[index].__metadata__OriginalValues;
     // }
-    newState[index]=action.payload.listItem;
+    newState[index] = action.payload.listItem;
     return newState;
 }
 /**

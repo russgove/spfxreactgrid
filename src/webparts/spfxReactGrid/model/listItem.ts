@@ -8,7 +8,7 @@ export default class ListItem {
     /** The Original Values of this item . Need this to revert changes */
     public __metadata__OriginalValues: ListItem;
     /** the internal ID for tthe listitem */
-    public GUID: string
+    public GUID: string;
     public ID: number;
     /**
      *  When a new Item is added, its status is set to new and its given a Guid.

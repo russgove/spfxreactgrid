@@ -141,7 +141,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     let listItem = new ListItem();
     for (const column of this.props.columns) {
-      listItem[column.name] === null;
+      listItem[column.name] = null;
     }
     if (this.props.listDefinitions.length === 1) {
       listItem.__metadata__ListDefinitionId = this.props.listDefinitions[0].guid;
@@ -289,9 +289,9 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       const oldFieldName = utils.ParseSPField(oldColRef.name).id;
       switch (newColRef.fieldDefinition.TypeAsString) {
         case "User":
-// should male a local copy befor i start messing with these.// fieldd names may overlap on old and new
-       //   const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
-         const name = listItem[oldFieldName].Name;// the user login name
+          // should male a local copy befor i start messing with these.// fieldd names may overlap on old and new
+          //   const name = listItem.__metadata__OriginalValues[oldFieldName].Name;// the user login name
+          const name = listItem[oldFieldName].Name;// the user login name
           const siteUsersOnNewSite = this.props.siteUsers.find(su => su.siteUrl === newListDef.siteUrl);
           const newUser = siteUsersOnNewSite.siteUser.find(user => user.loginName === name);
           listItem[newFieldName].Id = newUser.id;
@@ -318,7 +318,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const {entityid, columnid} = this.state.editing;
     const entity: ListItem = this.props.listItems.find((temp) => temp.GUID === entityid);
     const listDef = this.getListDefinition(entity.__metadata__ListDefinitionId);
-    const titlecolumnid = this.props.columns.find(c => { return c.type === "__LISTDEFINITIONTITLE__" }).guid
+    const titlecolumnid = this.props.columns.find(c => { return c.type === "__LISTDEFINITIONTITLE__"; }).guid;
     if (columnid === titlecolumnid) { // user just changed the listDef,
 
       if (entity.__metadata__GridRowStatus === GridRowStatus.pristine) {
@@ -328,8 +328,8 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
       }
       entity.__metadata__ListDefinitionId = value.key; // value is a DropDDownOptions
       if (entity.__metadata__GridRowStatus !== GridRowStatus.new) {
-        const listDef = this.getListDefinition(value.key);
-        this.props.getSiteUsersAction(listDef.siteUrl).then(r => {
+        const newListDef = this.getListDefinition(value.key);
+        this.props.getSiteUsersAction(newListDef.siteUrl).then(r => {
           this.mapOldListFieldsToNewListFields(entity);
           this.props.saveListItem(entity);
         });
@@ -355,7 +355,6 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
         entity[internalName].Title = value.text;
         break;
       case "DateTime":
-        const year = value.getFullYear().toString();
 
         entity[internalName] = (value.getFullYear().toString()) + "-" + (value.getMonth() + 1).toString() + "-" + value.getDate().toString() + "T00:00:00Z";
         break;
@@ -447,7 +446,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
     const {entity, column, cellUpdated, cellUpdatedEvent} = props;
 
     if (column.type === "__LISTDEFINITIONTITLE__") {
-      entity.__metadata__ListDefinitionId
+
       const opts: Array<IDropdownOption> = this.props.listDefinitions.map(ld => {
         return { key: ld.guid, text: ld.title };
       });
@@ -497,6 +496,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             <Spinner type={SpinnerType.normal} />
           );
         }
+      /* falls through */
       case "Lookup":
 
         let lookupField = colref.fieldDefinition.LookupField;
@@ -539,6 +539,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
             <Spinner type={SpinnerType.normal} />
           );
         }
+      /* falls through */
       case "Choice":
         const choices = colref.fieldDefinition.Choices.map((c, i) => {
 
@@ -640,6 +641,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           </a>
           );
         }
+      /* falls through */
       case "Lookup":
 
         if (entity[internalName] === undefined) { // value not set
@@ -653,16 +655,18 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           </a>
           );
         }
+      /* falls through */
       case "Text":
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
           {entity[internalName]}
         </a>
         );
+      /* falls through */
       case "Note":
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} dangerouslySetInnerHTML={{ __html: entity[internalName] }} >
         </a>
         );
-
+      /* falls through */
       case "DateTime":
         let value: string;
         if (entity[internalName] === null) {
@@ -680,6 +684,7 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
           {value}
         </a>
         );
+      /* falls through */
       default:
         return (<a href="#" onFocus={this.toggleEditing} style={{ textDecoration: "none" }} >
           {entity[internalName]}

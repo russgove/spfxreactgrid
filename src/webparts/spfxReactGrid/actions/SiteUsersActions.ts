@@ -7,17 +7,13 @@ import "whatwg-fetch";
 import { Site } from "sp-pnp-js";
 import { SiteUser, SiteUsers, SiteUsersStatus } from "../model/SiteUsers";
 export function getSiteUsersAction(dispatch: any, siteUrl: string): any {
-
     let siteUsers = new SiteUsers(siteUrl);
     // first add the empty header record to the store, then issue a request to get the details
     const site = new Site(siteUrl);
-    let fields = ["Id"];
-
     const promise = site.rootWeb.siteUsers.get()
         .then((response) => {
             const data: SiteUser[] = _.map(response, (item: any) => {
-
-                              return new SiteUser(item.Id, item.Title,item.LoginName);
+                return new SiteUser(item.Id, item.Title, item.LoginName);
             });
             siteUsers.siteUser = data;
             siteUsers.status = SiteUsersStatus.fetched;
@@ -26,7 +22,6 @@ export function getSiteUsersAction(dispatch: any, siteUrl: string): any {
         })
         .catch((error) => {
             console.log(error);
-
             siteUsers.status = SiteUsersStatus.error;
             dispatch(getSiteUsersErrorAction(error, siteUsers)); // need to ewname this one to be digfferent from the omported ome
         });

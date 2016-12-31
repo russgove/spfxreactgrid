@@ -5,7 +5,7 @@ import {
     GET_LISTITEMS,
     GOT_LISTITEMS,
     GET_LISTITEMSERROR,
-    GET_LISTITEM,
+
     GOT_LISTITEM,
     GET_LISTITEMERROR,
     CLEAR_LISTITEMS,
@@ -50,7 +50,7 @@ export function removeListItem(dispatch: any, listItem: ListItem, listDefinition
     switch (listItem.__metadata__GridRowStatus) {
         case GridRowStatus.modified:
         case GridRowStatus.pristine:
-            const promise = web.lists.getById(listid).items.getById(listItem.ID).recycle()
+            web.lists.getById(listid).items.getById(listItem.ID).recycle()
                 .then((response) => {
                     // shouwld have an option to rfresh here in cas of calculated columns
 
@@ -144,12 +144,12 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
                 .then((response) => {
 
                     getListItem(listDefinition, listItem.ID)
-                        .then((response) => {
+                        .then((r) => {
 
                             // srfresh here in cas of calculated columns
-                            response.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
-                            response.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
-                            const gotListItems = updateListItemSuccessAction(response);
+                            r.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                            r.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
+                            const gotListItems = updateListItemSuccessAction(r);
                             dispatch(gotListItems); // need to ewname this one to be digfferent from the omported ome
                         });
                 })
@@ -170,14 +170,14 @@ export function updateListItemAction(dispatch: any, listDefinition: ListDefiniti
 
                     const itemId = response.data.Id;
                     getListItem(listDefinition, itemId)
-                        .then((response) => {
+                        .then((r) => {
                             /**
                                   * data recived after adding an item is NOT the same as we recive from a get
                                   * need to fetch item and wap it in
                                   */
-                            response.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
-                            response.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
-                            const actiom = addedNewItemInSharepouint(response, listItem);
+                            r.__metadata__ListDefinitionId = listDefinition.guid; // save my listdef, so i can get the columnReferences later
+                            r.__metadata__GridRowStatus = GridRowStatus.pristine; // save my listdef, so i can get the columnReferences later
+                            const actiom = addedNewItemInSharepouint(r, listItem);
                             dispatch(actiom); // need to ewname this one to be digfferent from the omported ome
                         })
                         .catch((error) => {
@@ -259,7 +259,7 @@ export function getListItem(listDefinition: ListDefinition, itemId: number): Pro
 
     const web = new Web(weburl);
 
-    let promise: Promise<any> = web.lists.getById(listid).items.getById(itemId).select(fieldnames.concat("GUID").concat("Id").join(",")).expand(expands.join(",")).get()
+    let promise: Promise<any> = web.lists.getById(listid).items.getById(itemId).select(fieldnames.concat("GUID").concat("Id").join(",")).expand(expands.join(",")).get();
 
     return promise;
 }
