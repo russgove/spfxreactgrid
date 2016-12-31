@@ -1,26 +1,13 @@
 ## spfxreactgrid
 
-A Sharepoint Grid built using SPFX, React and Redux. Lets users edit listdata from multiple Webs and Multiple Sites.
+An SPFX Webpart that uses React and Redux to let users edit list data from multiple Webs and Multiple Sites in a single grid.
 
 ### Building the code
 
 ```bash
 git clone the repo
 npm i
-npm i -g gulp
-gulp
+gulp serve
 ```
 
-This package produces the following:
 
-* lib/* commonjs components - this allows this package to be reused from other packages.
-* dist/* - a single bundle containing the components used for uploading to a cdn pointing a registered Sharepoint webpart library to.
-* example/* a test page that hosts all components in this package.
-
-### Build options
-
-gulp nuke - TODO
-gulp test - TODO
-gulp watch - TODO
-gulp build - TODO
-gulp deploy - TODO
