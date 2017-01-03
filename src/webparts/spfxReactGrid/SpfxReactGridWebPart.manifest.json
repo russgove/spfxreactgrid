@@ -13,7 +13,8 @@
     "description": { "default": "react grid sample" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "SPFX React Grid"
+      "description": "SPFX React Grid",
+      "ColumnDefinitionFieldLabel" :"Field Definitions"
     }
   }]
 }
