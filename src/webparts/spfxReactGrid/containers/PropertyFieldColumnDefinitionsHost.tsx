@@ -10,9 +10,7 @@ import { IWebPartContext } from '@microsoft/sp-webpart-base';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Button, ButtonType } from 'office-ui-fabric-react/lib/Button';
 import { Panel, PanelType } from 'office-ui-fabric-react/lib/Panel';
-
 import * as strings from "spfxReactGridStrings";
-
 export interface IPropertyFieldColumnDefinitionsHostProps {
   label: string;
   initialValue?: Array<ColumnDefinition>;
@@ -21,16 +19,10 @@ export interface IPropertyFieldColumnDefinitionsHostProps {
   properties: any;
   store: any
 }
-
 export interface IPropertyFieldColumnDefinitionsHostState {
   openPanel?: boolean;
-  openRecent?: boolean;
-  openSite?: boolean;
-  openUpload?: boolean;
-
   columnDefinitions: Array<ColumnDefinition>;
 }
-
 /**
  * @class
  * Renders the controls for PropertyFieldColumnDefinitions component
@@ -42,25 +34,20 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
    * Contructor
    */
   constructor(props: IPropertyFieldColumnDefinitionsHostProps) {
+    debugger;
     super(props);
     //Bind the current object to the external called onSelectDate method
     this.onOpenPanel = this.onOpenPanel.bind(this);
     this.onClosePanel = this.onClosePanel.bind(this);
 
     this.onClickRecent = this.onClickRecent.bind(this);
-    this.onClickSite = this.onClickSite.bind(this);
-    this.onClickUpload = this.onClickUpload.bind(this);
-
     this.addColumn = this.addColumn.bind(this);
     this.moveColumnDown = this.moveColumnDown.bind(this);
     this.moveColumnUp = this.moveColumnUp.bind(this);
-    this.onEraseButton = this.onEraseButton.bind(this);
+    this.saveChanges = this.saveChanges.bind(this);
     this.state = {
-      columnDefinitions: this.props.initialValue,
-      openPanel: false,
-      openRecent: false,
-      openSite: true,
-      openUpload: false
+      columnDefinitions: this.props.properties.columns,
+      openPanel: false
     };
   }
   private addColumn(): void {
@@ -92,32 +79,20 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
     debugger;
     this.props.store.dispatch(moveCulumnDown(column));
   }
-  private saveImageProperty(imageUrl: string): void {
+  private saveChanges(): void {
     if (this.props.onPropertyChange) {
       debugger;
-      // this.props.properties[this.props.targetProperty] = imageUrl;
-      // this.props.onPropertyChange(this.props.targetProperty, this.props.initialValue, imageUrl);
+       this.props.properties.ColumnDefinitions=this.state.columnDefinitions;
+       this.props.onPropertyChange("ColumnDefinitions", this.props.initialValue, this.state.columnDefinitions);
     }
   }
-
-  /**
-  * @function
-  * Click on erase button
-  *
-  */
-  private onEraseButton(): void {
-    debugger;
-    //  this.state.selectedImage = '';
-    this.setState(this.state);
-    this.saveImageProperty('');
-  }
-
   /**
   * @function
   * Open the panel
   *
   */
   private onOpenPanel(element?: any): void {
+    debugger;
     this.state.openPanel = true;
     this.setState(this.state);
   }
@@ -159,22 +134,6 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
     //  window.removeEventListener('message', this.handleIframeData, false);
   }
 
-  private onClickSite(element?: any): void {
-    this.state.openRecent = false;
-    this.state.openSite = true;
-    this.state.openUpload = false;
-    this.setState(this.state);
-  }
-
-  private onClickUpload(element?: any): void {
-    this.state.openRecent = false;
-    this.state.openSite = false;
-    this.state.openUpload = true;
-    this.setState(this.state);
-  }
-
-
-
   /**
    * @function
    * Renders the datepicker controls with Office UI  Fabric
@@ -189,9 +148,7 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
       <div style={{ marginBottom: '8px' }}>
         <Label>{this.props.label}</Label>
         <Button onClick={this.onOpenPanel}>{strings.ColumnDefinitionsButtonSelect}</Button>
-        <Button onClick={this.onEraseButton} disabled={this.state.columnDefinitions != null && this.state.columnDefinitions.length != 0 ? false : true}>
-          {strings.ColumnDefinitionsButtonReset}</Button>
-        {this.state.openPanel === true ?
+          {this.state.openPanel === true ?
           <Panel
             isOpen={this.state.openPanel} hasCloseButton={true} onDismiss={this.onClosePanel}
             isLightDismiss={true} type={PanelType.large}
@@ -204,6 +161,7 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
               removeAllColumns={this.removeAllColumns}
               removeColumn={this.removeColumn}
               saveColumn={this.saveColumn}
+              save={this.saveChanges}
 
 
 

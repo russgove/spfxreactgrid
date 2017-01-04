@@ -11,7 +11,7 @@ import configureStore from "./store/configure-store";
 const { Router, createMemoryHistory } = require("react-router");
 
 import { addLists } from "./actions/listActions";
-import { addColumns } from "./actions/columnActions";
+import { addColumns ,removeAllColumns} from "./actions/columnActions";
 import { addPageContext } from "./actions/PageContextActions";
 import { PropertyFieldColumnDefinitions } from "./containers/PropertyFieldColumnDefinitions";
 import {
@@ -39,6 +39,7 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
   public constructor(context: IWebPartContext) {
     super(context);
     Log.verbose("SpfxReactGridWebPart", "In constructor of SpfxReactGridWebPart");
+    this.onPropertyChange = this.onPropertyChange.bind(this);
   }
   public render(): void {
 
@@ -56,11 +57,23 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
 
     // this.properties.columns = [];
     //  this.properties.lists =[];
-    this.properties.columns = store.getState().columns;
+   // this.properties.columns = store.getState().columns;
     this.properties.lists = store.getState().lists;
     return super.onBeforeSerialize();
   }
-  private onPropertyChange: (propertyPath: string, oldValue: any, newValue: any) => void;
+  private onPropertyChange(propertyPath: string, oldValue: any, newValue: any) {
+    debugger;
+    switch (propertyPath) {
+      case "ColumnDefinitions":
+        this.properties.columns = newValue;
+        store.dispatch(removeAllColumns());
+        store.dispatch(addColumns(this.properties.columns));
+
+        break;
+      default:
+        break;
+    }
+  };
   protected get propertyPaneSettings(): IPropertyPaneSettings {
     Log.verbose("SpfxReactGridWebPart", "In propertyPaneSettings of SpfxReactGridWebPart");
     return {
@@ -81,7 +94,7 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
                   label: strings.ColumnDefinitionFieldLabel,
                   onPropertyChange: this.onPropertyChange,
                   properties: this.properties,
-                  store:store
+                  store: store
                 })
               ]
             }
