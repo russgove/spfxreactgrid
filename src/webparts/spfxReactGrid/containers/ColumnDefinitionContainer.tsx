@@ -41,7 +41,7 @@ export interface IColumnsPageProps extends React.Props<any> {
     addColumn: () => void;
     removeAllColumns: () => void;
     removeColumn: (column) => void;
-    saveColumn: (Column) => void;
+
     moveColumnUp: (Column: ColumnDefinition) => void;
     moveColumnDown: (Column: ColumnDefinition) => void;
     save: () => void;
@@ -61,9 +61,7 @@ function mapDispatchToProps(dispatch) {
             const col: ColumnDefinition = new ColumnDefinition(id.toString(), "", 80, true);
             dispatch(addColumn(col));
         },
-        saveColumn: (updatedRowData): void => {
-            dispatch(saveColumn(updatedRowData));
-        },
+
         removeColumn: (column): void => {
 
             dispatch(removeColumn(column));
@@ -151,7 +149,7 @@ export class ColumnDefinitionContainerNative extends React.Component<IColumnsPag
         const entity: ColumnDefinition = this.props.columns.find((temp) => temp.guid === entityid);
         const column = this.gridColulumns.find(temp => temp.id === columnid);
         entity[column.name] = value;
-        this.props.saveColumn(entity);
+      //  this.props.saveColumn(entity);
 
     }
 
