@@ -5,6 +5,9 @@
  * @copyright 2016 Olivier Carpentier
  * Released under MIT licence
  */
+import * as ColumnReducers from "../reducers/Columnreducer";
+import { Guid, Log } from "@microsoft/sp-client-base";
+import { ColumnDefinitionContainerNative } from "./ColumnDefinitionContainer";
 import ColumnDefinition from "../model/ColumnDefinition"
 import * as React from 'react';
 import { EnvironmentType } from '@microsoft/sp-client-base';
@@ -23,36 +26,36 @@ import * as strings from "spfxReactGridStrings";
  */
 // export interface IPropertyFieldColumnDefinitionsHostProps extends IPropertyFieldColumnDefinitionsPropsInternal {
 // }
- export interface IPropertyFieldColumnDefinitionsHostProps  {
+export interface IPropertyFieldColumnDefinitionsHostProps {
 
-   /**
-    * @var
-    * Property field label displayed on top
-    */
-   label: string;
-   /**
-    * @var
-    * Initial value
-    */
-   initialValue?: Array<ColumnDefinition>;
-   /**
-    * @var
-    * Parent web part context
-    */
-   context: IWebPartContext;
-   /**
-    * @function
+  /**
+   * @var
+   * Property field label displayed on top
+   */
+  label: string;
+  /**
+   * @var
+   * Initial value
+   */
+  initialValue?: Array<ColumnDefinition>;
+  /**
+   * @var
+   * Parent web part context
+   */
+  context: IWebPartContext;
+  /**
+   * @function
 //    * Defines a onPropertyChange function to raise when the selected Color changed.
-    * Normally this function must be always defined with the 'this.onPropertyChange'
-    * method of the web part object.
-    */
-   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-     /**
-    * @var
-    * Parent Web Part properties
-    */
-   properties: any;
- }
+   * Normally this function must be always defined with the 'this.onPropertyChange'
+   * method of the web part object.
+   */
+  onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
+  /**
+ * @var
+ * Parent Web Part properties
+ */
+  properties: any;
+}
 
 export interface IPropertyFieldColumnDefinitionsHostState {
   openPanel?: boolean;
@@ -84,7 +87,9 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
     this.onClickUpload = this.onClickUpload.bind(this);
     this.mouseEnterImage = this.mouseEnterImage.bind(this);
     this.mouseLeaveImage = this.mouseLeaveImage.bind(this);
-   // this.handleIframeData = this.handleIframeData.bind(this);
+     this.moveColumnUp = this.moveColumnUp.bind(this);
+
+    // this.handleIframeData = this.handleIframeData.bind(this);
     this.onEraseButton = this.onEraseButton.bind(this);
 
     //Inits the state
@@ -99,13 +104,39 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
     //Load recent images
     this.LoadRecentImages();
   }
+  private addColumn(): void {
+    const id = Guid.newGuid();
+    const col: ColumnDefinition = new ColumnDefinition(id.toString(), "", 80, true);
+    debugger;
+    // dispatch(addColumn(col));
+  }
+  saveColumn(updatedRowData): void {
+    debugger;
+    //  dispatch(saveColumn(updatedRowData));
+  }
+  removeColumn(column): void {
+    debugger;
+    //  dispatch(removeColumn(column));
+  }
+  removeAllColumns(): void {
+    debugger;
+    // dispatch(removeAllColumns());
+  }
+  moveColumnUp(column): void {
+    debugger;
+    ColumnReducers.moveColumnUp(this.props.properties.columns,column);
+    // dispatch(moveCulumnUp(column));
+  }
+  moveColumnDown(column): void {
+    debugger;
+    // dispatch(moveCulumnDown(column));
+  }
 
-
- /**
-  * @function
-  * Save the image value
-  *
-  */
+  /**
+   * @function
+   * Save the image value
+   *
+   */
   private saveImageProperty(imageUrl: string): void {
     if (this.props.onPropertyChange) {
       debugger;
@@ -121,7 +152,7 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
   */
   private onEraseButton(): void {
     debugger;
-  //  this.state.selectedImage = '';
+    //  this.state.selectedImage = '';
     this.setState(this.state);
     this.saveImageProperty('');
   }
@@ -188,7 +219,7 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
   *
   */
   public componentDidMount() {
- //   window.addEventListener('message', this.handleIframeData, false);
+    //   window.addEventListener('message', this.handleIframeData, false);
   }
 
   /**
@@ -197,7 +228,8 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
   *
   */
   public componentWillUnmount() {
-  //  window.removeEventListener('message', this.handleIframeData, false);
+    debugger;
+    //  window.removeEventListener('message', this.handleIframeData, false);
   }
 
   private onClickSite(element?: any): void {
@@ -217,9 +249,9 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
   private LoadRecentImages(): void {
     //var folderService: SPFolderPickerService = new SPFolderPickerService(this.props.context);
     //folderService.getFolders(this.state.currentSPFolder, this.currentPage, this.pageItemCount).then((response: ISPFolders) => {
-      //Binds the results
-      //this.state.childrenFolders = response;
-      //this.setState({ openRecent: this.state.openRecent,openSite: this.state.openSite, openUpload: this.state.openUpload, loading: false, selectedFolder: this.state.selectedFolder, currentSPFolder: this.state.currentSPFolder, childrenFolders: this.state.childrenFolders });
+    //Binds the results
+    //this.state.childrenFolders = response;
+    //this.setState({ openRecent: this.state.openRecent,openSite: this.state.openSite, openUpload: this.state.openUpload, loading: false, selectedFolder: this.state.selectedFolder, currentSPFolder: this.state.currentSPFolder, childrenFolders: this.state.childrenFolders });
     //});
   }
 
@@ -229,34 +261,36 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
    */
   public render(): JSX.Element {
 
-    // var iframeUrl = this.props.context.pageContext.web.absoluteUrl;
-    // iframeUrl += '/_layouts/15/onedrive.aspx?picker=';
-    // iframeUrl += '%7B%22sn%22%3Afalse%2C%22v%22%3A%22files%22%2C%22id%22%3A%221%22%2C%22o%22%3A%22';
-    // iframeUrl += encodeURI(this.props.context.pageContext.web.absoluteUrl.replace(this.props.context.pageContext.web.serverRelativeUrl, ""));
-    // iframeUrl += "%22%7D&id=";
-    // iframeUrl += encodeURI(this.props.context.pageContext.web.serverRelativeUrl);
-    // iframeUrl += '&view=2&typeFilters=';
-    // iframeUrl += encodeURI('folder,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.pdf,.txt');
-    // iframeUrl += '&p=2';
 
-
+    debugger;
 
     //Renders content
     return (
-      <div style={{ marginBottom: '8px'}}>
+      <div style={{ marginBottom: '8px' }}>
         <Label>{this.props.label}</Label>
         <Button onClick={this.onOpenPanel}>{strings.ColumnDefinitionsButtonSelect}</Button>
-        <Button onClick={this.onEraseButton} disabled={this.state.columnDefinitions != null && this.state.columnDefinitions.length != 0 ? false: true}>
-        {strings.ColumnDefinitionsButtonReset}</Button>
-        { this.state.openPanel === true ?
-        <Panel
-          isOpen={this.state.openPanel} hasCloseButton={true} onDismiss={this.onClosePanel}
-          isLightDismiss={true} type={PanelType.large}
-          headerText={strings.ColumnDefinitionsTitle}>
+        <Button onClick={this.onEraseButton} disabled={this.state.columnDefinitions != null && this.state.columnDefinitions.length != 0 ? false : true}>
+          {strings.ColumnDefinitionsButtonReset}</Button>
+        {this.state.openPanel === true ?
+          <Panel
+            isOpen={this.state.openPanel} hasCloseButton={true} onDismiss={this.onClosePanel}
+            isLightDismiss={true} type={PanelType.large}
+            headerText={strings.ColumnDefinitionsTitle}>
+            <ColumnDefinitionContainerNative
+              columns={this.props.properties.columns}
+              addColumn={this.addColumn}
+              moveColumnDown={this.moveColumnDown}
+              moveColumnUp={this.moveColumnUp}
+              removeAllColumns={this.removeAllColumns}
+              removeColumn={this.removeColumn}
+              saveColumn={this.saveColumn}
 
 
-        </Panel>
-        : ''}
+
+              />
+
+          </Panel>
+          : ''}
 
       </div>
     );
@@ -273,14 +307,15 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
     element.currentTarget.children[0].children[0].style.visibility = 'hidden';
   }
 
-    private onImageRender(item?: any, index?: number): React.ReactNode {
+  private onImageRender(item?: any, index?: number): React.ReactNode {
     return (
-      <div style={{padding: '2px', width: '191px', height: '191px', display:'inline-block'}} onMouseEnter={this.mouseEnterImage} onMouseLeave={this.mouseLeaveImage}>
-        <div style={{cursor: 'pointer',width: '187px', height: '187px',
+      <div style={{ padding: '2px', width: '191px', height: '191px', display: 'inline-block' }} onMouseEnter={this.mouseEnterImage} onMouseLeave={this.mouseLeaveImage}>
+        <div style={{
+          cursor: 'pointer', width: '187px', height: '187px',
           backgroundImage: "url('https://ocarpenmsdn.sharepoint.com/sites/devcenter/Pictures/09.jpg')",
           backgroundSize: 'cover',
           marginRight: '0px', marginBottom: '0px', paddingTop: '0px', paddingLeft: '0'
-          }}>
+        }}>
         </div>
       </div>
     );
@@ -318,8 +353,8 @@ class SPFolderPickerService {
    * @function
    * Service constructor
    */
-  constructor(pageContext: IWebPartContext){
-      this.context = pageContext;
+  constructor(pageContext: IWebPartContext) {
+    this.context = pageContext;
   }
 
   /**
@@ -352,7 +387,7 @@ class SPFolderPickerService {
         queryUrl += skipNumber;
       }
       return this.context.httpClient.get(queryUrl).then((response: Response) => {
-          return response.json();
+        return response.json();
       });
     }
   }
@@ -363,16 +398,16 @@ class SPFolderPickerService {
    */
   private getFoldersMock(parentFolderServerRelativeUrl?: string): Promise<ISPFolders> {
     return SPFolderPickerMockHttpClient.getFolders(this.context.pageContext.web.absoluteUrl).then(() => {
-          const listData: ISPFolders = {
-              value:
-              [
-                  { Name: 'Mock Folder One', ServerRelativeUrl: '/mockfolderone' },
-                  { Name: 'Mock Folder Two', ServerRelativeUrl: '/mockfoldertwo' },
-                  { Name: 'Mock Folder Three', ServerRelativeUrl: '/mockfolderthree' }
-              ]
-          };
-          return listData;
-      }) as Promise<ISPFolders>;
+      const listData: ISPFolders = {
+        value:
+        [
+          { Name: 'Mock Folder One', ServerRelativeUrl: '/mockfolderone' },
+          { Name: 'Mock Folder Two', ServerRelativeUrl: '/mockfoldertwo' },
+          { Name: 'Mock Folder Three', ServerRelativeUrl: '/mockfolderthree' }
+        ]
+      };
+      return listData;
+    }) as Promise<ISPFolders>;
   }
 
 }
@@ -384,20 +419,20 @@ class SPFolderPickerService {
  */
 class SPFolderPickerMockHttpClient {
 
-    /**
-     * @var
-     * Mock SharePoint result sample
-     */
-    private static _results: ISPFolders = { value: []};
+  /**
+   * @var
+   * Mock SharePoint result sample
+   */
+  private static _results: ISPFolders = { value: [] };
 
-    /**
-     * @function
-     * Mock get folders method
-     */
-    public static getFolders(restUrl: string, options?: any): Promise<ISPFolders> {
-      return new Promise<ISPFolders>((resolve) => {
-            resolve(SPFolderPickerMockHttpClient._results);
-        });
-    }
+  /**
+   * @function
+   * Mock get folders method
+   */
+  public static getFolders(restUrl: string, options?: any): Promise<ISPFolders> {
+    return new Promise<ISPFolders>((resolve) => {
+      resolve(SPFolderPickerMockHttpClient._results);
+    });
+  }
 
 }

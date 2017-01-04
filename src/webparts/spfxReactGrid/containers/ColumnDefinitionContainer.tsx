@@ -9,7 +9,7 @@ import { Guid, Log } from "@microsoft/sp-client-base";
 
 const fieldTypes: Array<IDropdownOption> = [
     { key: null, text: "(Selecte one)" },
-   { key: "__LISTDEFINITIONTITLE__", text: "List Title" }, //used to display the ListDefinition Title in the grid, for when users add a new item
+    { key: "__LISTDEFINITIONTITLE__", text: "List Title" }, //used to display the ListDefinition Title in the grid, for when users add a new item
     { key: "Text", text: "Text" },
     { key: "Integer", text: "Integer" },
     { key: "Note", text: "Note" },
@@ -36,7 +36,7 @@ const fieldTypes: Array<IDropdownOption> = [
     // { name: "WorkflowEventType", value: "WorkflowEventType" },
 
 ];
-interface IColumnsPageProps extends React.Props<any> {
+export interface IColumnsPageProps extends React.Props<any> {
     columns: Array<ColumnDefinition>;
     addColumn: () => void;
     removeAllColumns: () => void;
@@ -88,13 +88,13 @@ export interface GridColumn {
     formatter?: string;
     editor?: string;
 }
-interface IGridProps {
+export interface IGridProps {
     editing: {
         entityid: string;
         columnid: string;
     };
 }
-class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGridProps> {
+export class ColumnDefinitionContainerNative extends React.Component<IColumnsPageProps, IGridProps> {
     public constructor() {
         super();
         this.CellContents = this.CellContents.bind(this);
@@ -341,4 +341,4 @@ class ColumnDefinitionContainer extends React.Component<IColumnsPageProps, IGrid
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(ColumnDefinitionContainer);
+)(ColumnDefinitionContainerNative);

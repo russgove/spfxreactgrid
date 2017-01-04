@@ -7,6 +7,7 @@
  * Released under MIT licence
  */
 import ColumnDefinition from "../model/ColumnDefinition";
+
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import {
