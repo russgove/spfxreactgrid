@@ -44,6 +44,7 @@ export interface IColumnsPageProps extends React.Props<any> {
     saveColumn: (Column) => void;
     moveColumnUp: (Column: ColumnDefinition) => void;
     moveColumnDown: (Column: ColumnDefinition) => void;
+    //save: () => void;
 }
 interface IContextMenu extends React.Props<any> {
     onRowDelete: AdazzleReactDataGrid.ColumnEventCallback;
@@ -77,6 +78,9 @@ function mapDispatchToProps(dispatch) {
         moveColumnDown: (column): void => {
             dispatch(moveCulumnDown(column));
         },
+        //   save: (column): void => {
+     //      // dispatch(moveCulumnDown(column));
+     //   },
     };
 }
 
@@ -321,7 +325,9 @@ export class ColumnDefinitionContainerNative extends React.Component<IColumnsPag
                     canCheck: true,
                     icon: "Delete",
                     onClick: this.props.removeAllColumns
-                }]} />
+                }
+
+                ]} />
                 <table style={{ borderColor: "#600", borderWidth: "0 0 0 0", borderStyle: "solid" }}>
                     <thead>
                         <tr>

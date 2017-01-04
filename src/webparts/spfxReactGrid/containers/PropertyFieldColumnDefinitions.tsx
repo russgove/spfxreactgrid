@@ -1,13 +1,4 @@
-/**
- * @file PropertyFieldColumnDefinitions.ts
- * Define a custom field of type PropertyFieldColumnDefinitions for
- * the SharePoint Framework (SPfx)
- *
- * @copyright 2016 Olivier Carpentier
- * Released under MIT licence
- */
 import ColumnDefinition from "../model/ColumnDefinition";
-
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import {
@@ -24,33 +15,13 @@ import { IWebPartContext } from '@microsoft/sp-webpart-base';
  *
  */
 export interface IPropertyFieldColumnDefinitionsProps {
-  /**
-   * @var
-   * Property field label displayed on top
-   */
+
   label: string;
-  /**
-   * @var
-   * Initial value
-   */
   initialValue?: Array<ColumnDefinition>;
-  /**
-   * @var
-   * Parent web part context
-   */
   context: IWebPartContext;
-  /**
-   * @function
-   * Defines a onPropertyChange function to raise when the selected Color changed.
-   * Normally this function must be always defined with the 'this.onPropertyChange'
-   * method of the web part object.
-   */
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-    /**
-   * @var
-   * Parent Web Part properties
-   */
   properties: any;
+  store:any
 }
 
 /**
@@ -70,6 +41,7 @@ export interface IPropertyFieldColumnDefinitionsPropsInternal extends IPropertyP
   onDispose(elem: HTMLElement): void;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
   properties: any;
+  store:any;
 }
 
 /**
@@ -124,7 +96,8 @@ class PropertyFieldColumnDefinitionsBuilder implements IPropertyPaneField<IPrope
     //  onDispose: this.dispose,
      // onRender: this.render,
      onPropertyChange: this.onPropertyChange,
-     properties: this.customProperties
+     properties: this.customProperties,
+     store:this.properties.store
     });
     //Calls the REACT content generator
     ReactDom.render(element, elem);
@@ -157,7 +130,9 @@ export function PropertyFieldColumnDefinitions(targetProperty: string, propertie
       properties: properties.properties,
       context: properties.context,
       onDispose: null,
-      onRender: null
+      onRender: null,
+      store:properties.store
+
     };
     //Calles the PropertyFieldColumnDefinitions builder object
     //This object will simulate a PropertyFieldCustom to manage his rendering process
