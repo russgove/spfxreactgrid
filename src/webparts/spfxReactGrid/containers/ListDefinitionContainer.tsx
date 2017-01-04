@@ -25,7 +25,7 @@ export class GridColumn {
     public formatter: string = "",
     public editor?: string) { }
 }
-interface IListViewPageProps extends React.Props<any> {
+export interface IListViewPageProps extends React.Props<any> {
   lists: Array<ListDefinition>;
   columnRefs: Array<ColumnDefinition>;
   sites: Array<Site>;
@@ -75,13 +75,13 @@ function mapDispatchToProps(dispatch) {
     },
   };
 }
-interface IGridProps {
+export interface IGridProps {
   editing: {
     entityid: string;
     columnid: string;
   };
 }
-class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridProps> {
+export class ListDefinitionContainerNative extends React.Component<IListViewPageProps, IGridProps> {
   public defaultColumns: Array<GridColumn> = [
     {
       id: "rowGuid",
@@ -322,6 +322,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
     switch (column.editor) {
 
       case "WebEditor":
+      debugger;
         let webs = this.getWebsForSite(entity);
         return (<WebEditor webs={webs} selectedValue={columnValue} onChange={cellUpdated} />);
       case "ListEditor":
@@ -387,7 +388,7 @@ class ListDefinitionContainer extends React.Component<IListViewPageProps, IGridP
   }
   public TableRow(props: { entity: ListDefinition, columns: Array<GridColumn>, cellUpdated: (newValue) => void, cellUpdatedEvent: (event: React.SyntheticEvent) => void; }): JSX.Element {
     const {entity, columns, cellUpdated, cellUpdatedEvent} = props;
-    debugger;
+
     return (
       <tr>
         {
@@ -469,4 +470,4 @@ debugger;
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ListDefinitionContainer);
+)(ListDefinitionContainerNative);

@@ -12,7 +12,7 @@ export interface IPropertyFieldColumnDefinitionsProps {
   label: string;
   initialValue?: Array<ColumnDefinition>;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-  properties: any;
+  columnDefinitions: Array<ColumnDefinition>;
 }
 export interface IPropertyFieldColumnDefinitionsPropsInternal extends IPropertyPaneCustomFieldProps {
   label: string;
@@ -21,37 +21,31 @@ export interface IPropertyFieldColumnDefinitionsPropsInternal extends IPropertyP
   onRender(elem: HTMLElement): void;
   onDispose(elem: HTMLElement): void;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-  properties: any;
+  columnDefinitions: Array<ColumnDefinition>;
 }
 class PropertyFieldColumnDefinitionsBuilder implements IPropertyPaneField<IPropertyFieldColumnDefinitionsPropsInternal> {
-
   //Properties defined by IPropertyPaneField
   public type: IPropertyPaneFieldType = 1;//IPropertyPaneFieldType.Custom;
   public targetProperty: string;
   public properties: IPropertyFieldColumnDefinitionsPropsInternal;
-
   //Custom properties
   private label: string;
-  private initialValue: string;
-  private context: IWebPartContext;
   private onPropertyChange: (propertyPath: string, oldValue: any, newValue: any) => void;
   private customProperties: any;
   public constructor(_targetProperty: string, _properties: IPropertyFieldColumnDefinitionsPropsInternal) {
-    debugger;
-    this.render = this.render.bind(this);
+     this.render = this.render.bind(this);
     this.properties = _properties;
     this.label = _properties.label;
     this.properties.onDispose = this.dispose;
     this.properties.onRender = this.render;
     this.onPropertyChange = _properties.onPropertyChange;
-    this.customProperties = _properties.properties;
+    this.customProperties = _properties.columnDefinitions;
   }
   private render(elem: HTMLElement): void {
-    debugger;
     const element: React.ReactElement<IPropertyFieldColumnDefinitionsHostProps> = React.createElement(PropertyFieldColumnDefinitionsHost, {
       label: this.label,
      onPropertyChange: this.onPropertyChange,
-     properties: this.customProperties,
+     columnDefinitions: this.customProperties,
 
     });
     ReactDom.render(element, elem);
@@ -67,7 +61,7 @@ export function PropertyFieldColumnDefinitions(targetProperty: string, propertie
       targetProperty: targetProperty,
       initialValue: properties.initialValue,
       onPropertyChange: properties.onPropertyChange,
-      properties: properties.properties,
+      columnDefinitions: properties.columnDefinitions,
       onDispose: null,
       onRender: null,
     };

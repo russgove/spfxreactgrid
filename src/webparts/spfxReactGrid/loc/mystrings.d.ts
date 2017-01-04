@@ -3,6 +3,13 @@ declare interface ISpfxReactGridStrings {
   BasicGroupName: string;
   DescriptionFieldLabel: string;
 
+  ListDefinitionFieldLabel:string;
+    /**The Label on the reset CD Button */
+  ListDefinitionsButtonSelect:string;
+   /**The Label on the reset Button */
+  ListDefinitionsButtonReset:string;
+  /**The Title on the popupPage */
+  ListDefinitionsTitle:string;
   ColumnDefinitionFieldLabel:string;
     /**The Label on the reset CD Button */
   ColumnDefinitionsButtonSelect:string;
@@ -11,7 +18,6 @@ declare interface ISpfxReactGridStrings {
   /**The Title on the popupPage */
   ColumnDefinitionsTitle:string;
 }
-
 declare module 'spfxReactGridStrings' {
   const strings: ISpfxReactGridStrings;
   export = strings;
