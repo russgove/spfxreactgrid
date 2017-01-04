@@ -14,10 +14,10 @@ import * as strings from "spfxReactGridStrings";
 export interface IPropertyFieldColumnDefinitionsHostProps {
   label: string;
   initialValue?: Array<ColumnDefinition>;
-  context: IWebPartContext;
+ // context: IWebPartContext;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
   properties: any;
-  store: any
+ // store: any
 }
 export interface IPropertyFieldColumnDefinitionsHostState {
   openPanel?: boolean;
@@ -54,19 +54,19 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
     const id = Guid.newGuid();
     const col: ColumnDefinition = new ColumnDefinition(id.toString(), "", 80, true);
     debugger;
-    this.props.store.dispatch(addColumn(col));
+ //   this.props.store.dispatch(addColumn(col));
   }
   saveColumn(updatedRowData): void {
     debugger;
-    this.props.store.dispatch(saveColumn(updatedRowData));
+ ///   this.props.store.dispatch(saveColumn(updatedRowData));
   }
   removeColumn(column): void {
     debugger;
-    this.props.store.dispatch(removeColumn(column));
+ //   this.props.store.dispatch(removeColumn(column));
   }
   removeAllColumns(): void {
     debugger;
-    this.props.store.dispatch(removeAllColumns());
+  //  this.props.store.dispatch(removeAllColumns());
   }
   moveColumnUp(column: ColumnDefinition): void {
     debugger;
@@ -77,7 +77,7 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
   }
   moveColumnDown(column): void {
     debugger;
-    this.props.store.dispatch(moveCulumnDown(column));
+  //  this.props.store.dispatch(moveCulumnDown(column));
   }
   private saveChanges(): void {
     if (this.props.onPropertyChange) {

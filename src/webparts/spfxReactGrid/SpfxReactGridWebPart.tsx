@@ -90,11 +90,11 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
                   label: strings.DescriptionFieldLabel
                 }),
                 PropertyFieldColumnDefinitions("ColumnDefinitions", {
-                  context: this.context,
+
                   label: strings.ColumnDefinitionFieldLabel,
                   onPropertyChange: this.onPropertyChange,
                   properties: this.properties,
-                  store: store
+
                 })
               ]
             }

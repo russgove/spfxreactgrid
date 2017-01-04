@@ -18,10 +18,10 @@ export interface IPropertyFieldColumnDefinitionsProps {
 
   label: string;
   initialValue?: Array<ColumnDefinition>;
-  context: IWebPartContext;
+//  context: IWebPartContext;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
   properties: any;
-  store:any
+//  store:any
 }
 
 /**
@@ -36,12 +36,12 @@ export interface IPropertyFieldColumnDefinitionsPropsInternal extends IPropertyP
   label: string;
   initialValue?:  Array<ColumnDefinition>;
   targetProperty: string;
-  context: IWebPartContext;
+ // context: IWebPartContext;
   onRender(elem: HTMLElement): void;
   onDispose(elem: HTMLElement): void;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
   properties: any;
-  store:any;
+ // store:any;
 }
 
 /**
@@ -74,7 +74,7 @@ class PropertyFieldColumnDefinitionsBuilder implements IPropertyPaneField<IPrope
     this.properties = _properties;
     this.label = _properties.label;
   //  this.initialValue = _properties.initialValue;
-    this.context = _properties.context;
+   // this.context = _properties.context;
     this.properties.onDispose = this.dispose;
     this.properties.onRender = this.render;
     this.onPropertyChange = _properties.onPropertyChange;
@@ -91,13 +91,13 @@ class PropertyFieldColumnDefinitionsBuilder implements IPropertyPaneField<IPrope
     const element: React.ReactElement<IPropertyFieldColumnDefinitionsHostProps> = React.createElement(PropertyFieldColumnDefinitionsHost, {
       label: this.label,
      // initialValue: this.initialValue,
-      context: this.context,
+     // context: this.context,
     //  targetProperty: this.targetProperty,
     //  onDispose: this.dispose,
      // onRender: this.render,
      onPropertyChange: this.onPropertyChange,
      properties: this.customProperties,
-     store:this.properties.store
+   //  store:this.properties.store
     });
     //Calls the REACT content generator
     ReactDom.render(element, elem);
@@ -128,10 +128,10 @@ export function PropertyFieldColumnDefinitions(targetProperty: string, propertie
       initialValue: properties.initialValue,
       onPropertyChange: properties.onPropertyChange,
       properties: properties.properties,
-      context: properties.context,
+     // context: properties.context,
       onDispose: null,
       onRender: null,
-      store:properties.store
+   //   store:properties.store
 
     };
     //Calles the PropertyFieldColumnDefinitions builder object
