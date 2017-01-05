@@ -14,8 +14,8 @@ export interface IPropertyFieldListDefinitionsProps {
   label: string;
   initialValue?: Array<ListDefinition>;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-  ListDefinitions: Array<ListDefinition>;
-  ColumnDefinitions: Array<ColumnDefinition>;
+  getListDefinitions: () => Array<ListDefinition>;
+  getColumnDefinitions: () =>Array<ColumnDefinition>;
   PageContext: PageContext
 }
 export interface IPropertyFieldListDefinitionsPropsInternal extends IPropertyPaneCustomFieldProps {
@@ -77,8 +77,8 @@ export function PropertyFieldListDefinitions(targetProperty: string, properties:
     targetProperty: targetProperty,
     initialValue: properties.initialValue,
     onPropertyChange: properties.onPropertyChange,
-    ListDefinitions: properties.ListDefinitions,
-    ColumnDefinitions: properties.ColumnDefinitions,
+    ListDefinitions: properties.getListDefinitions(),
+    ColumnDefinitions: properties.getColumnDefinitions(),
     PageContext:properties.PageContext,
     onDispose: null,
     onRender: null,

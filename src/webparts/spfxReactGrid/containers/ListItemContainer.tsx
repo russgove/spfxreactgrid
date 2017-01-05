@@ -167,6 +167,14 @@ class ListItemContainer extends React.Component<IListViewPageProps, IGridState> 
 
     this.props.getListItems(this.props.listDefinitions);
   }
+  public componentWillReceiveProps(newProps:IListViewPageProps) {
+    debugger;
+      if (newProps.listDefinitions ===  this.props.listDefinitions && newProps.columns=== this.props.columns){
+        return;
+      }
+
+     this.props.getListItems(this.props.listDefinitions);
+  }
   /**
  * Method to get the parent TD of any cell,
  * The listItemId and columnID are stored as attributes of the cells parent TD.

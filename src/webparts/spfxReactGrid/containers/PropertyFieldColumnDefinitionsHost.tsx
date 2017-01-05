@@ -66,6 +66,7 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
 
       //this.props.properties.ColumnDefinitions = this.state.columnDefinitions;
       this.props.onPropertyChange("ColumnDefinitions", this.props.initialValue, this.state.columnDefinitions);
+      this.onClosePanel();
     }
   }
   private onOpenPanel(element?: any): void {

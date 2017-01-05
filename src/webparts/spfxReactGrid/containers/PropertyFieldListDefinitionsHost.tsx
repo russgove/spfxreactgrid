@@ -47,7 +47,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
       Sites: []
     };
   }
-  getWebs(siteUrl: string): any {
+  private getWebs(siteUrl: string): any {
     debugger;
     const site: SPSite = new SPSite(siteUrl);
     const promise = site.rootWeb.webs.orderBy("Title").get()
@@ -68,7 +68,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
     return promise;
   }
 
-  getListsForWeb(webUrl: string): any {
+  private getListsForWeb(webUrl: string): any {
     debugger;
     const web = new SPWeb(webUrl);
     const promise = web.lists.orderBy("Title").get()
@@ -93,7 +93,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
     return promise;
   }
 
-  getFieldsForList(webUrl: string, listId: string): any {
+  private getFieldsForList(webUrl: string, listId: string): any {
     debugger;
     const web = new SPWeb(webUrl);
     const promise = web.lists.getById(listId).fields.filter("Hidden eq false").orderBy("Title").get()
@@ -113,6 +113,8 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
             }
           }
         }
+        this.setState(this.state);
+
       })
       .catch((error) => {
         console.log(error);
@@ -154,6 +156,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
 
       //this.props.properties.ListDefinitions = this.state.ListDefinitions;
       this.props.onPropertyChange("ListDefinitions", this.props.initialValue, this.state.ListDefinitions);
+      this.onClosePanel();
     }
   }
   private onOpenPanel(element?: any): void {

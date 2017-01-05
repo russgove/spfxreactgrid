@@ -12,7 +12,7 @@ export interface IPropertyFieldColumnDefinitionsProps {
   label: string;
   initialValue?: Array<ColumnDefinition>;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-  columnDefinitions: Array<ColumnDefinition>;
+    getColumnDefinitions: () =>Array<ColumnDefinition>;
 }
 export interface IPropertyFieldColumnDefinitionsPropsInternal extends IPropertyPaneCustomFieldProps {
   label: string;
@@ -61,7 +61,7 @@ export function PropertyFieldColumnDefinitions(targetProperty: string, propertie
       targetProperty: targetProperty,
       initialValue: properties.initialValue,
       onPropertyChange: properties.onPropertyChange,
-      columnDefinitions: properties.columnDefinitions,
+      columnDefinitions: properties.getColumnDefinitions(),
       onDispose: null,
       onRender: null,
     };

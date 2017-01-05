@@ -209,7 +209,7 @@ export class ListDefinitionContainerNative extends React.Component<IListViewPage
     else {
       this.updateExtendedColumn(entity, columnid, value);
     }
-    this.props.saveList(entity);
+  //  this.props.saveList(entity);
   }
 
   public addList(event): any {
