@@ -35,9 +35,7 @@ class App extends React.Component<IAppProps, void> {
     const { children} = this.props;
     return (
       <div>
-        <Button> <Link to="/lists">List Definitions</Link></Button>
-        <Button> <Link to="/columns">Column Definitions</Link></Button>
-        <Button> <Link to="/">List Items</Link></Button>
+
         <div>
           {this.messageBar(this.props.systemStatus.fetchStatus)}
           <div>{this.props.systemStatus.currentAction}
