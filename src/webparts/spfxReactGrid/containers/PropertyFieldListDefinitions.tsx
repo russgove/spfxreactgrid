@@ -56,7 +56,7 @@ class PropertyFieldListDefinitionsBuilder implements IPropertyPaneField<IPropert
     debugger;
     const ldProps: IPropertyFieldListDefinitionsHostProps = {
       label: this.label,
-      ColumnDefinitions: new Array<ColumnDefinition>(),
+      ColumnDefinitions: this.properties.ColumnDefinitions,
       onPropertyChange: this.onPropertyChange,
       ListDefinitions: this.customProperties,
       PageContext: this.properties.PageContext

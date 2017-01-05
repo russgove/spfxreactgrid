@@ -101,7 +101,18 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
         const data = _.map(response, (item: any) => {
           return new WebListField(item.id, new utils.ParsedSPField(item.InternalName, item.Title).toString(), item);
         });
-        console.log(data);
+        for (const site of this.state.Sites) {
+          for (const web of site.webs) {
+            if (web.url === webUrl) {
+              for (const list of web.lists) {
+                if (list.id === listId) {
+                  list.fields = data;
+                  list.fieldsFetched = true;
+                }
+              }
+            }
+          }
+        }
       })
       .catch((error) => {
         console.log(error);

@@ -10,8 +10,8 @@ import { Provider } from "react-redux";
 import configureStore from "./store/configure-store";
 const { Router, createMemoryHistory } = require("react-router");
 
-import { addLists } from "./actions/listActions";
 import { addColumns, removeAllColumns } from "./actions/columnActions";
+import { addLists, removeAllLists } from "./actions/listActions";
 import { addPageContext } from "./actions/PageContextActions";
 import { PropertyFieldColumnDefinitions, IPropertyFieldColumnDefinitionsProps } from "./containers/PropertyFieldColumnDefinitions";
 import { PropertyFieldListDefinitions, IPropertyFieldListDefinitionsProps } from "./containers/PropertyFieldListDefinitions";
@@ -46,7 +46,7 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
 
     store.dispatch(addLists(this.properties.lists));
     store.dispatch(addColumns(this.properties.columns));
-    store.dispatch(addPageContext(this.context.pageContext));
+  //  store.dispatch(addPageContext(this.context.pageContext));
     Log.verbose("SpfxReactGridWebPart", "In render of SpfxReactGridWebPart");
     ReactDom.render(App(), this.domElement);
   }
@@ -63,12 +63,18 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
     return super.onBeforeSerialize();
   }
   private onPropertyChange(propertyPath: string, oldValue: any, newValue: any) {
-
+debugger;
     switch (propertyPath) {
       case "ColumnDefinitions":
         this.properties.columns = newValue;
         store.dispatch(removeAllColumns());
         store.dispatch(addColumns(this.properties.columns));
+
+        break;
+         case "ListDefinitions":
+        this.properties.lists = newValue;
+        store.dispatch(removeAllLists());
+        store.dispatch(addLists(this.properties.lists));
 
         break;
       default:
