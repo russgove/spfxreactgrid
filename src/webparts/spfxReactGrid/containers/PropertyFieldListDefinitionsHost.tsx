@@ -37,6 +37,9 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
     this.addList = this.addList.bind(this);
     this.moveListUp = this.moveListUp.bind(this);
     this.moveListDown = this.moveListDown.bind(this);
+    this.getWebs = this.getWebs.bind(this);
+    this.getListsForWeb = this.getListsForWeb.bind(this);
+    this.getFieldsForList = this.getFieldsForList.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
     this.state = {
       ListDefinitions: this.props.ListDefinitions,
@@ -56,7 +59,6 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
         console.log(data);
         let site: Site = new Site(siteUrl);
         site.webs = data;
-
         this.state.Sites.push(site);
         this.setState(this.state);
       })
@@ -74,6 +76,16 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
         const data = _.map(response, (item: any) => {
           return new WebList(item.Id, item.Title, item.Url, );
         });
+        for (const site of this.state.Sites) {
+          for (const web of site.webs) {
+            if (web.url === webUrl) {
+              web.lists = data;
+              web.listsFetched = true;
+            }
+          }
+        }
+        this.setState(this.state);
+
       })
       .catch((error) => {
         console.log(error);
@@ -96,9 +108,9 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
       });
     return promise;
   }
-  private addList(): void {
+  private addList(siteUrl): void {
     const id = Guid.newGuid();
-    const list: ListDefinition = new ListDefinition(id.toString(), null, null, "", null, null);
+    const list: ListDefinition = new ListDefinition(id.toString(), null, null, siteUrl, null, null);
 
     this.state.ListDefinitions.push(list);
     this.setState(this.state);
@@ -165,6 +177,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
               removeList={this.removeList}
               sites={this.state.Sites}
               saveList={this.saveChanges}
+              save={this.saveChanges}
               pageContext={this.props.PageContext}
               />
 

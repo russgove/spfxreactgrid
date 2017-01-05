@@ -41,7 +41,7 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
     super(context);
     Log.verbose("SpfxReactGridWebPart", "In constructor of SpfxReactGridWebPart");
     this.onPropertyChange = this.onPropertyChange.bind(this);
-    }
+  }
   public render(): void {
 
     store.dispatch(addLists(this.properties.lists));
@@ -76,18 +76,20 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
     }
   };
   protected get propertyPaneSettings(): IPropertyPaneSettings {
+    debugger;
+
     Log.verbose("SpfxReactGridWebPart", "In propertyPaneSettings of SpfxReactGridWebPart");
     const cdProps: IPropertyFieldColumnDefinitionsProps = {
       label: strings.ColumnDefinitionFieldLabel,
       onPropertyChange: this.onPropertyChange,
-      columnDefinitions: this.properties.columns,
+      columnDefinitions: this.properties.columns || [],
 
     };
     const ldProps: IPropertyFieldListDefinitionsProps = {
       label: strings.ListDefinitionFieldLabel,
       onPropertyChange: this.onPropertyChange,
-      ColumnDefinitions: this.properties.columns,
-      ListDefinitions: this.properties.lists,
+      ColumnDefinitions: this.properties.columns || [],
+      ListDefinitions: this.properties.lists || [],
       PageContext: this.context.pageContext
 
     };

@@ -36,6 +36,7 @@ export interface IListViewPageProps extends React.Props<any> {
   getWebs: (siteUrl) => Promise<any>;
   getListsForWeb: (webUrl) => Promise<any>;
   getFieldsForList: (webUrl, listId) => Promise<any>;
+  save: () => void;
   pageContext: PageContext;
 }
 function mapStateToProps(state) {
@@ -322,7 +323,7 @@ export class ListDefinitionContainerNative extends React.Component<IListViewPage
     switch (column.editor) {
 
       case "WebEditor":
-      debugger;
+        debugger;
         let webs = this.getWebsForSite(entity);
         return (<WebEditor webs={webs} selectedValue={columnValue} onChange={cellUpdated} />);
       case "ListEditor":
@@ -423,12 +424,10 @@ export class ListDefinitionContainerNative extends React.Component<IListViewPage
   }
 
   public render() {
-debugger;
+    debugger;
     return (
       <Container testid="columns" size={2} center>
-        <h1>List Definitions</h1>
-
-        <CommandBar items={[{
+         <CommandBar items={[{
           key: "Add LIST",
           name: "Add a List",
           icon: "Add",
@@ -447,6 +446,13 @@ debugger;
           isChecked: true,
           icon: "ClearFilter"
 
+        },
+        {
+          key: "save",
+          name: "save",
+          canCheck: true,
+          icon: "Save",
+          onClick: this.props.save
         }]} />
 
         <table border="1">

@@ -76,9 +76,9 @@ function mapDispatchToProps(dispatch) {
         moveColumnDown: (column): void => {
             dispatch(moveCulumnDown(column));
         },
-         save: (column): void => {
-     //      // dispatch(moveCulumnDown(column));
-       },
+        save: (column): void => {
+            //      // dispatch(moveCulumnDown(column));
+        },
     };
 }
 
@@ -149,7 +149,7 @@ export class ColumnDefinitionContainerNative extends React.Component<IColumnsPag
         const entity: ColumnDefinition = this.props.columns.find((temp) => temp.guid === entityid);
         const column = this.gridColulumns.find(temp => temp.id === columnid);
         entity[column.name] = value;
-      //  this.props.saveColumn(entity);
+        //  this.props.saveColumn(entity);
 
     }
 
@@ -311,7 +311,6 @@ export class ColumnDefinitionContainerNative extends React.Component<IColumnsPag
         const {  addColumn } = this.props;
         return (
             <Container testid="columns" size={2} center>
-                <h1>Column Definitions</h1>
                 <CommandBar items={[{
                     key: "AddColumns",
                     name: "Add a Column",
@@ -325,7 +324,7 @@ export class ColumnDefinitionContainerNative extends React.Component<IColumnsPag
                     icon: "Delete",
                     onClick: this.props.removeAllColumns
                 },
-                        {
+                {
                     key: "save",
                     name: "save",
                     canCheck: true,
