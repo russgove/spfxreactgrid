@@ -1,7 +1,7 @@
 ﻿import * as React from "react";
 import { SharePointLookupCellFormatter } from "../components/SharePointFormatters";
 const connect = require("react-redux").connect;
-import { addColumn, removeColumn, saveColumn, removeAllColumns, moveCulumnUp, moveCulumnDown } from "../actions/columnActions";
+import { addColumn, removeColumn,  removeAllColumns, moveCulumnUp, moveCulumnDown } from "../actions/columnActions";
 import ColumnDefinition from "../model/ColumnDefinition";
 import { Button, ButtonType, TextField, CommandBar, Dropdown, IDropdownOption, Toggle } from "office-ui-fabric-react";
 import Container from "../components/container";

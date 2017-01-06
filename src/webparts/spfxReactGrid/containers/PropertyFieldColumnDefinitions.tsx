@@ -7,7 +7,7 @@ import {
   IPropertyPaneCustomFieldProps
 } from '@microsoft/sp-webpart-base';
 import PropertyFieldColumnDefinitionsHost, { IPropertyFieldColumnDefinitionsHostProps } from './PropertyFieldColumnDefinitionsHost';
-import { IWebPartContext } from '@microsoft/sp-webpart-base';
+
 export interface IPropertyFieldColumnDefinitionsProps {
   label: string;
   initialValue?: Array<ColumnDefinition>;

@@ -5,12 +5,11 @@ import configureStore from "./store/configure-store";
 const { Router, createMemoryHistory } = require("react-router");
 import { addColumns, removeAllColumns } from "./actions/columnActions";
 import { addLists, removeAllLists } from "./actions/listActions";
-import { addPageContext } from "./actions/PageContextActions";
 import { PropertyFieldColumnDefinitions, IPropertyFieldColumnDefinitionsProps } from "./containers/PropertyFieldColumnDefinitions";
 import { PropertyFieldListDefinitions, IPropertyFieldListDefinitionsProps } from "./containers/PropertyFieldListDefinitions";
 import {
   BaseClientSideWebPart,
-  IPropertyPaneSettings, IWebPartData, IHtmlProperties,
+  IPropertyPaneSettings,
   IWebPartContext,
   PropertyPaneTextField
 } from "@microsoft/sp-webpart-base";
@@ -38,13 +37,19 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
       this.cdProps = {
         label: strings.ColumnDefinitionFieldLabel,
         onPropertyChange: this.onPropertyChange,
-        getColumnDefinitions: ()=>{return this.properties.columns||[]},
+        getColumnDefinitions: ()=>{
+          return this.properties.columns||[];
+        },
       };
       this.ldProps = {
         label: strings.ListDefinitionFieldLabel,
         onPropertyChange: this.onPropertyChange,
-        getColumnDefinitions: ()=>{return this.properties.columns||[]},
-        getListDefinitions:() =>{return this.properties.lists||[]},
+        getColumnDefinitions: ()=>{
+          return this.properties.columns||[];
+        },
+        getListDefinitions:() =>{
+          return this.properties.lists||[];
+        },
         PageContext: this.context.pageContext
       };
   }

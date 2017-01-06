@@ -11,7 +11,7 @@ import * as strings from "spfxReactGridStrings";
 import * as utils from "../utils/utils";
 import { Web as SPWeb } from "sp-pnp-js";
 import { Site as SPSite } from "sp-pnp-js";
-import { Guid, Log, PageContext } from "@microsoft/sp-client-base";
+import { Guid,  PageContext } from "@microsoft/sp-client-base";
 
 export interface IPropertyFieldListDefinitionsHostProps {
   label: string;
@@ -49,8 +49,8 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
   }
   private getWebs(siteUrl: string): any {
     debugger;
-    const site: SPSite = new SPSite(siteUrl);
-    const promise = site.rootWeb.webs.orderBy("Title").get()
+    const spSite: SPSite = new SPSite(siteUrl);
+    const promise = spSite.rootWeb.webs.orderBy("Title").get()
       .then((response) => {
         const data = _.map(response, (item: any) => {
           const web: Web = new Web(item.Id, item.Title, item.Url);
@@ -70,8 +70,8 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
 
   private getListsForWeb(webUrl: string): any {
     debugger;
-    const web = new SPWeb(webUrl);
-    const promise = web.lists.orderBy("Title").get()
+    const spWeb = new SPWeb(webUrl);
+    const promise = spWeb.lists.orderBy("Title").get()
       .then((response) => {
         const data = _.map(response, (item: any) => {
           return new WebList(item.Id, item.Title, item.Url, );
@@ -95,8 +95,8 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
 
   private getFieldsForList(webUrl: string, listId: string): any {
     debugger;
-    const web = new SPWeb(webUrl);
-    const promise = web.lists.getById(listId).fields.filter("Hidden eq false").orderBy("Title").get()
+    const spWeb = new SPWeb(webUrl);
+    const promise = spWeb.lists.getById(listId).fields.filter("Hidden eq false").orderBy("Title").get()
       .then((response) => {
         const data = _.map(response, (item: any) => {
           return new WebListField(item.id, new utils.ParsedSPField(item.InternalName, item.Title).toString(), item);

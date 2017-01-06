@@ -1,12 +1,10 @@
 import * as React from "react";
 import {
-  Button,
   MessageBar,
   MessageBarType
 } from "office-ui-fabric-react";
 const connect = require("react-redux").connect;
 import SystemStatus from "../model/SystemStatus";
-const Link = require("react-router").Link;
 import Content from "../components/content";
 interface IAppProps extends React.Props<any> {
   systemStatus: SystemStatus;

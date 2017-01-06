@@ -8,15 +8,14 @@ import {
   IPropertyPaneCustomFieldProps
 } from '@microsoft/sp-webpart-base';
 import PropertyFieldListDefinitionsHost, { IPropertyFieldListDefinitionsHostProps } from './PropertyFieldListDefinitionsHost';
-import { IWebPartContext } from '@microsoft/sp-webpart-base';
-import { Guid, Log, PageContext } from "@microsoft/sp-client-base";
+import {  PageContext } from "@microsoft/sp-client-base";
 export interface IPropertyFieldListDefinitionsProps {
   label: string;
   initialValue?: Array<ListDefinition>;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
   getListDefinitions: () => Array<ListDefinition>;
   getColumnDefinitions: () =>Array<ColumnDefinition>;
-  PageContext: PageContext
+  PageContext: PageContext;
 }
 export interface IPropertyFieldListDefinitionsPropsInternal extends IPropertyPaneCustomFieldProps {
   label: string;
@@ -38,8 +37,6 @@ class PropertyFieldListDefinitionsBuilder implements IPropertyPaneField<IPropert
 
   //Custom properties
   private label: string;
-  private initialValue: string;
-  private context: IWebPartContext;
   private onPropertyChange: (propertyPath: string, oldValue: any, newValue: any) => void;
   private customProperties: any;
   public constructor(_targetProperty: string, _properties: IPropertyFieldListDefinitionsPropsInternal) {
