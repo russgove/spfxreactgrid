@@ -38,13 +38,13 @@ export default class SpfxReactGridWebPart extends BaseClientSideWebPart<ISpfxRea
       this.cdProps = {
         label: strings.ColumnDefinitionFieldLabel,
         onPropertyChange: this.onPropertyChange,
-        getColumnDefinitions: ()=>{return this.properties.columns},
+        getColumnDefinitions: ()=>{return this.properties.columns||[]},
       };
       this.ldProps = {
         label: strings.ListDefinitionFieldLabel,
         onPropertyChange: this.onPropertyChange,
-        getColumnDefinitions: ()=>{return this.properties.columns},
-        getListDefinitions:() =>{return this.properties.lists},
+        getColumnDefinitions: ()=>{return this.properties.columns||[]},
+        getListDefinitions:() =>{return this.properties.lists||[]},
         PageContext: this.context.pageContext
       };
   }
