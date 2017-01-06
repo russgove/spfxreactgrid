@@ -63,8 +63,6 @@ export default class PropertyFieldColumnDefinitionsHost extends React.Component<
   }
   private saveChanges(): void {
     if (this.props.onPropertyChange) {
-
-      //this.props.properties.ColumnDefinitions = this.state.columnDefinitions;
       this.props.onPropertyChange("ColumnDefinitions", this.props.initialValue, this.state.columnDefinitions);
       this.onClosePanel();
     }

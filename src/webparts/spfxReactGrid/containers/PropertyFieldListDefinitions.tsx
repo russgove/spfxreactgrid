@@ -24,8 +24,8 @@ export interface IPropertyFieldListDefinitionsPropsInternal extends IPropertyPan
   onRender(elem: HTMLElement): void;
   onDispose(elem: HTMLElement): void;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-  ListDefinitions: Array<ListDefinition>;
-  ColumnDefinitions: Array<ColumnDefinition>;
+   getListDefinitions: () => Array<ListDefinition>;
+  getColumnDefinitions: () =>Array<ColumnDefinition>;
     PageContext: PageContext;
 }
 class PropertyFieldListDefinitionsBuilder implements IPropertyPaneField<IPropertyFieldListDefinitionsPropsInternal> {
@@ -47,15 +47,14 @@ class PropertyFieldListDefinitionsBuilder implements IPropertyPaneField<IPropert
     this.properties.onDispose = this.dispose;
     this.properties.onRender = this.render;
     this.onPropertyChange = _properties.onPropertyChange;
-    this.customProperties = _properties.ListDefinitions;
   }
   private render(elem: HTMLElement): void {
     debugger;
     const ldProps: IPropertyFieldListDefinitionsHostProps = {
       label: this.label,
-      ColumnDefinitions: this.properties.ColumnDefinitions,
+      getColumnDefinitions: this.properties.getColumnDefinitions,
+      getListDefinitions: this.properties.getListDefinitions,
       onPropertyChange: this.onPropertyChange,
-      ListDefinitions: this.customProperties,
       PageContext: this.properties.PageContext
 
     };
@@ -74,8 +73,8 @@ export function PropertyFieldListDefinitions(targetProperty: string, properties:
     targetProperty: targetProperty,
     initialValue: properties.initialValue,
     onPropertyChange: properties.onPropertyChange,
-    ListDefinitions: properties.getListDefinitions(),
-    ColumnDefinitions: properties.getColumnDefinitions(),
+    getListDefinitions: properties.getListDefinitions,
+    getColumnDefinitions: properties.getColumnDefinitions,
     PageContext:properties.PageContext,
     onDispose: null,
     onRender: null,

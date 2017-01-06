@@ -11,14 +11,14 @@ import * as strings from "spfxReactGridStrings";
 import * as utils from "../utils/utils";
 import { Web as SPWeb } from "sp-pnp-js";
 import { Site as SPSite } from "sp-pnp-js";
-import { Guid,  PageContext } from "@microsoft/sp-client-base";
+import { Guid, PageContext } from "@microsoft/sp-client-base";
 
 export interface IPropertyFieldListDefinitionsHostProps {
   label: string;
   initialValue?: Array<ListDefinition>;
   onPropertyChange(propertyPath: string, oldValue: any, newValue: any): void;
-  ListDefinitions: Array<ListDefinition>;
-  ColumnDefinitions: Array<ColumnDefinition>;
+  getListDefinitions: () => Array<ListDefinition>;
+  getColumnDefinitions: () => Array<ColumnDefinition>;
   PageContext: PageContext;
 }
 export interface IPropertyFieldListDefinitionsHostState {
@@ -42,7 +42,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
     this.getFieldsForList = this.getFieldsForList.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
     this.state = {
-      ListDefinitions: this.props.ListDefinitions,
+      ListDefinitions: this.props.getListDefinitions(),
       openPanel: false,
       Sites: []
     };
@@ -153,8 +153,6 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
   }
   private saveChanges(): void {
     if (this.props.onPropertyChange) {
-
-      //this.props.properties.ListDefinitions = this.state.ListDefinitions;
       this.props.onPropertyChange("ListDefinitions", this.props.initialValue, this.state.ListDefinitions);
       this.onClosePanel();
     }
@@ -181,7 +179,7 @@ export default class PropertyFieldListDefinitionsHost extends React.Component<IP
             isLightDismiss={true} type={PanelType.large}
             headerText={strings.ListDefinitionsTitle}>
             <ListDefinitionContainerNative
-              columnRefs={this.props.ColumnDefinitions}
+              columnRefs={this.props.getColumnDefinitions()}
               lists={this.state.ListDefinitions}
               addList={this.addList}
               getFieldsForList={this.getFieldsForList}
